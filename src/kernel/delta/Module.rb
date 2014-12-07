@@ -1,9 +1,5 @@
 class Module
 
-  def clone
-    raise NotImplementedError , "Module#clone"
-  end
-
   # Invoked as a callback when a reference to an undefined symbol is made.
   def const_missing(symbol)
     raise NameError, "uninitialized constant #{symbol}"
@@ -28,7 +24,7 @@ class Module
   primitive '__ruby_instance_methods', 'rubyInstanceMethods:protection:'
 
   def methods(regular = true)
-    set = self.__ruby_singleton_methods(false, -1)  # include protected meths
+    set = self.__ruby_methods(false, -1)  # include protected meths
     if regular
       set =  set + self.__ruby_methods(true, -1) # include protected meths
     end
@@ -66,12 +62,12 @@ class Module
     path.to_s.split('::').each do |n|
       next if n.empty?
       if ns.const_defined?(n)
-	ns = ns.const_get(n)
+        ns = ns.const_get(n)
       else
-	raise ArgumentError, "undefined class/module #{n}"
+        raise ArgumentError, "undefined class/module #{n}"
       end
       unless ns._kind_of?(Module)
-	raise TypeError, "#{ns} in #{path} does not refer to class/module"
+        raise TypeError, "#{ns} in #{path} does not refer to class/module"
       end
     end
     ns
@@ -88,7 +84,7 @@ class Module
       sym = name
       str = name.to_s
     else
-      str = Type.coerce_to(name, String, :to_str)
+      str = Maglev::Type.coerce_to(name, String, :to_str)
       sym = nil
     end
     unless str =~ /^[A-Z](\w)*\z/

@@ -1,0 +1,3 @@
+fails:Matrix.lower_triangular? returns true for a square lower triangular Matrix
+fails:Matrix.lower_triangular? returns true for an empty Matrix
+fails:Matrix.lower_triangular? returns false for a non lower triangular square Matrix

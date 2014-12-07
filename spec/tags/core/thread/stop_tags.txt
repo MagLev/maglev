@@ -1,0 +1,2 @@
+fails:describes a running thread
+fails:Thread#stop? describes a dying sleeping thread

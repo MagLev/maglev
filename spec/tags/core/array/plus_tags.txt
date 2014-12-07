@@ -1,1 +1,2 @@
 fails:Array#+ does not get infected even if an original array is tainted
+fails:Array#+ does not infected even if an original array is untrusted

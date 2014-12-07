@@ -27,7 +27,7 @@ class String
         s = __withAll(str)
       else
         s = __alloc
-        str = Type.coerce_to(str, String, :to_str)
+        str = Maglev::Type.coerce_to(str, String, :to_str)
         s.replace(str)
       end
     else
@@ -52,7 +52,7 @@ class String
       if self.class._equal?(String)
         # do nothing
       else
-        str = Type.coerce_to(args[0], String, :to_str)
+        str = Maglev::Type.coerce_to(args[0], String, :to_str)
         self.replace(str)
       end
     elsif len > 1
@@ -66,7 +66,7 @@ class String
     if self.class._equal?(String)
       # do nothing
     else
-      str = Type.coerce_to(str, String, :to_str)
+      str = Maglev::Type.coerce_to(str, String, :to_str)
       self.replace(str)
     end
     self
@@ -77,7 +77,7 @@ class String
     if self.class._equal?(String)
       # do nothing
     else
-      str = Type.coerce_to(str, String, :to_str)
+      str = Maglev::Type.coerce_to(str, String, :to_str)
       self.replace(str)
     end
     self
@@ -117,7 +117,7 @@ class String
   end
 
   def *(n)
-    n = Type.coerce_to(n, Integer, :to_int)
+    n = Maglev::Type.coerce_to(n, Integer, :to_int)
     unless n._isFixnum
       if n._isInteger
         raise RangeError , 'arg exceeds max Fixnum'
@@ -167,7 +167,7 @@ class String
       # range checked in  __append primitive
       other = arg
     else
-      other = Type.coerce_to(arg, String, :to_str)
+      other = Maglev::Type.coerce_to(arg, String, :to_str)
     end
     self.__append(other)
     # self.taint if other.tainted?
@@ -242,7 +242,7 @@ class String
         return nil
       end
       return nil if o._isSymbol
-      o = Type.coerce_to(o, String, :to_str)
+      o = Maglev::Type.coerce_to(o, String, :to_str)
     end
     i = 1
     o_size = o.__size
@@ -326,7 +326,7 @@ class String
     elsif index._isInteger
       raise ArgumentError, 'String#[index] primitive failed'
     else
-      index = Type.__coerce_to_Fixnum_to_int(index)
+      index = Maglev::Type.__coerce_to_Fixnum_to_int(index)
       self.__at(index)
     end
   end
@@ -346,11 +346,11 @@ class String
         if length._isFixnum
           raise ArgumentError, 'String#[start,length] primitive failed'
         else
-          length = Type.__coerce_to_Fixnum_to_int(length)
+          length = Maglev::Type.__coerce_to_Fixnum_to_int(length)
         end
       else
-        start = Type.__coerce_to_Fixnum_to_int(start)
-        length = Type.coerce_to(length, Fixnum, :to_int)
+        start = Maglev::Type.__coerce_to_Fixnum_to_int(start)
+        length = Maglev::Type.coerce_to(length, Fixnum, :to_int)
       end
       # no tainted logic
       return nil if length < 0
@@ -379,7 +379,7 @@ class String
     if value._isFixnum || value._isString
       # ok
     else
-      value = Type.__coerce_to_String_to_str( value )
+      value = Maglev::Type.__coerce_to_String_to_str( value )
       val_coerced = true
     end
     if index._isFixnum
@@ -395,7 +395,7 @@ class String
         self.__at_length_put( arr[0] , arr[1], value)
       end
     else
-      index = Type.coerce_to(index, Fixnum, :to_int)
+      index = Maglev::Type.coerce_to(index, Fixnum, :to_int)
       self.__at_put(index, value)
     end
     # taint if value.tainted?
@@ -407,9 +407,9 @@ class String
   # smalltalk code handles Regexp and Fixnum first args
 
   def __prim_at_length_put_failed(index, count, value)
-    index = Type.coerce_to(index, Fixnum, :to_int)
-    str_value = Type.coerce_to(value, String, :to_str)
-    count = Type.coerce_to(count, Fixnum, :to_int)
+    index = Maglev::Type.coerce_to(index, Fixnum, :to_int)
+    str_value = Maglev::Type.coerce_to(value, String, :to_str)
+    count = Maglev::Type.coerce_to(count, Fixnum, :to_int)
     self.__at_length_put(idx, count, str_value)
     # no taint logic
   end
@@ -468,13 +468,13 @@ class String
     return nil  if sep._equal?(nil)
     my_size = self.__size
     return nil  if my_size._equal?(0)
-    sep = Type.coerce_to(sep, String, :to_str)
+    sep = Maglev::Type.coerce_to(sep, String, :to_str)
     if sep == "\n"
       last_ch = self.__at(-1)
       diminish_by = 0
-      if last_ch._equal?( ?\n )
-        diminish_by += 1 if self.__at(-2)._equal?( ?\r ) && my_size > 1
-      elsif last_ch._not_equal?( ?\r )
+      if last_ch.eql?( ?\n )
+        diminish_by += 1 if self.__at(-2).eql?( ?\r ) && my_size > 1
+      elsif last_ch.not_eql?( ?\r )
         return nil
       end
       diminish_by += 1
@@ -483,8 +483,8 @@ class String
       separator_sz = sep.__size
       if separator_sz._equal?(0)
         sz = my_size
-        while sz > 0 && self.__at(sz-1)._equal?( ?\n )
-          if sz > 1 && self.__at(sz-2)._equal?( ?\r )
+        while sz > 0 && self.__at(sz-1).eql?( ?\n )
+          if sz > 1 && self.__at(sz-2).eql?( ?\r )
             sz -= 2
           else
             sz -= 1
@@ -535,8 +535,8 @@ class String
   def chop!
     my_size = self.__size
     if my_size._not_equal?( 0 )
-      if self.__at(-1)._equal?( ?\n )
-        if my_size > 1 && self.__at(-2)._equal?( ?\r )
+      if self.__at(-1).eql?( ?\n )
+        if my_size > 1 && self.__at(-2).eql?( ?\r )
           self.__size=(my_size - 2)
         else
           self.__size=(my_size - 1)
@@ -619,7 +619,7 @@ class String
       block.call(self)
       return self
     end
-    sep = Type.coerce_to(a_sep, String, :to_str)
+    sep = Maglev::Type.coerce_to(a_sep, String, :to_str)
 
     # algorithm replicated in   StringEachEnumerator
     # id = self.__id__
@@ -642,12 +642,12 @@ class String
       end
     elsif sep_size._equal?(0)
       while i < my_size
-        if self.__at(i)._equal?( ?\n )
-          if self.__at(i+=1)._not_equal?( ?\n )
+        if self.__at(i).eql?( ?\n )
+          if self.__at(i+=1).not_eql?( ?\n )
             i += 1
             next
           end
-          i += 1 while i < my_size && self.__at(i)._equal?( ?\n )
+          i += 1 while i < my_size && self.__at(i).eql?( ?\n )
         end
         if i > 0 && self.__at(i-1)._equal?( newline )
           line = self.__at(last, i-last)
@@ -692,7 +692,7 @@ class String
     # Do not cache size before looping.  Specs require
     # us to go to new end when string grows or shrinks in the yield.
     while n < self.__size
-      block.call( self.__at(n) )
+      block.call( self.__ordAt(n) )
       n = n + 1
     end
     self
@@ -709,7 +709,7 @@ class String
     while n < lim
       str = args[n]
       begin
-        str = Type.coerce_to(str, String, :to_str)
+        str = Maglev::Type.coerce_to(str, String, :to_str)
         if self.__at_equals(my_siz - str.__size + 1 , str)
           return true
         end
@@ -723,46 +723,16 @@ class String
 
   primitive 'eql?', '='
 
+  def not_eql?(other)
+    not self.eql?(other)
+  end
+
   def _gsub_copyfrom_to(from, match_start)
     to = match_start # match_start is zero based
     if to > (sz = self.__size)
       to = sz
     end
     self.__copyfrom_to( from + 1 , to )
-  end
-
-  # Generic version of gsub, for aliasing
-  # ELSE BRANCH COPIED FROM SPECIALIZED VERSION
-  def gsub(regex, str=nil, &block)
-    if str
-      _gsub_internal(regex, str)[0]
-    else
-      # if block_given?,
-      #  $~ and related variables will be valid in block if
-      #   blocks's home method and caller's home method are the same
-      unless block_given?
-        # updating of $~ not implemented yet on  this path
-        return StringGsubEnumerator.new(self, :gsub, regex) # for 1.8.7
-      end
-      start = 0
-      out = self.class.__alloc
-      last_match = nil
-      self.__get_pattern(regex, true).__each_match_vcgl(self, 0x30) do |match|
-        last_match = match
-        out.__append_internal(self._gsub_copyfrom_to(start, match.begin(0)))
-        saveTilde = block.__fetchRubyVcGlobal(0)
-        begin
-          block.__setRubyVcGlobal(0, match)
-          out.__append_internal(block.call(match.__at(0)).to_s)
-        ensure
-          block.__setRubyVcGlobal(0, saveTilde)
-        end
-        start = match.end(0)
-      end
-      out.__append_internal(self.__copyfrom_to(start + 1, self.__size))
-      last_match.__storeRubyVcGlobal(0x20) # store into caller's $~
-      out
-    end
   end
 
   # Returns a copy of <i>self</i> with <em>all</em> occurrences of <i>pattern</i>
@@ -786,8 +756,24 @@ class String
   #   "hello".gsub(/[aeiou]/, '*')              #=> "h*ll*"
   #   "hello".gsub(/([aeiou])/, '<\1>')         #=> "h<e>ll<o>"
   #   "hello".gsub(/./) {|s| s[0].to_s + ' '}   #=> "104 101 108 108 111 "
-  def gsub(regex, str)
-    _gsub_internal(regex, str)[0]
+  #
+  # Generic version of gsub, for aliasing
+  # BOTH BRANCHES COPIED FROM SPECIALIZED VERSIONS BELOW
+  def gsub(regex, replacement=MaglevUndefined, &block)
+    if !replacement._equal?(MaglevUndefined)
+      __gsub_perform_substitution(regex, replacement)[0]
+    elsif block
+      __gsub_perform_block_substitution(regex, &block)
+    else
+      StringGsubEnumerator.new(self, :gsub, regex)
+    end
+  end
+
+  # specialized version for invocation with block
+  # COPY TO ELSE BRANCH OF GENERIC VERSION ABOVE IF CHANGED
+  def gsub(regex, &block)
+    return StringGsubEnumerator.new(self, :gsub, regex) unless block
+    __gsub_perform_block_substitution(regex, &block)
   end
 
   #-- Returns an array of [newvalue, modified], where modified is true if a
@@ -796,23 +782,68 @@ class String
   # incorrect results for something like "replace the last 's' with an 's'"
   # (which breaks Rails routing...)
   #++
-  def _gsub_internal(regex, str)
+  def gsub(regex, replacement)
+    __gsub_perform_substitution(regex, replacement)[0]
+  end
+
+  def __gsub_perform_substitution(regex, replacement)
+    # 1. phase convert arguments to correct types
+    hash = Maglev::Type.__coerce_to_Hash_to_hash_or_nil(replacement)
+    replacement = Maglev::Type.coerce_to(replacement, String, :to_str) if hash._equal?(nil)
+
     modified = false
-    str = Type.coerce_to(str, String, :to_str)
+    # 2. phase: prepare substitution loop
     out = self.class.__alloc
+    out.force_encoding(self.encoding) # TODO: if force encoding is implemented this should be tested
     start = 0
     pat = self.__get_pattern(regex, true)
     last_match = nil
+    # 3. phase: substitute
     pat.__each_match(self) do |match|
       modified = true
       last_match = match
+      # append string between matches
       out.__append_internal(self._gsub_copyfrom_to(start, match.begin(0)))
-      out.__append_internal(str.__to_sub_replacement(match))
+      if hash
+        # replace with hash
+        val = hash[match.to_s]
+        val = val.to_s unless val.kind_of?(String)
+      else
+        # replace with string 
+        val = replacement.__to_sub_replacement(match)
+      end
+      val.force_encoding(self.encoding) # TODO: if force encoding is implemented this should be tested
+      out.__append_internal(val)
+      start = match.end(0)
+    end
+    # append from last match to end of string
+    out.__append_internal(self.__copyfrom_to(start + 1, self.__size))
+    last_match.__storeRubyVcGlobal(0x30) # store into caller's $~
+    return [out, modified]
+  end
+  
+  def __gsub_perform_block_substitution(regex, &block)
+    # if block_given?,
+    #  $~ and related variables will be valid in block if
+    #   blocks's home method and caller's home method are the same
+    start = 0
+    out = self.class.__alloc
+    last_match = nil
+    self.__get_pattern(regex, true).__each_match_vcgl(self, 0x30) do |match|
+      last_match = match
+      out.__append_internal(self._gsub_copyfrom_to(start, match.begin(0)))
+      saveTilde = block.__fetchRubyVcGlobal(0)
+      begin
+        block.__setRubyVcGlobal(0, match)
+        out.__append_internal(block.call(match.__at(0)).to_s)
+      ensure
+        block.__setRubyVcGlobal(0, saveTilde)
+      end
       start = match.end(0)
     end
     out.__append_internal(self.__copyfrom_to(start + 1, self.__size))
     last_match.__storeRubyVcGlobal(0x30) # store into caller's $~
-    [out, modified]
+    out
   end
 
   # From Rubinius
@@ -836,17 +867,17 @@ class String
       index = current + 1
 
       cap = self.__at(index)
-      if cap._equal?( ?& )
+      if cap.eql?( ?& )
         result << match.__at(0)
-      elsif cap._equal?( ?` )
+      elsif cap.eql?( ?` )
         result << match.pre_match
-      elsif cap._equal?( ?' )
+      elsif cap.eql?( ?' )
         result << match.post_match
-      elsif cap._equal?( ?+ )
+      elsif cap.eql?( ?+ )
         result << match.captures.compact.__at(-1).to_s
       elsif cap >= ?0 && cap <= ?9
-        result << match.__at(cap - ?0 ).to_s
-      elsif cap._equal?( ?\\ ) # escaped backslash
+        result << match.__at(cap.to_i).to_s
+      elsif cap.eql?( ?\\ ) # escaped backslash
         result << '\\'
       else     # unknown escape
         result << '\\'
@@ -871,63 +902,18 @@ class String
     out
   end
 
-  # specialized version for invocation with block
-  # COPY TO ELSE BRANCH OF GENERIC VERSION ABOVE IF CHANGED
-  def gsub(regex, &block)
-    # if block_given?,
-    #  $~ and related variables will be valid in block if
-    #   blocks's home method and caller's home method are the same
-    unless block_given?
-      # updating of $~ not implemented yet on  this path
-      return StringGsubEnumerator.new(self, :gsub, regex) # for 1.8.7
-    end
-    start = 0
-    out = self.class.__alloc
-    last_match = nil
-    self.__get_pattern(regex, true).__each_match_vcgl(self, 0x30) do |match|
-      last_match = match
-      out.__append_internal(self._gsub_copyfrom_to(start, match.begin(0)))
-      saveTilde = block.__fetchRubyVcGlobal(0)
-      begin
-        block.__setRubyVcGlobal(0, match)
-        out.__append_internal(block.call(match.__at(0)).to_s)
-      ensure
-        block.__setRubyVcGlobal(0, saveTilde)
-      end
-      start = match.end(0)
-    end
-    out.__append_internal(self.__copyfrom_to(start + 1, self.__size))
-    last_match.__storeRubyVcGlobal(0x20) # store into caller's $~
-    out
-  end
-
   def gsub!(regex, str)
-    result = _gsub_internal(regex, str)
-    unless result[1]
+    result, modified = __gsub_perform_substitution(regex, str)
+    unless modified
       nil
     else
-      replace(result[0])  # replace detects frozen
+      replace(result)  # replace detects frozen
     end
   end
 
   def gsub!(regex, &block)
-    # From Rubinius
-    # $~ and related variables will be valid in block if
-    #   blocks's home method and caller's home method are the same
-    start = 0
-    out = self.class.__alloc
-    self.__get_pattern(regex, true).__each_match_vcgl(self, 0x30) do |match|
-      out.__append_internal(self._gsub_copyfrom_to(start, match.begin(0) ))
-      saveTilde = block.__fetchRubyVcGlobal(0)
-      begin
-        block.__setRubyVcGlobal(0, match)
-        out.__append_internal(block.call(match.__at(0)).to_s)
-      ensure
-        block.__setRubyVcGlobal(0, saveTilde)
-      end
-      start = match.end(0)
-    end
-    out.__append_internal(self.__copyfrom_to(start + 1, self.__size))
+    return StringGsubEnumerator.new(self, :gsub!, regex) unless block
+    out = __gsub_perform_block_substitution(regex, &block)
     if self == out
       nil
     else
@@ -938,7 +924,7 @@ class String
   def __delete_underscore_strip
     str = self
     idx = 1
-    idx = str.__indexOfByte( ?_ , 1 )
+    idx = str.__indexOfByte( ?_.ord , 1 )
     unless idx._equal?(0)
       str = str.delete('_')
     end
@@ -947,7 +933,7 @@ class String
 
   def __delete_underscore
     str = self
-    idx = str.__indexOfByte( ?_ , 1 )
+    idx = str.__indexOfByte( ?_.ord , 1 )
     unless idx._equal?(0)
       str = str.delete('_')
     end
@@ -961,7 +947,7 @@ class String
     ch = self.__at(idx)
     while idx < lim
       nxt = self.__at(idx + 1)
-      if ch._equal?( ?_ ) && nxt._equal?( ?_ )
+      if ch.eql?( ?_ ) && nxt.eql?( ?_ )
         str = self.dup
         str[idx] = ?Z
         return str
@@ -980,7 +966,7 @@ class String
     ch = str.__at(idx)
     while idx < lim
       nxt = str.__at(idx + 1)
-      if ch._equal?( ?_ ) && nxt._not_equal?( ?_ )
+      if ch.eql?( ?_ ) && nxt.not_eql?( ?_ )
         dest_idx = idx
         break
       end
@@ -989,7 +975,7 @@ class String
     end
     while idx < lim
       nxt = str.__at(idx + 1)
-      if ch._equal?( ?_ ) && nxt._not_equal?( ?_ )
+      if ch.eql?( ?_ ) && nxt.not_eql?( ?_ )
         # do not include ch in result
       else
         str[dest_idx] = ch
@@ -1011,7 +997,7 @@ class String
     s =~ /^([+-]?)(0[xX])?([[:xdigit:]]*)/
     sign_str = $1
     num = Integer.__from_string_radix( $3 , 16)
-    if sign_str[0]._equal?( ?- )
+    if sign_str[0].eql?( ?- )
       num = num * -1
     end
     num
@@ -1033,7 +1019,7 @@ class String
     if offset._equal?(MaglevUndefined)
       self.__index(item, 0, 0x50)
     else
-      offset = Type.coerce_to(offset, Integer, :to_int)
+      offset = Maglev::Type.coerce_to(offset, Integer, :to_int)
       self.__index(item, offset, 0x50)
     end
   end
@@ -1049,7 +1035,7 @@ class String
   end
 
   def index(item, offset)
-    offset = Type.coerce_to(offset, Integer, :to_int)
+    offset = Maglev::Type.coerce_to(offset, Integer, :to_int)
     self.__index(item, offset, 0x40)
   end
 
@@ -1076,7 +1062,7 @@ class String
     else
       # try to coerce to a number or string and try again,
       #   will raise TypeError if item is a Symbol .
-      coerced = Type.__coerce_to_string_or_integer(item)
+      coerced = Maglev::Type.__coerce_to_string_or_integer(item)
       return self.index(coerced, zoffset)
     end
   end
@@ -1085,8 +1071,8 @@ class String
 
   def insert(index, string)
     # account for smalltalk index
-    index = Type.coerce_to(index, Integer, :to_int)
-    string = Type.coerce_to(string, String, :to_str)
+    index = Maglev::Type.coerce_to(index, Integer, :to_int)
+    string = Maglev::Type.coerce_to(string, String, :to_str)
     idx = index < 0 ? index + size + 2 : index + 1
     if idx <= 0 || idx > size + 1
       raise IndexError, "index #{index} out of string"
@@ -1115,10 +1101,10 @@ class String
   def justify(width, direction, padstr=" ")
     # This started off as Rubinius, but was heavily modified since most
     # work is done in smalltalk.
-    padstr = Type.coerce_to(padstr, String, :to_str)
+    padstr = Maglev::Type.coerce_to(padstr, String, :to_str)
     raise ArgumentError, "zero width padding" if padstr.__size._equal?(0)
 
-    width = Type.coerce_to(width, Integer, :to_int) unless width._isFixnum
+    width = Maglev::Type.coerce_to(width, Integer, :to_int) unless width._isFixnum
     sz = size
     if width > sz
       padsize = width - sz
@@ -1169,11 +1155,11 @@ class String
     sign_str = arr.__at(1)
     body = arr.__at(2)
     first_ch = body.__at(0)
-    if first_ch._equal?( ?+ ) || first_ch._equal?( ?- )
+    if first_ch.eql?( ?+ ) || first_ch.eql?( ?- )
       return 0  # redundant sign character is not an octal digit
     end
     num = Integer.__from_string_radix(body, base)
-    if sign_str[0]._equal?( ?- )
+    if sign_str[0].eql?( ?- )
       num = num * -1
     end
     num
@@ -1200,7 +1186,7 @@ class String
       end
       return [ self.dup , '', '' ]
     else
-      pstr = Type.coerce_to(pattern, String, :to_str)
+      pstr = Maglev::Type.coerce_to(pattern, String, :to_str)
       return self.partition(pstr)
     end
   end
@@ -1259,7 +1245,7 @@ class String
       was_undef = true
       zoffset = my_size._equal?(0) ? 0 : my_size
     else
-      zoffset = Type.coerce_to(original_offset, Integer, :to_int)
+      zoffset = Maglev::Type.coerce_to(original_offset, Integer, :to_int)
       zoffset += my_size if zoffset < 0
     end
     return nil if zoffset < 0
@@ -1288,7 +1274,7 @@ class String
       zidx = item.__rindex_string(self, zoffset, vcgl_idx)
       return zidx
     else
-      coerced = Type.coerce_to(item, String, :to_str)
+      coerced = Maglev::Type.coerce_to(item, String, :to_str)
       return self.rindex(coerced, original_offset)
     end
   end
@@ -1320,7 +1306,7 @@ class String
       end
       return [ '', '', self.dup ]
     else
-      pstr = Type.coerce_to(pattern, String, :to_str)
+      pstr = Maglev::Type.coerce_to(pattern, String, :to_str)
       return self.rpartition(pstr)
     end
   end
@@ -1374,8 +1360,8 @@ class String
       # r.taint if self.tainted? or start.tainted?
       return r
     end
-    start = Type.coerce_to(start, Integer, :to_int)
-    len = Type.coerce_to(a_len, Integer, :to_int)
+    start = Maglev::Type.coerce_to(start, Integer, :to_int)
+    len = Maglev::Type.coerce_to(a_len, Integer, :to_int)
     return nil if len < 0
     return self.class.__alloc if len._equal?(0)
     start += sz if start < 0
@@ -1411,7 +1397,7 @@ class String
       return nil if start._equal?(0)
       slice!(start - 1, arg.__size) # adjust coming from smalltalk
     else
-      arg = Type.coerce_to(arg, Integer, :to_int)
+      arg = Maglev::Type.coerce_to(arg, Integer, :to_int)
       s = slice!(arg, 1)
       return nil if s._equal?(nil)
       s.__at(0)
@@ -1422,7 +1408,7 @@ class String
     md = regexp.match(self)
     md.__storeRubyVcGlobal( vcgl_idx ) # update $~
     return nil if md._equal?(nil)
-    idx = Type.coerce_to(length, Integer, :to_int)
+    idx = Maglev::Type.coerce_to(length, Integer, :to_int)
     return nil if idx >= md.size or idx < 0
     m_begin = md.begin(idx)
     m_len = md.end(idx) - m_begin
@@ -1475,7 +1461,7 @@ class String
       limited = false
       limit = nil
     else
-      limit = Type.coerce_to(limit, Integer, :to_int)
+      limit = Maglev::Type.coerce_to(limit, Integer, :to_int)
       return [self.dup] if limit._equal?(1)
       limited = limit > 0 ? true : false
       suppress_trailing_empty = limit._equal?(0)
@@ -1497,6 +1483,7 @@ class String
 
   primitive '__at_equals', 'at:equals:'  # first arg is one-based offset, no coercion
 
+
   def __split_string_on(delim, limit, limited, suppress_trailing_empty)
     results = []
     delim_length = delim.__size
@@ -1506,8 +1493,9 @@ class String
     lim = self.__size
 
     first_char = delim.__at(0)
+
     while current < lim
-      if self.__at(current)._equal?(first_char) and self.__at_equals(current + 1, delim)
+      if self.__at(current).eql?(first_char) and self.__at(current, delim_length).eql?(delim)
         results << self.__at(start, (current - start))
         count += 1
         start = current + delim_length
@@ -1528,11 +1516,11 @@ class String
   end
 
   def __is_whitespace(char)
-    char._equal?(?\ ) ||
-      char._equal?(?\t) ||
-      char._equal?(?\n) ||
-      char._equal?(?\r) ||
-      char._equal?(?\v)
+    char.eql?( ?\ .ord ) ||
+      char.eql?( ?\t.ord) ||
+      char.eql?( ?\n.ord) ||
+      char.eql?( ?\r.ord) ||
+      char.eql?( ?\v.ord)
   end
 
   # Skip contiguous whitespace starting at index and return the index of
@@ -1542,7 +1530,7 @@ class String
   def __skip_contiguous_whitespace(index)
     lim = self.__size
     while(index < lim)
-      char = self.__at(index)
+      char = self.__ordAt(index)
       return index unless char <= 32 and __is_whitespace(char)  # \t \n etc. are less than space which is 32
       index += 1
     end
@@ -1558,7 +1546,7 @@ class String
     num = limited ? limit - 1 : 0
 
     while current < eos
-      char = self.__at(current)
+      char = self.__ordAt(current)
       if char <= 32 and __is_whitespace(char)
         results << self.__at(start, (current - start))
         count += 1
@@ -1600,7 +1588,7 @@ class String
 
   def __split_regex(pattern, limit, limited, suppress_trailing_empty)
     unless pattern._isRegexp
-      pattern = Type.coerce_to(pattern, String, :to_str)
+      pattern = Maglev::Type.coerce_to(pattern, String, :to_str)
       pattern = Regexp.new(Regexp.quote(pattern))
     end
 
@@ -1665,7 +1653,7 @@ class String
     while n < lim
       str = args[n]
       begin
-        str = Type.coerce_to(str, String, :to_str)
+        str = Maglev::Type.coerce_to(str, String, :to_str)
         if self.__at_equals(1 , str)
           return true
         end
@@ -1679,7 +1667,7 @@ class String
 
   def start_with?(string)
     begin
-      str = Type.coerce_to(string, String, :to_str)
+      str = Maglev::Type.coerce_to(string, String, :to_str)
       if self.__at_equals(1 , str)
         return true
       end
@@ -1704,7 +1692,7 @@ class String
   # we don't know number of frames up stack to find caller's $~
 
   def sub(pattern, replacement)
-    replacement = Type.coerce_to(replacement, String, :to_str)
+    replacement = Maglev::Type.coerce_to(replacement, String, :to_str)
     regex = self.__get_pattern(pattern, true)
 
     # If pattern is a string, then do NOT interpret regex special characters.
@@ -1814,7 +1802,7 @@ class String
     tot = 0
     n = 0
     lim = self.__size
-    power = Type.coerce_to(power, Fixnum, :to_int)
+    power = Maglev::Type.coerce_to(power, Fixnum, :to_int)
     if power <= 0
       while n < lim
         tot = tot + self.__at(n)
@@ -1850,11 +1838,11 @@ class String
   end
 
   def to_i(base=10)
-    base = Type.coerce_to(base, Integer, :to_int)
+    base = Maglev::Type.coerce_to(base, Integer, :to_int)
     if base._equal?(10)
       str = self
-      if self.__at(0)._equal?( ?0 ) && self.__at(1)._equal?( ?d )
-        if self.__at(2)._equal?( ?- )
+      if self.__at(0).eql?( ?0 ) && self.__at(1).eql?( ?d )
+        if self.__at(2).eql?( ?- )
           return 0 # sign must come before base specifier
         end
         str = self.__at(2, self.__size - 2)
@@ -1874,7 +1862,7 @@ class String
       if exp_prefix._not_equal?(nil)
         prefix = self.__at(0,2)
         if prefix == exp_prefix
-          if self.__at(2)._equal?( ?- )
+          if self.__at(2).eql?( ?- )
             return 0 # sign must come before base specifier
           end
           str = self.__at(2, self.__size - 2)
@@ -1901,7 +1889,7 @@ class String
     else
       s = str
       first_ch = s.__at(0)
-      if first_ch._equal?( ?+ ) || first_ch._equal?( ?- )
+      if first_ch.eql?( ?+ ) || first_ch.eql?( ?- )
         s = s.__at(1, s.__size - 1)
       end
     end
@@ -1924,7 +1912,7 @@ class String
       end
     end
     num = Integer.__from_string_radix(str, base)
-    if sign_str._not_equal?(nil) && sign_str[0]._equal?( ?- )
+    if sign_str._not_equal?(nil) && sign_str[0].eql?( ?- )
       num = num * -1
     end
     num
@@ -1957,8 +1945,8 @@ class String
   #  <code>String#tr</code>. Returns <i>str</i>, or <code>nil</code> if no
   #  changes were made.
   def tr!(from_str, to_str)
-    from = Type.coerce_to(from_str, String, :to_str)
-    to   = Type.coerce_to(to_str,   String, :to_str)
+    from = Maglev::Type.coerce_to(from_str, String, :to_str)
+    to   = Maglev::Type.coerce_to(to_str,   String, :to_str)
 
     # Make the case for single character replacement more efficient.
     # Avoids creating a translation table.
@@ -1968,7 +1956,7 @@ class String
       lim = size
       i = 0
       while (i < lim)
-        self[i] = tochar if self[i]._equal?(fchar)
+        self[i] = tochar if self[i].eql?(fchar)
         i += 1
       end
       self
@@ -2017,8 +2005,8 @@ class String
   #     "hello".tr_s('el', '*')    #=> "h*o"
   #     "hello".tr_s('el', 'hx')   #=> "hhxo"
   def tr_s(from_str, to_str)
-    from = Type.coerce_to(from_str, String, :to_str)
-    to   = Type.coerce_to(to_str,   String, :to_str)
+    from = Maglev::Type.coerce_to(from_str, String, :to_str)
+    to   = Maglev::Type.coerce_to(to_str,   String, :to_str)
     str = self.dup
     # str.taint if self.tainted?
     str.__tr_s!(from, to) || str
@@ -2029,6 +2017,24 @@ class String
   primitive 'upcase', 'asUppercase'   # no taint propagation
 
   primitive 'upcase!', 'rubyUpcaseInPlace'  # prim detects frozen if would change
+
+  primitive '__ordAt', '_rubyOrdAt:'
+
+  def ord()
+    self.__ordAt(0)
+  end
+
+  def chr()
+    self[0]
+  end
+
+  def tolower()
+    self.ord.tolower
+  end
+
+  def toupper()
+    self.ord.toupper
+  end
 
   # MNI: upto
 
@@ -2070,6 +2076,30 @@ class String
 
   def between?(min, max)
     (min <= self) && (self <= max)
+  end
+
+  def encode(*args)
+    # TODO
+    self.dup
+  end
+
+  def encode!(*args)
+    # TODO
+    self
+  end
+
+  def encoding
+    Encoding::UTF_8
+  end
+
+  def force_encoding(encoding)
+    #TODO
+    self
+  end
+
+  def valid_encoding?
+    #TODO
+    true
   end
 
 end

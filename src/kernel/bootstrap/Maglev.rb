@@ -47,6 +47,19 @@ module Maglev
     PERSISTENT_ROOT = Hash.new
   end
 
+  def root
+    PERSISTENT_ROOT
+  end
+
+  def [](key)
+    root[key]
+  end
+
+  def []=(key, value)
+    root[key] = value
+  end
+  module_function :root, :[], :[]=
+
   # Executes the block with the current thread in transient mode, which
   # affects the following operations:
   #
@@ -349,6 +362,7 @@ module Maglev
     end
     return true
   end
+  alias commit commit_transaction
 
   # Rolls back all modifications made to committed GemStone objects and
   # provides the session with a new view of the most recently committed
@@ -362,6 +376,7 @@ module Maglev
   def abort_transaction
     return System.abort_transaction
   end
+  alias abort abort_transaction
 
   # Starts a new transaction for the session.  An abort is done before
   # the new transaction is started - giving the session a new snapshot of
@@ -419,7 +434,7 @@ module Maglev
     RubyContext.clear_persistent_LOADED_FEATURES
   end
 
-  module_function( :commit_transaction, :abort_transaction,
+  module_function( :commit, :commit_transaction, :abort, :abort_transaction,
                    :begin_transaction,  :clear_persistent_LOADED_FEATURES,
                    :commit_and_release_locks )
 

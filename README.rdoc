@@ -1,5 +1,6 @@
 = MagLev
-<b>Build Status:</b> {<img height="18" src="http://ci.rkh.im/view/Maglev/job/MagLev-Rubyspecs/lastBuild/buildStatus"/>}[http://ci.rkh.im/view/Maglev/job/MagLev-Rubyspecs/lastBuild/] {<img height="18" src="http://ci.gemstone.com/job/MagLev_RubySpec-master/lastBuild/buildStatus"/>}[http://ci.gemstone.com/job/MagLev_RubySpec-master/lastBuild/]
+<b>Build Status:</b> {<img
+src="https://travis-ci.org/MagLev/maglev.png?branch=master" alt="Build Status" />}[https://travis-ci.org/MagLev/maglev]
 
 == Minimum Requirements
 * 64-bit hardware. There are no plans for a 32-bit version.

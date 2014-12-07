@@ -23,7 +23,7 @@ module Kernel
       unless ok
         raise ArgumentError, "invalid value for Float(): #{obj.inspect}"
       end
-      idxu = str.__indexOfByte( ?_ , 1 ) # arg/result is one-based
+      idxu = str.__indexOfByte( ?_.ord , 1 ) # arg/result is one-based
       unless idxu._equal?(0)
         if idxu._equal?(str.size ) ||
             (rc = str =~ /([\d]+_e)|(e_)/i )
@@ -37,7 +37,7 @@ module Kernel
       end
       return f * sign
     end
-    Type.coerce_to(obj, Float, :to_f)
+    Maglev::Type.coerce_to(obj, Float, :to_f)
   end
 
   module_function :Float
@@ -99,12 +99,12 @@ module Kernel
     if bad
       raise TypeError, 'Kernel#Array, to_ary did not return an Array'
     end
-    Type.coerce_to(obj, Array, :to_a)
+    Maglev::Type.coerce_to(obj, Array, :to_a)
   end
   module_function :Array
 
   def String(obj)
-    Type.coerce_to(obj, String, :to_s)
+    Maglev::Type.coerce_to(obj, String, :to_s)
   end
 
   module_function :String
@@ -126,7 +126,7 @@ module Kernel
   #  private :FloatValue   # TODO: uncomment
 
   def warn(warning)
-    $stderr.write "#{warning}\n" if $VERBOSE._equal?(true)
+    $stderr.puts warning unless $VERBOSE.nil?
     nil
   end
   module_function :warn

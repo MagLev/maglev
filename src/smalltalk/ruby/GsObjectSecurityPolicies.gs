@@ -2,7 +2,9 @@
 run
   "following classes moved to DataCuratorObjectSecurityPolicy because they have
    Ruby mappings loaded by the Ruby bootstrap."
-{ Array . 
+{AbstractDictionary .
+ AbstractException .
+ Array . 
  Behavior . 
  Boolean . 
  Class .
@@ -91,6 +93,7 @@ run
  SocketErrorEPIPE . 
  AlmostOutOfStack . 
  SystemCallError . 
+ TransactionError . 
  ThreadError . 
  ArgumentTypeError . 
  UNIXServer .

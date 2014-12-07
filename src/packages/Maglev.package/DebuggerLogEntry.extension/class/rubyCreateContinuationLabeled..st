@@ -10,5 +10,5 @@ rubyCreateContinuationLabeled: aString
       meth := self class compiledMethodAt: #remoteBreakpointMethod.
       meth setBreakAtStepPoint: 1.
       self remoteBreakpointMethod ].
-    (action == #stop and: [GsProcess _current == cc]) ifTrue: [ GsProcess _current suspend ].
+    action == #stop ifTrue: [ GsProcess _current suspend ].
 

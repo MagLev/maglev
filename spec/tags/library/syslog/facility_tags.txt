@@ -1,0 +1,3 @@
+fails:Syslog.facility returns the logging facility
+fails:Syslog.facility defaults to LOG_USER
+fails:Syslog.facility resets after each open call

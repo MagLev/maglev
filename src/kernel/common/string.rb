@@ -7,7 +7,7 @@ class String
       if stop._isSymbol 
         raise TypeError , 'upto does not support Symbol arg'
       end
-      stop = Type.coerce_to(stop, String, :to_str)
+      stop = Maglev::Type.coerce_to(stop, String, :to_str)
     end
     return self if self > stop
 
@@ -20,7 +20,7 @@ class String
     stop_sz = stop.__size
     until current == stop_val
       block.call(current)
-      current = Type.coerce_to(current.succ, String, :to_str)
+      current = Maglev::Type.coerce_to(current.succ, String, :to_str)
       curr_sz = current.__size
       break if curr_sz._equal?(0) || curr_sz > stop_sz 
     end
@@ -117,6 +117,10 @@ class String
 
     last_match.__storeRubyVcGlobal(0x30) # store into caller's $~
     return ret
+  end
+
+  def self.try_convert(arg)
+    Maglev::Type.__coerce_to_String_to_str_or_nil(arg)
   end
 
 end

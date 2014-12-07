@@ -1,3 +1,4 @@
+# -*- coding: utf-8 -*-
 class IO
 
   # FNM*, LOCK*, APPEND ... , SEEK*  , initialized in IO2.rb
@@ -9,6 +10,8 @@ class IO
     end
     self
   end
+
+
 
   def bytes()  # added for 1.8.7
     return IoByteEnumerator.new(self, :each_byte)
@@ -31,40 +34,40 @@ class IO
     while not eof?
       buf = self.read(4096)
       if buf._equal?(nil)
-	return self
+  return self
       end
       len = buf.size
       if len._equal?(0)
-	return self
+  return self
       end
       n = 0
       while n < len
-	block.call( buf[n] )
-	n += 1
+  block.call( buf[n] )
+  n += 1
       end
     end
     self
   end
 
-  def each_char(&block)  
+  def each_char(&block)
     unless block_given?
       return IoCharEnumerator.new(self, :each_char) # for 1.8.7
     end
     while not eof?
       buf = self.read(4096)
       if buf._equal?(nil)
-	return self
+  return self
       end
       len = buf.size
       if len._equal?(0)
-	return self
+  return self
       end
       n = 0
       while n < len
-	str = ' ' 
-	str[0] = buf[n]
-	block.call( str )
-	n += 1
+  str = ' '
+  str[0] = buf[n]
+  block.call( str )
+  n += 1
       end
     end
     self
@@ -73,7 +76,7 @@ class IO
   def __next_line(sep)
     # used by Enumerators
     if sep._equal?(nil)
-      self.__contents 
+      self.__contents
     elsif sep.__size._equal?(0)
       self.__next_paragraph
     else
@@ -88,7 +91,7 @@ class IO
     if sep._equal?(nil)
       block.call( self.__contents )
     else
-      sep = Type.coerce_to(sep, String, :to_str)
+      sep = Maglev::Type.coerce_to(sep, String, :to_str)
       if sep.__size._equal?(0)
         while not eof?
           para = self.__next_paragraph
@@ -103,7 +106,7 @@ class IO
     self
   end
 
-  alias each each_line 
+  alias each each_line
 
   def lines(sep=$/)  # added for 1.8.7
     return IoEnumerator.new(self, :each_line, sep)
@@ -114,7 +117,7 @@ class IO
     #   F_GETFD, F_GETFL, F_SETFL, FD_CLOEXEC
     # Socket contains implementation specific to File::NONBLOCK
 
-    op = Type.coerce_to(op, Fixnum, :to_int)
+    op = Maglev::Type.coerce_to(op, Fixnum, :to_int)
     arg = [ flags ]
     status = __fcntl(op, arg )
     if status._equal?(0)
@@ -148,7 +151,7 @@ class IO
     unless block_given?
       return f.each_line(sep)  # return an Enumerator, for 1.8.7
     end
-    f.each_line(sep) { | str | 
+    f.each_line(sep) { | str |
       block.call(str)
     }
     nil
@@ -161,21 +164,21 @@ class IO
 
   def getbyte  # added for 1.8.7
     self.getc
-  end 
+  end
 
   def gets(*args)    # [  begin gets implementation
     raise ArgumentError, 'expected 0 or 1 arg, with no block'
   end
-  
+
   def gets(sep_string)
-    # variant after first gets no bridges   
+    # variant after first gets no bridges
     res = self.__gets(sep_string, 0x31)
-    res 
+    res
   end
-  
+
   def gets
-    # variant after first gets no bridges  
-    res = self.__gets( $/, 0x31 ) 
+    # variant after first gets no bridges
+    res = self.__gets( $/, 0x31 )
     res
   end
 
@@ -185,7 +188,7 @@ class IO
       res = __contents
       self.__increment_lineno
     else
-      sep = Type.coerce_to(a_sep, String, :to_str)
+      sep = Maglev::Type.coerce_to(a_sep, String, :to_str)
       sep_len = sep.length
       if sep_len._equal?(0)
         res = self.eof?  ?  nil : self.__next_paragraph
@@ -198,7 +201,7 @@ class IO
   end
 
   def __next_paragraph()
-    # caller has checked for not eof? 
+    # caller has checked for not eof?
     para = ''
     while true  # add non-empty lines to result
       str = self.__next_line_to( 10 )
@@ -214,9 +217,9 @@ class IO
         return para
       end
       ch = self.__peek_byte
-      if ch._equal?(10) 
+      if ch._equal?(10)
         para << self.read(1)  # add first empty line
-        while true   # skip subsequent empty lines 
+        while true   # skip subsequent empty lines
           break if eof?
           ch = self.__peek_byte
           if ch._not_equal?(10)
@@ -273,7 +276,7 @@ class IO
 
   # ]   end of gets implementation
 
-  # NOTE: IO#read() is deprecated...perhaps we don't bother? 
+  # NOTE: IO#read() is deprecated...perhaps we don't bother?
   #   read is implemented in subclasses
 
   def initialize(*args, &block)
@@ -299,11 +302,11 @@ class IO
   end
 
   def lineno=(integer)
-    # per specs, does not alter $. 
+    # per specs, does not alter $.
     if closed?
       raise IOError, 'IO#lineno= on a closed IO'
     end
-    num = Type.coerce_to(integer, Fixnum, :to_int)
+    num = Maglev::Type.coerce_to(integer, Fixnum, :to_int)
     @_st_lineNumber = num
     num
   end
@@ -315,7 +318,7 @@ class IO
       num = 0
     end
     num += 1
-    @_st_lineNumber = num 
+    @_st_lineNumber = num
     $. = num
     num
   end
@@ -328,11 +331,19 @@ class IO
     nil  # need to change after self.popen and self.pipe implemented
   end
 
-  def self.popen(cmd, mode="r", &block)
-    cmd = Type.coerce_to(cmd, String, :to_s)
-    mode = Type.coerce_to(mode, String, :to_s)
+  def self.popen(cmd, options={}, &block)
+    cmd = Maglev::Type.coerce_to(cmd, String, :to_s)
+    mode = "r"
+
+    if options._isHash
+      #TODO: evaluate options
+      mode = options["mode"] ? options["mode"] : "r"
+    else
+      mode = Maglev::Type.coerce_to(mode, String, :to_s)
+    end
+
     if cmd[0]._equal?( ?-)
-      raise ArgumentError , '"-" prefix not supported by IO.popen' 
+      raise ArgumentError , '"-" prefix not supported by IO.popen'
     end
     f = File.__popen(cmd, mode);
     if f._isFixnum
@@ -342,7 +353,7 @@ class IO
       res = block.call( f)
       f.close
       res
-    else 
+    else
       f
     end
   end
@@ -410,7 +421,7 @@ class IO
     if obj._isString
       str = obj[0,1]  # write first char of arg
     else
-      c = Type.coerce_to(obj, Integer, :to_int)
+      c = Maglev::Type.coerce_to(obj, Integer, :to_int)
       c = c % 256
       str = 'x'
       str[0] = c
@@ -428,7 +439,7 @@ class IO
     if obj._isString
       str = obj[0,1]  # write first char of arg
     else
-      c = Type.coerce_to(obj, Integer, :to_int)
+      c = Maglev::Type.coerce_to(obj, Integer, :to_int)
       c = c % 256
       str = 'x'
       str[0] = c
@@ -493,7 +504,7 @@ class IO
       end
       unless line._equal?(nil)
         write(line)
-        write(eol) unless line[-1]._equal?(10)
+        write(eol) unless line[-1].eql?(?\n)
       end
       n = n + 1
     end
@@ -511,17 +522,43 @@ class IO
   #  IO.read("testfile", 20, 10)   #=> "ne one\nThis is line "
   #
   # Returns the empty string for empty files, unless length is passed, then returns nil
-  def self.read(name, length=MaglevUndefined, an_offset=0)
-    offset = if an_offset._equal?(nil)
-               0
-             else
-               Type.coerce_to(an_offset, Fixnum, :to_int)
-             end
+
+  # since 1.9.3:
+  # read(name, [length [, offset]] ) → string click to toggle source
+  # read(name, [length [, offset]], open_args) → string
+
+  def self.read(*args)
+    raise Errno::EINVAL, "to few arguments" if args.length < 1
+    name = args.shift
+
+    case args.length
+    when 1
+      ex = args.shift
+      if ex.class._equal?(Fixnum)
+        length = Maglev::Type.coerce_to(ex, Fixnum, :to_int)
+      else
+        open_args = ex
+      end
+    when 2
+      length = args.shift
+      ex2 = args.shift
+      if ex2.class._equal?(Fixnum)
+        offset = Maglev::Type.coerce_to(ex2, Fixnum, :to_int)
+      else
+        open_args = ex2
+      end
+    when 3
+      length = Maglev::Type.coerce_to(args.shift, Fixnum, :to_int)
+      offset = Maglev::Type.coerce_to(args.shift, Fixnum, :to_int)
+      open_args = args.shift
+    end
+
+
+    offset = 0 if offset._equal?(nil)
     raise Errno::EINVAL, "offset must not be negative" if offset < 0
 
     read_all_bytes = length._equal?(MaglevUndefined) || length._equal?(nil)
     unless read_all_bytes
-      length = Type.coerce_to(length, Fixnum, :to_int)
       raise ArgumentError, "length must not be negative" if length < 0
     end
 
@@ -539,9 +576,17 @@ class IO
     data
   end
 
+  def self.write(*args)
+    raise NotImplementedError, 'Class:write'
+  end
+
   # def read() ; end  # subclass responsibility
 
-  def readchar 
+  def read_nonblock(*args)
+    recv_nonblock(*args)
+  end
+
+  def readchar
     ch = self.getc
     if ch._equal?(nil)
       raise EOFError, 'EOF during readchar'
@@ -605,32 +650,20 @@ class IO
     self.pos
   end
 
-  def self.select( reads, writes=nil, errs=nil, timeout=nil )
-    if timeout._isFixnum
-      ms = timeout * 1000
-      unless ms._isFixnum && ms >= 0
-        raise ArgumentError , "IO#select, timeout not representable as Fixnum milliseconds >=0"
-      end
-    elsif timeout._not_equal?(nil)
-      timeout = Type.coerce_to(timeout, Float, :to_f)
-      ms = (timeout * 1000.0 ).to_int
-      unless ms._isFixnum && ms >= 0
-        raise ArgumentError , "IO#select, timeout not representable as Fixnum milliseconds >=0"
-      end
-    end
-    Kernel.__select(reads, writes, errs, *[ ms ])
+  def self.select(reads, writes=nil, errs=nil, timeout=nil)
+    Kernel.select(reads, writes, errs, timeout)
   end
 
   primitive 'stat',  'stat'
- 
+
   primitive 'sync', 'sync'
 
   # sync= has no effect, in Maglev  File and Socket never buffer output
-  primitive 'sync=', 'setSync:'  
+  primitive 'sync=', 'setSync:'
 
   def self.sysopen(filename, mode=MaglevUndefined, permission=MaglevUndefined)
     f = File.open(filename, mode, permission)
-    f.__fileno 
+    f.__fileno
   end
 
   # def sysread(length, buffer); end # subclass responsibility
@@ -644,5 +677,99 @@ class IO
   end
 
   # def ungetc ; end # subclass responsibility
+
+  class StreamCopier
+    def initialize(from, to, length, offset)
+      @length = length
+      @offset = offset
+
+      @from_io, @from = to_io(from, "rb")
+      @to_io, @to = to_io(to, "wb")
+
+      @method = read_method @from
+    end
+
+    def to_io(obj, mode)
+      if obj.kind_of? IO
+        flag = true
+        io = obj
+      else
+        flag = false
+
+        if obj._isString
+          io = File.open obj, mode
+        elsif obj.respond_to? :to_path
+          path = Maglev::Type.coerce_to obj, String, :to_path
+          io = File.open path, mode
+        else
+          io = obj
+        end
+      end
+
+      return flag, io
+    end
+
+    def read_method(obj)
+      if obj.respond_to? :readpartial
+        :readpartial
+      else
+        :read
+      end
+    end
+
+    def run
+      @from.ensure_open_and_readable
+      @to.ensure_open_and_writable
+
+      saved_pos = @from.pos if @from_io
+
+      @from.seek @offset, IO::SEEK_CUR if @offset
+
+      size = @length ? @length : 16384
+      bytes = 0
+
+      begin
+        while data = @from.send(@method, size, "")
+          @to.write data
+          bytes += data.size
+
+          break if @length && bytes >= @length
+        end
+      rescue EOFError
+        # done reading
+      end
+
+      @to.flush
+      return bytes
+    ensure
+      if @from_io
+        @from.pos = saved_pos if @offset
+      else
+        @from.close
+      end
+
+      @to.close unless @to_io
+    end
+  end
+
+  def self.copy_stream(from, to, max_length=nil, offset=nil)
+    StreamCopier.new(from, to, max_length, offset).run
+  end
+
+  def ensure_open_and_readable
+    raise IOError, "not opened for reading" unless !self.closed? and self.__readable
+  end
+
+  def ensure_open_and_writable
+    raise IOError, "not opened for writing" unless !self.closed? and self.__writable
+  end
+
+  def self.binread(*args)
+    self.read(*args)
+  end
+
+  def self.binwrite(*args)
+    self.write(*args)
+  end
 
 end

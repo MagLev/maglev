@@ -1,0 +1,1 @@
+fails:Fixnum#coerce when given a String returns  an array containing two Floats

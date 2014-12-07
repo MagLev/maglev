@@ -146,6 +146,15 @@ class Object
     self.call(*args)
   end
 
+  def public_send(sym, *args)
+    # TODO: public_methods should return an array of symbols
+    if protected_methods.include?(sym.to_s) || private_methods.include?(sym.to_s)
+      raise NoMethodError(sym)
+    else
+      send(sym, *args)
+    end
+  end
+
   # primitive   '__basic_dup', '_rubyBasicDup'  # use non-singleton class
   primitive   '__basic_clone', 'shallowCopy' # use singleton class
 
@@ -261,14 +270,14 @@ class Object
         a = [ self ]
       end
     end
-    a
+    Array.new(a)
   end
 
   def __splat_return_value
     # runtime support for  return *v  , invoked from generated code
-    v = Type.coerce_to_or_nil(self, Array, :to_ary)
+    v = Maglev::Type.coerce_to_or_nil(self, Array, :to_ary)
     if v._equal?(nil)
-      v = Type.coerce_to_or_nil(self, Array, :to_a)
+      v = Maglev::Type.coerce_to_or_nil(self, Array, :to_a)
       if v._equal?(nil)
         v = self
       end
@@ -334,14 +343,14 @@ class Object
 
   def instance_variable_get(a_name)
     unless a_name._isStringOrSymbol
-      a_name = Type.coerce_to(a_name, String, :to_str)
+      a_name = Maglev::Type.coerce_to(a_name, String, :to_str)
     end
     __instvar_get(a_name.to_sym)
   end
 
   def instance_variable_set(a_name, a_val)
     unless a_name._isStringOrSymbol
-      a_name = Type.coerce_to(a_name, String, :to_str)
+      a_name = Maglev::Type.coerce_to(a_name, String, :to_str)
     end
     __instvar_put(a_name.to_sym, a_val)
     a_val
@@ -399,7 +408,9 @@ class Object
       end
       modules.each do |a_module|
         cl.__include_module(a_module)
-        a_module.extended(self)
+        if a_module.respond_to? :extended
+          a_module.extended(self)
+        end
       end
     end
     self
@@ -440,6 +451,14 @@ class Object
     self
   end
 
+  def initialize_dup(other)
+    initialize_copy(other)
+  end
+
+  def initialize_clone(other)
+    initialize_copy(other)
+  end
+
   def instance_of?(cls)
     # Modified from RUBINIUS
     if self.class._equal?(cls)
@@ -471,7 +490,7 @@ class Object
     #  be put in the binding...
     lex_path = self.__getRubyVcGlobal(0x32) # the __lexPath, synthesized by AST to IR code in .mcz
     str = args[0]
-    string = Type.coerce_to(str, String, :to_str)
+    string = Maglev::Type.coerce_to(str, String, :to_str)
     ctx = self.__binding_ctx(1)
     bnd = Binding.new(ctx, self, block_arg)
     bnd.__set_lex_scope(lex_path)
@@ -532,9 +551,9 @@ class Object
 
   def remove_instance_variable(name)
     unless name._isStringOrSymbol
-      name = Type.coerce_to(name, String, :to_str)
+      name = Maglev::Type.coerce_to(name, String, :to_str)
     end
-    if name.__at(0)._not_equal?( ?@ )
+    if name.__at(0).not_eql?( ?@ )
       raise NameError, "intance variable names must begin with '@'"
     end
     self.__remove_iv(name)
@@ -687,7 +706,6 @@ class Object
   primitive_nobridge 'find_references_in_memory', 'findReferencesInMemory'
 
   # MaglevUndefined in Object1.rb
-
 end
 Object.__freeze_constants
 

@@ -1,0 +1,1 @@
+fails:Tempfile.open when passed a block returns the value of the block

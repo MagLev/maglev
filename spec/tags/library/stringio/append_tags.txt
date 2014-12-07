@@ -1,1 +1,2 @@
 fails:StringIO#<< when passed [Object] taints self's String when the passed argument is tainted
+fails:StringIO#<< when in append mode appends the passed argument to the end of self, ignoring current position

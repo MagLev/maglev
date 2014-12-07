@@ -19,4 +19,5 @@ class String
     [ base, $1, $3 ]  # result is [ baseFixnum , signString, magnitudeString ]
   end
 
+
 end

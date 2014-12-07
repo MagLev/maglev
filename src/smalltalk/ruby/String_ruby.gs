@@ -73,6 +73,11 @@ anArg _isSmallInteger ifTrue:[
 self _primitiveFailed:#_rubyAddAll: args: { anArg }
 %
 
+method:
+evaluateInContext: anObject
+  ^ self evaluateInContext: anObject symbolList: GsSession currentSession symbolList
+%
+
 ! edits to _rubyAt1:  must be replicated to _rubyAt2: for env 2"
 method:
 _rubyAt1: anOffset
@@ -85,7 +90,9 @@ _rubyAt1: anOffset
      returns nil if anOffset is out of range,
      else returns character code at specified position.
   "
-<primitive: 686>
+anOffset isInteger ifTrue:[
+  ^ self _rubyAt1: anOffset length: 1.
+].
 anOffset _isOneByteString  ifTrue:[ "a String"  | ofs |
   ofs := self _findString: anOffset startingAt: 1 ignoreCase: false .
   ofs ~~ 0 ifTrue:[ ^ anOffset ].
@@ -99,6 +106,14 @@ anOffset _isRegexp ifTrue:[ "a Regexp" | aMatchData |
 ].
 ^ self @ruby1:__prim_at_failed: anOffset
 %
+
+! old version of _rubyAt1:. Returns an integer value of the character
+method:
+_rubyOrdAt: anInteger
+<primitive: 686>
+^ self @ruby1:__prim_at_failed: anInteger
+%
+
 
 method:
 _rubyAt: anOffset length: aCount
@@ -343,7 +358,7 @@ Characters that are quoted: Backslash $\ ASCII 92 and double quote ASCII 34"
   1 to: self size do: [:n | | c xlated av chDone |
     c := self at: n .
     c == $# ifTrue:[ | nextByte |
-      nextByte := self _rubyAt1: n  .  "atOrNil: n + 1"
+      nextByte := self _rubyOrdAt: n  .  "atOrNil: n + 1"
       (nextByte == 36 or:[ nextByte == 64 or:[ nextByte == 123]]) ifFalse:[
          "next char not one of  $  @  {  ,  do not escape " 
         aString add: c .
@@ -383,7 +398,7 @@ rubySelectorPrefix
   | sz |
   (sz := self size) > 1024 ifTrue:[ Error signal:'max Symbol size is 1024' ].
   sz < 4 ifTrue:[ Error signal:'missing ruby selector suffix' ].
-  (self _rubyAt1: -4) == 35"$#" ifFalse:[ Error signal:'invalid ruby selector suffix'].
+  (self _rubyOrdAt: -4) == 35"$#" ifFalse:[ Error signal:'invalid ruby selector suffix'].
 
   self _primitiveFailed: #rubySelectorPrefix args: #() .
 %
@@ -404,7 +419,7 @@ rubySelectorPrefixSymbol
   | sz |
   (sz := self size) > 1024 ifTrue:[ Error signal:'max Symbol size is 1024' ].
   sz < 4 ifTrue:[ Error signal:'missing ruby selector suffix' ].
-  (self _rubyAt1: -4) == 35"$#"  ifFalse:[ Error signal:'invalid ruby selector suffix'].
+  (self _rubyOrdAt: -4) == 35"$#"  ifFalse:[ Error signal:'invalid ruby selector suffix'].
   self _primitiveFailed: #rubySelectorPrefixSymbol args: #() .
 %
 
@@ -474,6 +489,11 @@ _asSymbolWithRubySuffix: argInt
   (argInt // 4) > 74 ifTrue:[ Error signal:'max of 74 fixed args exceeded' ].
 
   self _primitiveFailed: #_asSymbolWithRubySuffix: args: { argInt } .
+%
+
+method: 
+evaluateInContext: anObject
+  ^ self evaluateInContext: anObject symbolList: GsSession currentSession symbolList
 %
 
 !----------------------------------

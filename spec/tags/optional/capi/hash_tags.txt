@@ -1,0 +1,8 @@
+fails:C-API Hash function rb_hash calls #hash on the object
+fails:C-API Hash function rb_hash converts a Bignum returned by #hash to a Fixnum
+fails:C-API Hash function rb_hash calls #to_int to converts a value returned by #hash to a Fixnum
+fails:C-API Hash function rb_hash raises a TypeError if the object does not implement #to_int
+fails:C-API Hash function rb_hash_delete_if removes an entry if the block returns true
+fails:C-API Hash function rb_hash_delete_if returns an Enumerator when no block is passed
+fails:C-API Hash function rb_hash_foreach iterates over the hash
+fails:C-API Hash function rb_hash_foreach deletes via the callback

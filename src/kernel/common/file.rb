@@ -218,9 +218,9 @@ class File
   #  File.fnmatch(pattern, 'a/.b/c/foo', File::FNM_PATHNAME)    #=> false
   #  File.fnmatch(pattern, 'a/.b/c/foo', File::FNM_PATHNAME | File::FNM_DOTMATCH) #=> true
   def self.fnmatch(pattern, path, flags=0)
-    pattern = Type.coerce_to(pattern, String, :to_str).dup
-    path    = Type.coerce_to(path, String, :to_str).dup
-    flags   = Type.coerce_to(flags, Fixnum, :to_int) unless Fixnum === flags
+    pattern = Maglev::Type.coerce_to(pattern, String, :to_str).dup
+    path    = Maglev::Type.coerce_to(path, String, :to_str).dup
+    flags   = Maglev::Type.coerce_to(flags, Fixnum, :to_int) unless Fixnum === flags
 
     name_match(pattern, path, flags, 0, pattern.size, 0, path.size)
   end
@@ -228,11 +228,8 @@ class File
     alias_method :fnmatch?, :fnmatch
   end
 
-  ##
-  # Returns a new string formed by joining the strings using File::SEPARATOR.
-  #
-  #  File.join("usr", "mail", "gumby")   #=> "usr/mail/gumby"
-  def self.join(*args)
+
+  def self.__join(args)
     args_len = args.__size
     return ''  if args_len._equal?(0)
    
@@ -248,7 +245,7 @@ class File
       ts = Thread.__recursion_guard_set
       if ts.__add_if_absent(first)
         begin
-          first = join(*first)
+          first = __join(first)
         ensure
           ts.remove(first)
         end
@@ -258,7 +255,7 @@ class File
     else
       # We need to use dup here, since it's possible that
       # StringValue gives us a direct object we shouldn't mutate
-      first = Type.coerce_to(first, String, :to_str).dup
+      first = Maglev::Type.__coerce_to_path(first).dup
     end
 
     ret = first
@@ -277,7 +274,7 @@ class File
         end
         if ts.__add_if_absent(first)
           begin
-            value = join(*el)
+            value = __join(el)
           ensure
             ts.remove(first)
           end  
@@ -285,7 +282,7 @@ class File
           raise ArgumentError, "recursive array in File.join"
         end
       else
-        value = Type.coerce_to(el, String, :to_str).dup
+        value = Maglev::Type.coerce_to(el, String, :to_str).dup
       end
 
       if value.__at(0) == sep.__at(0) && value.__at_equals(1, sep)
@@ -300,6 +297,15 @@ class File
       idx += 1
     end
     ret
+  end
+  ##
+  # Returns a new string formed by joining the strings using File::SEPARATOR.
+  #
+  #  File.join("usr", "mail", "gumby")   #=> "usr/mail/gumby"
+  def self.join(*args)
+    # Adding another indirection to always work on the same array object
+    # (Splat operator always passes a copy.)
+    __join(args)
   end
 
 end

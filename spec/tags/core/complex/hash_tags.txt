@@ -1,0 +1,2 @@
+fails:Complex#hash should be static
+fails:Complex#hash is static

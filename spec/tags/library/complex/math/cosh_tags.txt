@@ -1,0 +1,1 @@
+fails:Math#cosh is a private instance method

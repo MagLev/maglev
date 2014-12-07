@@ -6,6 +6,8 @@ module ObjectSpace
   class Repository
     class_primitive_nobridge '__loaded_classes', '_loadedClasses:'
     primitive_nobridge '__list_instances_in_memory', '_listInstancesInMemory:'
+    primitive_nobridge '__list_instances', 'listInstances:limit:toDirectory:withMaxThreads:maxCpuUsage:memoryOnly:'
+
   end
 
   # class ObjectSpaceArray < Array , in ObjectSpace1.rb
@@ -110,7 +112,7 @@ module ObjectSpace
     clss = class_or_module ? [class_or_module] : loaded_classes(false)
     clss = clss.sort_by {|o| o.object_id}
     clss = clss.slice(0, 2034) # VM constant, see Repository>>_listInstancesInMemory:
-    objs = SystemRepository.__list_instances_in_memory(clss).flatten(1)
+    objs = ObjectSpace::SystemRepository.__list_instances_in_memory(clss).flatten(1)
 
     # Avoid leaking virtual modules into Ruby space
     if class_or_module.nil?

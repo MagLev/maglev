@@ -1,7 +1,7 @@
 require File.expand_path('simple', File.dirname(__FILE__))
 
 h = {'one' => {'two' => {'three' => 0}}}
-b = Marshal.dump(h, 6);
+b = Marshal.dump(h, 7);
 
 hb = Marshal.load(b)
 unless h == hb ; raise 'error' ; end
@@ -50,6 +50,7 @@ test_items = [
               ["xyz", "\004\b\"\bxyz"],
               [1, "\004\bi\006"],
               [2.71828, "\004\bf\0172.71828\000\367\220"],
+              #[/xyz/i, "\004\b/\bxyz\001"],
               [/xyz/, "\004\b/\bxyz\000"],
               [["hello", 12], "\004\b[\a\"\nhelloi\021"],
               [{"one"=>"two"}, "\004\b{\006\"\bone\"\btwo"],
@@ -60,7 +61,7 @@ test_items = [
 test_items.each do |(item, marshal)|
   b = Marshal.dump(item)
   item2 = Marshal.load(b)
-  #puts "=== #{item.inspect} => #{b.inspect}"
+  #puts "=== #{item.inspect} => #{item2.inspect}"
   test(item2, item, "Unmarshal: item: #{item.inspect} item2: #{item2.inspect}")
 
   item2 = Marshal.load(marshal)

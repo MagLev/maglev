@@ -5,7 +5,7 @@
 
 
 expected = "0.0\n"
-x = %x{LANG="it_IT.UTF-8" maglev-ruby -e 'p Float("0.0")' }
+x = %x{LANG="it_IT.UTF-8" maglev-ruby +d -e 'p Float("0.0")' }
 
-raise "Fail" unless expected == x
+raise "Fail: expected #{expected}, but was #{x}" unless expected == x
 

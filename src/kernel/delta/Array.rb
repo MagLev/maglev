@@ -85,7 +85,7 @@ class Array
   # When invoked without a block, returns an enumerator object instead.
   #
   def combination(num, &block)  # added for 1.8.7 , modified from Rubinius
-    num = Type.coerce_to( num, Fixnum, :to_int)
+    num = Maglev::Type.coerce_to( num, Fixnum, :to_int)
     unless block_given?
       return ArrayCombinationEnumerator.new(num, self, :combination) # for 1.8.7
     end
@@ -262,6 +262,7 @@ class Array
       else
         memo = memo.__send__(binary_op_sym, o)
       end
+      n = n +1
     end
     memo._equal?(un_defined) ? nil : memo
   end
@@ -415,7 +416,7 @@ class Array
   def permutation(num=nil, &block)  # added in 1.8.7, from Rubinius
     my_size = self.__size
     if num._not_equal?(nil)
-      num = Type.coerce_to( num, Fixnum, :to_int )
+      num = Maglev::Type.coerce_to( num, Fixnum, :to_int )
     end
     unless block_given?
       return ArrayCombinationEnumerator.new(num, self, :permutation)
@@ -476,7 +477,7 @@ class Array
     args_res = Array.new(nargs + 2)   
     args_res.__at_put(0, self)
     while n < nargs
-      an_arg = Type.coerce_to(args.__at(n), Array, :to_ary)
+      an_arg = Maglev::Type.coerce_to(args.__at(n), Array, :to_ary)
       n += 1
       args_res.__at_put(n,  an_arg)
     end

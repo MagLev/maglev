@@ -3,3 +3,17 @@ fails:String#inspect with $KCODE returns a string with extended character set wh
 fails:String#inspect with $KCODE can handle malformed UTF-8 string when $KCODE is UTF-8
 fails:String#inspect with $KCODE == 'UTF-8' returns a string with extended character set
 fails:String#inspect with $KCODE == 'UTF-8' returns malformed UTF-8 characters in stringified octal notation
+fails:String#inspect returns a string with non-printing characters replaced by \x notation
+fails:String#inspect returns a string with non-printing, characters replaced by \u notation for Unicode strings
+fails:String#inspect returns a string with extended characters for Unicode strings
+fails:String#inspect produces different output based on #force_encoding
+fails:String#inspect can handle malformed UTF-8 string for #force_encoding('UTF-8')
+fails:String#inspect untrusts the result if self is untrusted
+fails:String#inspect returns a string with a NUL character replaced by \x notation
+fails:String#inspect when default external is UTF-8 returns a string with non-printing characters replaced by \u notation for Unicode strings
+fails:String#inspect when default external is UTF-8 returns a string with a NUL character replaced by \x notation
+fails:String#inspect when default external is UTF-8 returns a string with extended characters for Unicode strings
+fails:String#inspect when Encoding.default_internal is nil returns a String with Encoding.default_external encoding if it is ASCII compatible
+fails:String#inspect when Encoding.default_internal is nil returns a String in US-ASCII encoding if Encoding.default_external is not ASCII compatible
+fails:String#inspect when Encoding.default_internal is not nil returns a String with Encoding.default_internal encoding if it is ASCII compatible
+fails:String#inspect when Encoding.default_internal is not nil returns a String in US-ASCII encoding if Encoding.default_internal is not ASCII compatible

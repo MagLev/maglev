@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 #=========================================================================
 # Copyright (C) GemStone Systems, Inc. 2010.
@@ -146,8 +146,15 @@ gss_file="${ARCHIVES_HOME}/${gss_name}.tar.gz"
 machine_name="`uname -n`"
 echo "[Info] Installing $gss_name on $machine_name"
 
-# IMPORTANT: Move to the parent directory of the MagLev git repository
-builtin cd "$GEMSTONES_HOME"
+# Look for either wget or curl to download GemStone
+if [ -e "`which wget 2>/dev/null`" ]; then
+    cmd="`which wget`"
+elif [ -e "`which curl 2>/dev/null`" ]; then
+    cmd="`which curl` -s -O"
+else
+    echo "[Error] Neither wget nor curl is available. Install one of them and rerun this script."
+    exit 1
+fi
 
 # Download appropriate version of GemStone
 if

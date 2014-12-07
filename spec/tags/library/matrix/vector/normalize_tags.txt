@@ -1,0 +1,2 @@
+fails:Vector#normalize returns a normalized copy of the vector
+fails:Vector#normalize raises an error for zero vectors

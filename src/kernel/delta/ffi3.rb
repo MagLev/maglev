@@ -252,6 +252,7 @@ module FFI
 
     def self.__install_native_type(a_type)
       FFI.const_set( a_type.name , a_type )
+      FFI::Type.const_set(a_type.name, a_type)
     end
     def self.__initialize_native_types
       # install various module level constants which are names for primitive types
@@ -261,6 +262,8 @@ module FFI
       __install_native_type( Type.new( :TYPE_UINT16, 2 , :uint16))
       __install_native_type( Type.new( :TYPE_INT32, 4 , :int32))
       __install_native_type( Type.new( :TYPE_UINT32, 4 , :uint32))
+      __install_native_type( Type.new( :LONG, 4 , :int32))
+      __install_native_type( Type.new( :ULONG, 4 , :uint32))
       __install_native_type( Type.new( :TYPE_INT64, 8 , :int64))
       __install_native_type( Type.new( :TYPE_UINT64, 8 , :uint64))
       __install_native_type( Type.new( :TYPE_FLOAT32, 4 , :float))
@@ -389,7 +392,7 @@ module FFI
         if a_name == CURRENT_PROCESS || a_name._equal?(nil)
           libs << nil
         else
-          a_name = ::Type.coerce_to(names[n], String, :to_str)
+          a_name = Maglev::Type.coerce_to(names[n], String, :to_str)
           libs << CLibrary.named(a_name)
         end
         lib_names << a_name
@@ -469,9 +472,9 @@ module FFI
     # function.
     # Returns a method or raises an error.
     def attach_function(name, a3, a4, a5=MaglevUndefined)
-      name = ::Type.coerce_to(name, String, :to_s)
+      name = Maglev::Type.coerce_to(name, String, :to_s)
       if a5._not_equal?(MaglevUndefined)
-        cname = ::Type.coerce_to(a3, String, :to_s)
+        cname = Maglev::Type.coerce_to(a3, String, :to_s)
         args = a4
         ret = a5
       else

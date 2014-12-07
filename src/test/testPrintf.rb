@@ -61,7 +61,7 @@ h = Hash.new
 h[5]=7
 test( sprintf("%p", h ) , '{5=>7}' , __LINE__ )
 
-test( sprintf("%s", h) , '57' , __LINE__ )
+test( sprintf("%s", h) , '{5=>7}' , __LINE__ )  #Hash.to_s changed in Ruby 1.9
 
 test( sprintf("%10.5s", 'abcdefgh') , '     abcde', __LINE__ )
 test( sprintf("%c", 50) , '2' , __LINE__ )

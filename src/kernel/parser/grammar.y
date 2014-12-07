@@ -43,6 +43,9 @@
 #include "doprimargs.hf"
 #include "intloopsup.hf"
 #include "om_inline.hf"
+#include "unicode/ustring.h"
+#include "unicode/umachine.h"
+#include "unicode/utf.h"
 
 #include "rubygrammar.h"
 
@@ -330,6 +333,7 @@ static int local_id(rb_parse_state* ps, NODE* quid);
 static int eval_local_id(rb_parse_state *st, NODE* idO);
 
 static void tokadd(char c, rb_parse_state *parse_state);
+static int tokadd_utf8(rb_parse_state *parse_state, int string_literal, int symbol_literal, int regexp_literal);
 
 static NODE* gettable(rb_parse_state *parse_state, NODE **idH);
 
@@ -565,8 +569,8 @@ static NODE* assignable(NODE **idH, NODE* srcOffset, NODE **valH, rb_parse_state
         k__LINE__
         k__FILE__
 
-%token <id>   tIDENTIFIER tFID tGVAR tIVAR tCONSTANT tCVAR tXSTRING_BEG
-%token <node> tINTEGER tFLOAT tSTRING_CONTENT
+%token <id>   tIDENTIFIER tFID tGVAR tIVAR tCONSTANT tCVAR tXSTRING_BEG tLABEL
+%token <node> tINTEGER tFLOAT tSTRING_CONTENT tCHAR
 %token <node> tNTH_REF tBACK_REF
 %token <num>  tREGEXP_END
 %type <node> singleton strings string string1 xstring regexp
@@ -1621,7 +1625,6 @@ aref_args       : none
                 | command opt_nl
                     {
                       yTrace(vps, "aref__args: | command opt_nl");
-                      rb_warning(vps, "parenthesize argument(s) for future version");
                       $$ = RubyRpCallArgs::s($1, vps);
                     }
                 | args trailer
@@ -1670,14 +1673,12 @@ paren_args      : '(' none ')'
                     {
                       yTrace(vps, "paren_args: | tLPAREN2 block_call opt_nl tRPAREN");
                       rParenLexPop(vps);
-		      rb_warning(vps, "parenthesize argument for future version");
                       $$ = RubyRpCallArgs::s( $2, vps);
                     }
                 | '(' args ',' block_call opt_nl ')'
                     {
                       yTrace(vps, "paren_args: | tLPAREN2 args tCOMMA block_call opt_nl tRPAREN");
                       rParenLexPop(vps);
-                      rb_warning(vps, "parenthesize argument for future version");
                       $$ = RubyArrayNode::append( $2, $4, vps);
                     }
                 ;
@@ -1689,7 +1690,6 @@ opt_paren_args  : none
 call_args       : command
                     {
                       yTrace(vps, "call_args: command");
-                      rb_warning(vps, "parenthesize argument(s) for future version");
 		      $$ = RubyRpCallArgs::s( $1, vps);
                     }
                 | args opt_block_arg
@@ -2657,7 +2657,8 @@ strings         : string
                     }
                 ;
 
-string          : string1
+string          : tCHAR
+                | string1
                 | string string1
                     {
                       yTrace(vps, "string: | string string1");
@@ -3181,6 +3182,11 @@ assoc           : arg_value tASSOC arg_value
                     {
                       yTrace(vps, "assoc: arg_value tASSOC arg_value");
                       $$ = RubyArrayNode::s_a_b( $1, $3, vps);
+                    }
+                  | tLABEL arg_value
+                    {
+                      yTrace(vps, "assoc: arg_value tLABEL arg_value");
+                      $$ = RubyArrayNode::s_a_b(RubySymbolNode::s($1, vps), $2, vps);
                     }
                 ;
 
@@ -4024,6 +4030,20 @@ static void startToken(rb_parse_state *ps)  // was named newtok()
     UTL_ASSERT( ps->tokenbuf != NULL);
 }
 
+
+static char * tokspace(int n, rb_parse_state *ps)
+{
+  ps->tokidx += n;
+
+  if(ps->tokidx >= ps->toksiz) {
+    do {
+      ps->toksiz *= 2;
+    } while(ps->toksiz < ps->tokidx);
+    ps->tokenbuf = (char*)realloc(ps->tokenbuf, sizeof(char) * ps->toksiz);
+  }
+  return &(ps->tokenbuf[ps->tokidx - n]);
+}
+
 static void tokadd(char c, rb_parse_state *ps)
 {
   UTL_ASSERT(ps->tokidx < ps->toksiz && ps->tokidx >= 0);
@@ -4041,6 +4061,88 @@ static void tokadd(char c, rb_parse_state *ps)
   ps->tokidx = idx; 
 }
 
+#define tokcopy(n, ps) memcpy(tokspace(n, ps), ps->lex_p - (n), (n))
+
+static int tokadd_utf8(rb_parse_state *ps, int string_literal, int symbol_literal, int regexp_literal)
+{
+  /*
+   * If string_literal is true, then we allow multiple codepoints
+   * in \u{}, and add the codepoints to the current token.
+   * Otherwise we're parsing a character literal and return a single
+   * codepoint without adding it
+   */
+
+  int codepoint;
+  int numlen;
+
+  if(regexp_literal) {
+    tokadd('\\', ps); tokadd('u', ps);
+  }
+
+  if(peek('{', ps)) {  /* handle \u{...} form */
+    do {
+      if(regexp_literal) tokadd(*ps->lex_p, ps);
+      nextc(ps);
+      codepoint = scan_hex(ps->lex_p, 6, &numlen);
+
+      if(numlen == 0)  {
+        rb_compile_error("invalid Unicode escape", ps);
+        return 0;
+      }
+      if(codepoint > 0x10ffff) {
+        rb_compile_error("invalid Unicode codepoint (too large)", ps);
+        return 0;
+      }
+
+      ps->lex_p += numlen;
+      if(regexp_literal) {
+        tokcopy(numlen, ps);
+      } else if(codepoint >= 0x80) {
+        char* dst = (char*)calloc(sizeof(char), 8);
+        int offset_counter = 0;
+        U8_APPEND_UNSAFE(dst, offset_counter, codepoint);
+        for (unsigned int i = 0; i < strlen(dst); i++) {
+          tokadd(*(dst + i), ps);
+        }
+        free(dst);
+      } else if(string_literal) {
+        tokadd(codepoint, ps);
+      }
+    } while(string_literal && (peek(' ', ps) || peek('\t', ps)));
+
+    if(!peek('}', ps)) {
+      rb_compile_error("unterminated Unicode escape", ps);
+      return 0;
+    }
+
+    if(regexp_literal) tokadd('}', ps);
+    nextc(ps);
+  } else {			/* handle \uxxxx form */
+    codepoint = scan_hex(ps->lex_p, 4, &numlen);
+    if(numlen < 4) {
+      rb_compile_error("invalid Unicode escape", ps);
+      return 0;
+    }
+    ps->lex_p += 4;
+    if(regexp_literal) {
+      tokcopy(4, ps);
+    } else if(codepoint >= 0x80) {
+      if (string_literal) {
+        char* dst = (char*)calloc(sizeof(char), 8);
+        int offset_counter = 0;
+        U8_APPEND_UNSAFE(dst, offset_counter, codepoint);
+        for (unsigned int i = 0; i < strlen(dst); i++) {
+          tokadd(*(dst + i), ps);
+        }
+        free(dst);
+      }
+    } else if(string_literal) {
+      tokadd(codepoint, ps);
+    }
+  }
+
+  return codepoint;
+}
 static int read_escape(rb_parse_state *ps)
 {
     int c;
@@ -4348,6 +4450,15 @@ static int tokadd_string(int func, int term, int paren, NODE **strTermH,
               case '\\':
                 if (func & STR_FUNC_ESCAPE) tokadd((char)c, ps);
                 break;
+
+              case 'u':
+                  if((func & STR_FUNC_EXPAND) == 0) {
+                    tokadd('\\', ps);
+                    break;
+                  }
+                  tokadd_utf8(ps, 1, func & STR_FUNC_SYMBOL, 
+                                     func & STR_FUNC_REGEXP);
+                  continue;
 
               default:
                 if (func & STR_FUNC_REGEXP) {
@@ -5127,11 +5238,14 @@ static int yylex(rb_parse_state* ps)
         else if (c == '\\') {
             c = read_escape(ps);
         }
+        startToken(ps);
         c &= 0xff;
+        tokadd((char)c,ps);
+        tokfix(ps);
         SET_lexState( EXPR_END);
-        *ps->lexvalH = int64ToSi( (intptr_t)c);
-        return tINTEGER;
-
+        *ps->lexvalH = RubyStrNode::s( NEW_STR(tok(ps), toklen(ps), ps) , ps);
+        SET_lexState( EXPR_END);
+        return tCHAR;
       case '&':
         if ((c = nextc(ps)) == '&') {
             SET_lexState( EXPR_BEG);
@@ -5952,6 +6066,16 @@ static int yylex(rb_parse_state* ps)
                 } else {
                     result = tIDENTIFIER;
                     needsNameToken = TRUE;
+                }
+            }
+            if ((lex_state == EXPR_BEG && !cmd_state) || IS_ARG(lex_state)) {
+                int p_c = *(ps->lex_p); // actual peek
+                if (ch_equals(':', p_c) && !(ps->lex_p + 1 < ps->lex_pend && (ps->lex_p)[1] == ':')) {
+                    lex_state = EXPR_BEG;
+                    nextc(ps);
+                    NODE* symqO = rb_parser_sym( tok(ps) , ps); 
+                    *ps->lexvalH = RpNameToken::s( ps, symqO );
+                    return tLABEL;
                 }
             }
 

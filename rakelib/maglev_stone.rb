@@ -109,10 +109,59 @@ class MagLevStone < Stone
     end
   end
 
+  def reload_everything
+    start unless running?
+    puts "Reloading src/smalltalk for #{@name}. This may take a minute..."
+    filename = "#{ML}/src/smalltalk/load#{@name}everything.gs"
+    ENV["imageRubyDir"] = "#{ML}/src/smalltalk/ruby"
+    File.open(filename, "w") do |f|
+      f.write(<<-EOS)
+        set gemstone #{@name}
+        level 0
+        display oops
+        display resultcheck
+        errorcount
+        iferr 1 exit 2
+        set user SystemUser pass swordfish
+        login
+        iferr 2 stack
+        output push baseruby.out
+        input #{ML}/src/smalltalk/fileinImageRubyDir.gs
+        commit
+        logout
+        exit
+      EOS
+    end
+    input_file(filename , false)
+    FileUtils.rm_f filename
+    reload_file_tree
+  end
+
+  def reload_file_tree
+    start unless running?
+    puts "Loading src/packages for #{@name}.  This may take a minute..."
+    script = File.read("#{ML}/src/smalltalk/loadfiletree.gs")
+    filename = "#{ML}/src/smalltalk/load#{@name}filetree.gs"
+    File.open(filename, "w") do |f|
+      f << script.gsub("MAGLEV_HOME", ML)
+    end
+    input_file(filename , false)
+    FileUtils.rm_f filename
+    reload_prims
+  end
+
   def reload_prims
     start unless running?
     puts "Loading Kernel for #{@name}.  This may take a few seconds..."
     input_file("#{ML}/src/smalltalk/ruby/allprims.topaz", false)
+
+    stonename = ENV["STONENAME"]
+    begin
+      ENV["STONENAME"] = ""
+      system("#{ML}/bin/maglev-ruby", "--stone", @name, "#{ML}/src/kernel/extensions.rb")
+    ensure
+      ENV["STONENAME"] = stonename
+    end
   end
 
   def prims_loaded?(name='maglev')

@@ -1,1 +1,3 @@
 fails:Kernel#trace_var is a private method
+fails:Kernel#trace_var accepts a proc argument insted of a block
+fails:Kernel#trace_var raises ArgumentError if no block or proc is provided

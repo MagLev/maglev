@@ -1,0 +1,4 @@
+fails:describes a running thread
+fails:Thread#status describes a killed thread
+fails:Thread#status describes a thread with an uncaught exception
+fails:Thread#status describes a dying sleeping thread

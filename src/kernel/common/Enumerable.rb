@@ -207,7 +207,7 @@ module Enumerable
     if count._equal?(nil)
       cnt = Fixnum__MAX
     else
-      cnt = Type.coerce_to( count, Fixnum, :to_int)
+      cnt = Maglev::Type.coerce_to( count, Fixnum, :to_int)
     end
     unless block_given?
       # Returns an Enumerator
@@ -220,7 +220,7 @@ module Enumerable
   end
 
   def drop(count)
-    cnt = Type.coerce_to( count, Fixnum, :to_int)
+    cnt = Maglev::Type.coerce_to( count, Fixnum, :to_int)
     self.to_a.drop(cnt) 
   end
 
@@ -229,7 +229,7 @@ module Enumerable
   end
 
   def each_cons(count, &block)  # added for 1.8.7
-    cnt = Type.coerce_to( count, Fixnum, :to_int)
+    cnt = Maglev::Type.coerce_to( count, Fixnum, :to_int)
     unless cnt > 0
       raise TypeError, 'each_cons, arg must be > 0'
     end
@@ -297,7 +297,7 @@ module Enumerable
   #      [10]
   #
   def each_slice(count, &block)	# rewritten for 1.8.7
-    slice_size = Type.coerce_to( count, Integer, :to_int)
+    slice_size = Maglev::Type.coerce_to( count, Integer, :to_int)
     unless slice_size > 0
       raise TypeError, 'each_slice, arg must be > 0'
     end
@@ -426,7 +426,7 @@ module Enumerable
       return self.first()
     end
     # return Array of first count elements of the enumeration
-    cnt = Type.coerce_to(count, Fixnum, :to_int)
+    cnt = Maglev::Type.coerce_to(count, Fixnum, :to_int)
     if cnt <= 0
       if cnt._equal?(0)
         return []
@@ -1089,7 +1089,7 @@ module Enumerable
   end
  
   def take(count)	# added for 1.8.7
-    cnt = Type.coerce_to( count, Fixnum, :to_int)
+    cnt = Maglev::Type.coerce_to( count, Fixnum, :to_int)
     if cnt <= 0
       if cnt < 0
         raise ArgumentError, 'arg to take must be >= 0'

@@ -1,1 +1,3 @@
 fails:BigDecimal#split Second value: a string with the significant digits
+fails:BigDecimal#split First value: -1 for numbers < 0
+fails:BigDecimal#split First value: 0 if BigDecimal is NaN

@@ -1,5 +1,8 @@
 class IO
 
+  module WaitReadable; end
+  module WaitWritable; end
+
   FNM_CASEFOLD = File::FNM_CASEFOLD
   FNM_DOTMATCH = File::FNM_DOTMATCH
   FNM_NOESCAPE = File::FNM_NOESCAPE

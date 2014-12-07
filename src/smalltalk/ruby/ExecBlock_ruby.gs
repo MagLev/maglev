@@ -32,6 +32,11 @@ _copyForRuby: opcode newBlockMethsInto: anArray
 %
 
 method:
+_rubyInstvarAt: descrArray
+  ^ self instVarNamed: descrArray first
+%
+
+method:
 _copyForProc: opcode
  "opcode == 0 , copy receiver for use in Proc.new_lambda .
   opcode == 2,  copy receiver for use in Proc.new

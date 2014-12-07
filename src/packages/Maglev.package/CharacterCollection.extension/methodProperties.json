@@ -2,4 +2,6 @@
 	"class" : {
 		 },
 	"instance" : {
-		"_isValidPathTermName" : "DataCurator 10/02/2012 14:30" } }
+		"_isValidPathTermName" : "DataCurator 10/02/2012 14:30",
+    "asRegex" : "DataCurator 12/02/2013 14:30",
+    "copyWithRegex:matchesTranslatedUsing:" : "DataCurator 12/02/2013 14:30" } }

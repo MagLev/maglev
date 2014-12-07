@@ -173,7 +173,7 @@ class Array
     if first._isArray
       a = __withall(first) # ignore the block
     else
-      siz = Type.coerce_to(first, Fixnum, :to_int)
+      siz = Maglev::Type.coerce_to(first, Fixnum, :to_int)
       a = __alloc(siz, nil)
       # block processed by initialize
     end
@@ -197,7 +197,7 @@ class Array
         self.replace(first)
         lim = 0 # ignore any block
       else
-        lim = Type.coerce_to(first, Fixnum, :to_int)
+        lim = Maglev::Type.coerce_to(first, Fixnum, :to_int)
         self.__size=(lim)
       end
     end
@@ -214,7 +214,7 @@ class Array
 
   def self.new(a_size, value)
     if self._equal?(Array)
-      s = Type.coerce_to(a_size, Fixnum, :to_int)
+      s = Maglev::Type.coerce_to(a_size, Fixnum, :to_int)
       a = __alloc(s, value)
     else
       a = __alloc(0, nil)
@@ -227,7 +227,7 @@ class Array
     if self.class._equal?(Array)
       # do nothing
     else
-      s = Type.coerce_to(a_size, Fixnum, :to_int)
+      s = Maglev::Type.coerce_to(a_size, Fixnum, :to_int)
       self.__size=(s)
       self.fill(value, 0, s)
     end
@@ -237,7 +237,7 @@ class Array
     if self.class._equal?(Array)
       # do nothing
     else
-      s = Type.coerce_to(a_size, Fixnum, :to_int)
+      s = Maglev::Type.coerce_to(a_size, Fixnum, :to_int)
       self.__size=(s)
       self.fill(value, 0, s)
     end
@@ -278,9 +278,9 @@ class Array
   end
 
   def self.__coerce_one_arg(arg)
-    carg = Type.coerce_to_or_nil(arg, Array, :to_ary)
+    carg = Maglev::Type.coerce_to_or_nil(arg, Array, :to_ary)
     if carg._equal?(nil)
-      carg = Type.coerce_to(arg, Fixnum, :to_int)
+      carg = Maglev::Type.coerce_to(arg, Fixnum, :to_int)
     end
     carg
   end
@@ -376,7 +376,7 @@ class Array
   # Set intersection.
   # Return new array containing elements common to two arrays.
   def &(other)
-    other = Type.coerce_to(other, Array, :to_ary)
+    other = Maglev::Type.coerce_to(other, Array, :to_ary)
     my_siz = self.__size
     other_siz  = other.__size
     dflt = Object.new
@@ -410,7 +410,7 @@ class Array
     if obj.respond_to?( :to_str )
       return join(obj)
     end
-    val = Type.coerce_to(obj, Fixnum, :to_int)
+    val = Maglev::Type.coerce_to(obj, Fixnum, :to_int)
     if val < 0
       raise ArgumentError, "arg must be >= 0"
     end
@@ -424,7 +424,7 @@ class Array
   end
 
   def +(arg)
-    arg = Type.coerce_to(arg, Array, :to_ary)
+    arg = Maglev::Type.coerce_to(arg, Array, :to_ary)
     res = self.dup
     if arg.__size._not_equal?(0)
       res.__insertall_at(arg, res.__size + 1)
@@ -433,7 +433,7 @@ class Array
   end
 
   def -(arg)
-    arg = Type.coerce_to(arg, Array, :to_ary)
+    arg = Maglev::Type.coerce_to(arg, Array, :to_ary)
     argSize = arg.__size
     mySize = self.__size
     default = []
@@ -474,7 +474,7 @@ class Array
   #
   # If other is not an array, raise a type error "TypeError
   def <=>(other)
-    other = Type.coerce_to(other, Array, :to_ary)
+    other = Maglev::Type.coerce_to(other, Array, :to_ary)
     ts = Thread.__recursion_guard_set
     added = ts.__add_if_absent(self)
     begin
@@ -503,11 +503,17 @@ class Array
     end
   end
 
+ 
   # ====== Comparable:
   # RxINC: This is a cut-n-paste to get things working for mspec.
   # Need to either overwrite or allow a mixin.
 
-  def ==(other)
+  # Return true if both are the same object, or if both are arrays, and
+  # have the same number of elements and all corresponding elements are
+  # eql?.
+  #
+
+  def eql?(other)
     return true if self._equal?(other)
     return false unless other._isArray
     lim = self.__size
@@ -523,57 +529,11 @@ class Array
         v = self.__at(i)
         ov = other[i]
         if v._equal?(ov)
-    # ok
-        elsif ts.include?(v) || ts.include?(ov)
-          if v._equal?(self) && ov._equal?(other)
-            # ok
-          elsif v._equal?(other) && ov._equal?(self)
-            # ok
-          else
-            raise ArgumentError, 'recursion too complex for Array#=='
-          end
-        elsif v == ov
-          # ok
-        else
-          return false
-        end
-        i += 1
-      end
-    ensure
-      if added
-        ts.remove(self)
-      end
-    end
-    true
-  end
-
-  # Return true if both are the same object, or if both are arrays, and
-  # have the same number of elements and all corresponding elements are
-  # eql?.
-  #
-  def eql?(other)
-    return true if self._equal?(other)
-    return false unless other._isArray
-    lim = self.__size
-    return false unless lim._equal?(other.__size)
-    ts = Thread.__recursion_guard_set
-    added = ts.__add_if_absent(self)
-    begin
-      i = 0
-      limi = lim
-      while i < limi
-        v = self.__at(i)
-        ov = other[i]
-        if v._equal?(ov)
           # ok
         elsif ts.include?(v) || ts.include?(ov)
-          if v._equal?(self) && ov._equal?(other)
-            # ok
-          elsif v._equal?(other) && ov._equal?(self)
-            # ok
-          else
-            raise ArgumentError, 'recursion too complex for Array#=='
-          end
+          # v and ov are the same objects, so behave like MRI 1.8.7 and return false
+          # in MRI 1.9.3 it should return true, though the array are not the same objects, but they have the same content
+          return true          
         elsif v.eql?(ov)
           # ok
         else
@@ -588,6 +548,8 @@ class Array
     end
     true
   end
+
+  alias :== :eql?
 
   def >(other)
     (self <=> other) > 0
@@ -649,7 +611,7 @@ class Array
 
   # Set Union.  Removes duplicates from self: [1,1,1] | [] => [1]
   def |(other)
-    other = Type.coerce_to(other, Array, :to_ary)
+    other = Maglev::Type.coerce_to(other, Array, :to_ary)
     hash = {}
     ary = []
     i = 0
@@ -752,7 +714,7 @@ class Array
   primitive_nobridge 'concat*', '_rubyAddAll:'
 
   def concat(arg)
-    arg = Type.coerce_to(arg, Array, :to_ary)
+    arg = Maglev::Type.coerce_to(arg, Array, :to_ary)
     if arg.__size._not_equal?(0)
       self.__insertall_at(arg, self.__size + 1)
     end
@@ -766,7 +728,7 @@ class Array
     unless block_given?
       return ArrayCycleEnumerator.new(self, count) # for 1.8.7
     end
-    lim = Type.coerce_to(count, Fixnum , :to_int)
+    lim = Maglev::Type.coerce_to(count, Fixnum , :to_int)
     if lim <= 0
       return nil # do nothing
     end
@@ -829,7 +791,7 @@ class Array
   # Delete element at specified +index+.  Return the deleted item, or
   # +nil+ if no item at +index+
   def delete_at(idx)
-    idx = Type.coerce_to(idx, Fixnum, :to_int)
+    idx = Maglev::Type.coerce_to(idx, Fixnum, :to_int)
     sz = self.__size
     if idx < 0
       idx = sz + idx
@@ -873,7 +835,7 @@ class Array
 
   def drop(count) # added in 1.8.7
     # return an Array containing self[count .. self.size -1]
-    cnt = Type.coerce_to(count, Fixnum, :to_int)
+    cnt = Maglev::Type.coerce_to(count, Fixnum, :to_int)
     if cnt < 0
       raise ArgumentError, 'arg to drop must be >= 0'
     end
@@ -969,7 +931,7 @@ class Array
   end
 
   def fetch(index, &block)
-    idx = Type.coerce_to(index, Fixnum, :to_int)
+    idx = Maglev::Type.coerce_to(index, Fixnum, :to_int)
     my_siz = self.__size
     bad = false
     if idx < 0
@@ -992,7 +954,7 @@ class Array
   end
 
   def fetch(index)
-    idx = Type.coerce_to(index, Fixnum, :to_int)
+    idx = Maglev::Type.coerce_to(index, Fixnum, :to_int)
     my_siz = self.__size
     if idx < 0
       idx = my_siz + idx
@@ -1007,7 +969,7 @@ class Array
   end
 
   def fetch(index, default)
-    idx = Type.coerce_to(index, Fixnum, :to_int)
+    idx = Maglev::Type.coerce_to(index, Fixnum, :to_int)
     my_siz = self.__size
     if idx < 0
       idx = my_siz + idx
@@ -1053,8 +1015,8 @@ class Array
 
   def fill(start, &block)
     if start._isRange
-      s = Type.coerce_to(start.begin, Fixnum, :to_int)
-      e = Type.coerce_to(start.end,   Fixnum, :to_int)
+      s = Maglev::Type.coerce_to(start.begin, Fixnum, :to_int)
+      e = Maglev::Type.coerce_to(start.end,   Fixnum, :to_int)
       s += self.__size if s < 0
       e += self.__size if e < 0
       if start.exclude_end?
@@ -1077,8 +1039,8 @@ class Array
   def fill(obj, start)
     # note no bridge methods for second and later variants
     if start._isRange
-      s = Type.coerce_to(start.begin, Fixnum, :to_int)
-      e = Type.coerce_to(start.end,   Fixnum, :to_int)
+      s = Maglev::Type.coerce_to(start.begin, Fixnum, :to_int)
+      e = Maglev::Type.coerce_to(start.end,   Fixnum, :to_int)
       s += self.__size if s < 0
       e += self.__size if e < 0
       if start.exclude_end?
@@ -1101,7 +1063,7 @@ class Array
       if start._equal?(nil)
         start = 0
       else
-        start = Type.coerce_to(start, Fixnum, :to_int)
+        start = Maglev::Type.coerce_to(start, Fixnum, :to_int)
       end
     end
     sz = self.__size
@@ -1134,7 +1096,7 @@ class Array
     if start._equal?(nil)
       start = 0
     else
-      start = Type.coerce_to(start, Fixnum, :to_int)
+      start = Maglev::Type.coerce_to(start, Fixnum, :to_int)
     end
     sz = self.__size
     unless length._isFixnum
@@ -1142,7 +1104,7 @@ class Array
         if length._kind_of?(Bignum)
           raise RangeError, "#{length} too big" if length >= 2**63
         else
-          length = Type.coerce_to(length, Fixnum, :to_int)
+          length = Maglev::Type.coerce_to(length, Fixnum, :to_int)
         end
         raise ArgumentError if length > sz
       end
@@ -1190,7 +1152,7 @@ class Array
   end
 
   def first(count)
-    cnt = Type.coerce_to(count, Fixnum, :to_int)
+    cnt = Maglev::Type.coerce_to(count, Fixnum, :to_int)
     if cnt < 0
       raise ArgumentError, 'negative count'
     end
@@ -1202,7 +1164,7 @@ class Array
   end
 
   def flatten(level = -1)  # level arg added for 1.8.7
-    lev = Type.coerce_to(level, Fixnum, :to_int)
+    lev = Maglev::Type.coerce_to(level, Fixnum, :to_int)
     if lev._equal?(0)
       return self
     end
@@ -1215,7 +1177,7 @@ class Array
   end
 
   def flatten!(level = -1)  # level arg added for 1.8.7
-    lev = Type.coerce_to(level, Fixnum, :to_int)
+    lev = Maglev::Type.coerce_to(level, Fixnum, :to_int)
     if lev._equal?(0)
       return nil
     end
@@ -1332,7 +1294,7 @@ class Array
   # element with the given index (counting from the end).
   def insert(idx, *args)
     return self if args.__size == 0
-    idx = Type.coerce_to(idx, Fixnum, :to_int)
+    idx = Maglev::Type.coerce_to(idx, Fixnum, :to_int)
     idx += (size + 1) if idx < 0
     raise IndexError, "#{idx} out of bounds" if idx < 0
     self[idx, 0] = args
@@ -1368,7 +1330,7 @@ class Array
   end
 
   def last(count)
-    cnt = Type.coerce_to(count, Fixnum, :to_int)
+    cnt = Maglev::Type.coerce_to(count, Fixnum, :to_int)
     my_size = self.__size
     if cnt <= 0
       if cnt < 0
@@ -1411,7 +1373,7 @@ class Array
   primitive '__pack', 'rubyPack:'
 
   def pack(template_str)
-    template_str = Type.coerce_to(template_str, String, :to_str)
+    template_str = Maglev::Type.coerce_to(template_str, String, :to_str)
     self.__pack(template_str)
   end
 
@@ -1430,7 +1392,7 @@ class Array
     if count._equal?(MaglevUndefined) 
       return self.pop()
     end 
-    cnt = Type.coerce_to(count, Fixnum, :to_int)
+    cnt = Maglev::Type.coerce_to(count, Fixnum, :to_int)
     if cnt < 0
       raise ArgumentError, 'arg to pop must be >= 0'
     end
@@ -1479,7 +1441,7 @@ class Array
   primitive '__replace', 'rubyReplace:'
 
   def replace(arg)
-    arg = Type.coerce_to(arg, Array, :to_ary)
+    arg = Maglev::Type.coerce_to(arg, Array, :to_ary)
     self.__replace(arg)
   end
 
@@ -1551,11 +1513,18 @@ class Array
 
   primitive_nobridge '__remove_from_to_', 'removeFrom:to:'
 
+  # Let's get the basic use case working - just pulling a single random element
+  # Check out https://github.com/rubinius/rubinius/blob/master/kernel/common/array.rb#L1286 for
+  # the Rubinius implementation
+  def sample(count=MaglevUndefined, options=MaglevUndefined)
+    return at Kernel.rand(size)
+  end
+
   def shift(count=MaglevUndefined)  # added in 1.8.7
     if count._equal?(MaglevUndefined) 
-      return self.shift()
+      return self.__shift
     end
-    cnt = Type.coerce_to(count, Fixnum, :to_int)
+    cnt = Maglev::Type.coerce_to(count, Fixnum, :to_int)
     if cnt < 0
       raise ArgumentError, 'arg to shift must be >= 0'
     end
@@ -1574,16 +1543,10 @@ class Array
   end
 
   def shift
-    sz = self.__size
-    elem = nil
-    unless sz._equal?(0)
-      elem = self.__at(0)
-      self.__remove_from_to_(1, 1)  # one-based args
-    end
-    elem
+    self.__shift
   end
 
-  def __shift  # used by Argf implementation
+  def __shift
     sz = self.__size
     elem = nil
     unless sz._equal?(0)
@@ -1612,8 +1575,8 @@ class Array
   primitive_nobridge 'slice', '_rubyAt:length:'
 
   def slice!(start, length)
-    start = Type.coerce_to(start, Fixnum, :to_int)
-    length = Type.coerce_to(length, Fixnum, :to_int)
+    start = Maglev::Type.coerce_to(start, Fixnum, :to_int)
+    length = Maglev::Type.coerce_to(length, Fixnum, :to_int)
     my_siz = self.__size
     if my_siz._equal?(0)
       return self.class.__alloc(0, nil)
@@ -1640,7 +1603,7 @@ class Array
 
   def slice!(arg)
     if arg._isRange
-      start = Type.coerce_to(arg.begin, Fixnum, :to_int)
+      start = Maglev::Type.coerce_to(arg.begin, Fixnum, :to_int)
       if start < 0
         my_siz = self.__size
         start = my_siz + start
@@ -1648,7 +1611,7 @@ class Array
           return nil
         end
       end
-      last = Type.coerce_to(arg.end, Fixnum, :to_int)
+      last = Maglev::Type.coerce_to(arg.end, Fixnum, :to_int)
       if last < 0
         last = self.__size + last
       end
@@ -1693,7 +1656,7 @@ class Array
 
   def take(count) # added in 1.8.7
     # return an Array containing self[0 .. count-1 ]
-    cnt = Type.coerce_to(count, Fixnum, :to_int)
+    cnt = Maglev::Type.coerce_to(count, Fixnum, :to_int)
     if cnt < 0
       raise ArgumentError, 'arg to take must be >= 0'
     end
@@ -1735,7 +1698,7 @@ class Array
   end
 
   def to_s
-    self.join
+    '[' + self.collect { |v| v.inspect }.join(', ') + ']'
   end
 
   # Transpose rows and columns (assumes self is an array of arrays, all of
@@ -1747,7 +1710,7 @@ class Array
     n = 0
     el_size = 0
     while n < my_size
-      elem = Type.coerce_to( self.__at(n), Array, :to_ary)
+      elem = Maglev::Type.coerce_to( self.__at(n), Array, :to_ary)
       elem_size = elem.__size
       if n._equal?(0)
         el_size = elem_size
@@ -1827,6 +1790,15 @@ class Array
       n = n + 1
     end
     res
+  end
+  
+  def self.try_convert(obj)
+    begin
+      array = Maglev::Type.__coerce_to_Array_to_ary(obj)
+    rescue TypeError
+      return nil
+    end
+    return array
   end
 
 end

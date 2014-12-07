@@ -22,7 +22,7 @@ module Kernel
     if wrap
       raise ArgumentError , 'Kernel.load  , wrap==true not supported yet' # TODO
     end
-    RUBY.load(Type.coerce_to(name, String, :to_str))
+    RUBY.load(Maglev::Type.coerce_to(name, String, :to_str))
     true
   end
 
@@ -257,7 +257,7 @@ module Kernel
         if k._isString
           vstr = nil
           unless v._equal?(nil)
-            vstr = Type.coerce_to(v, String, :to_str)
+            vstr = Maglev::Type.coerce_to(v, String, :to_str)
           end
           env_arr << k
           env_arr << vstr
@@ -324,10 +324,10 @@ module Kernel
         }
         lim -= 1
       end
-      cmd = Type.coerce_to(cmd, String, :to_str)
+      cmd = Maglev::Type.coerce_to(cmd, String, :to_str)
       arguments = []
       while idx < lim
-        arguments << Type.coerce_to(args[idx], String, :to_str)
+        arguments << Maglev::Type.coerce_to(args[idx], String, :to_str)
         idx += 1
       end
       if wd_for_exec
@@ -378,12 +378,12 @@ module Kernel
     file = args[2]
     line = args[3]
     unless file._equal?(nil)
-      file = Type.coerce_to(file, String, :to_str)
+      file = Maglev::Type.coerce_to(file, String, :to_str)
     end
     if line._equal?(nil)
       line = 0
     else
-      line = Type.coerce_to(line, Fixnum, :to_int)
+      line = Maglev::Type.coerce_to(line, Fixnum, :to_int)
     end
     if bnd._equal?(nil)
       ctx = self.__binding_ctx(1)
@@ -419,12 +419,12 @@ module Kernel
     file = args[2]
     line = args[3]
     unless file._equal?(nil)
-      file = Type.coerce_to(file, String, :to_str)
+      file = Maglev::Type.coerce_to(file, String, :to_str)
     end
     if line._equal?(nil)
       line = 0
     else
-      line = Type.coerce_to(line, Fixnum, :to_int)
+      line = Maglev::Type.coerce_to(line, Fixnum, :to_int)
     end
     # ctx = self.__binding_ctx(1)
     bnd = Binding.__basic_new( nil )
@@ -469,14 +469,13 @@ module Kernel
   primitive 'format*', 'sprintf:with:'
 
   def gets(sep=$/)
-    # TODO: Need to use-up ARGV first...
-    STDIN.gets(sep)
+    $stdin.gets(sep)
   end
 
   primitive 'global_variables', 'rubyGlobalVariables'
 
   def gsub(regex, string)
-    string = Type.coerce_to(string, String, :to_str)
+    string = Maglev::Type.coerce_to(string, String, :to_str)
     str = self.__getRubyVcGlobal(0x21) # get callers $_
     if str._equal?(nil)
       raise TypeError, 'Kernel.gsub, caller frame has no reference to $_ '
@@ -657,7 +656,7 @@ module Kernel
   #
   #     Got: in Child
   def open(name, *rest, &block)
-    path = Type.coerce_to(name, String, :to_str)
+    path = Maglev::Type.coerce_to(name, String, :to_str)
 
     if path._isString and path[0]._equal?(?|)
       return IO.popen(path[1..-1], *rest, &block)
@@ -836,7 +835,14 @@ module Kernel
   end
 
   def require(name)
-    RUBY.require(Type.coerce_to(name, String, :to_str))
+    RUBY.require(Maglev::Type.coerce_to(name, String, :to_str))
+  end
+
+  def require_relative(path)
+    caller_entry = Thread.__backtrace(false, 100)[1]
+    caller_dir = File.dirname(caller_entry[/^[^:]+/])
+    expanded_path = File.expand_path(path, caller_dir)
+    RUBY.require(expanded_path)
   end
 
   def scan(pattern)
@@ -864,19 +870,22 @@ module Kernel
   primitive_nobridge '__select*', 'selectRead:write:error:timeout:'
 
   def select(reads, writes=nil, errs=nil, timeout=nil)
-    if timeout._isFixnum
-      ms = timeout * 1000
-      unless ms._isFixnum && ms >= 0
-        raise ArgumentError , "IO#select, timeout not representable as Fixnum milliseconds >=0"
-      end
-    elsif timeout._not_equal?(nil)
-      timeout = Type.coerce_to(timeout, Float, :to_f)
-      ms = (timeout * 1000.0 ).to_int
-      unless ms._isFixnum && ms >= 0
-        raise ArgumentError , "IO#select, timeout not representable as Fixnum milliseconds >=0"
-      end
+    ms = if timeout._equal?(nil)
+      nil
+    elsif timeout._isFixnum
+      timeout * 1000
+    else
+      timeout = Maglev::Type.coerce_to(timeout, Float, :to_f)
+      (timeout * 1000.0 ).to_int
     end
-    Kernel.__select(reads, writes, errs, *[ ms ])
+
+    if ms._isFixnum && ms < 0
+      raise ArgumentError, 'Kernel.select, timeout not representable as Fixnum milliseconds >=0'
+    end
+
+    arrays = __select(reads, writes, errs, *[ ms ])
+    return arrays if arrays._equal?(nil)
+    arrays.map{|arr| Array(arr)}
   end
 
   # Preferred alternative to         class << self ; self ; end  .
@@ -937,7 +946,7 @@ module Kernel
 
   def `(arg)                         #` close quote for Emacs higlighting
     # called from generated code
-    arg = Type.coerce_to(arg, String, :to_str)
+    arg = Maglev::Type.coerce_to(arg, String, :to_str)
     arr = __forkv_exec(arg)  #   raw_status is arr[0]
     # Note that arr is available as $?.__prim_result for debugging
     status = arr[1]
@@ -955,7 +964,7 @@ module Kernel
     unless str._isString
       raise TypeError, '$_ is not a String'
     end
-    replacement = Type.coerce_to(replacement, String, :to_str)
+    replacement = Maglev::Type.coerce_to(replacement, String, :to_str)
     regex = str.__get_pattern(pattern, true)
     r = if (match = regex.__match_vcglobals(str, 0x30))
           str.__replace_match_with(match, replacement)
@@ -1022,7 +1031,7 @@ module Kernel
 
   def __xstr_exec(arg)
     # called from generated code
-    arg = Type.coerce_to(arg, String, :to_str)
+    arg = Maglev::Type.coerce_to(arg, String, :to_str)
     arr = __forkv_exec(arg)  #   raw_status is arr[0]
     # Note that arr is available as $?.__prim_result for debugging
     arr[2]  # child stdout
@@ -1039,7 +1048,7 @@ module Kernel
     if arg._is_a?(File)
       f = arg
     else
-      fn = Type.coerce_to(arg, String, :to_str)
+      fn = Maglev::Type.coerce_to(arg, String, :to_str)
       begin
         f = File.open(fn)
       rescue
@@ -1182,7 +1191,7 @@ module Kernel
 
   def __trace_var(name, &block)
     unless name._isSymbol
-      name = Type.coerce_to(name, String, :to_str)
+      name = Maglev::Type.coerce_to(name, String, :to_str)
       name = name.to_sym
     end
     __trace_global_assign(name, &block)
@@ -1210,6 +1219,7 @@ module Kernel
   # the callcc is the value of the block, or the value passed to
   # cont.call. See class Continuation for more details.
   def callcc
+    raise LocalJumpError, "no block given" unless block_given?
     Proc.new.__call_cc
   end
 end

@@ -1,4 +1,4 @@
-#! /bin/bash
+#! /usr/bin/env bash
 
 #=========================================================================
 # Copyright (C) GemStone Systems, Inc. 2010.

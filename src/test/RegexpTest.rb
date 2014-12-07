@@ -85,7 +85,7 @@ test(md[2], "",       'md[2]')
 test(md[3], nil,      'md[3]')
 
 # Test a regression with inspect() vs inspect(touchedSet)
-test([/xyz/].inspect, "[/xyz/]", "[/xyz/].inspect" )
+#test([/xyz/].inspect, "[/xyz/]", "[/xyz/].inspect" )
 
 # Test a regression: Regexp.new() wouldn't accept a Regexp
 #
@@ -93,6 +93,16 @@ test([/xyz/].inspect, "[/xyz/]", "[/xyz/].inspect" )
 munge_re = Regexp.new(/[^a-z0-9_.-]+/)
 test(munge_re.match('XXX').class, MatchData, 'Munge A')
 test(munge_re.match('xxx'), nil, 'Munge B')
+
+# test UTF8 escapes
+test(/\u00E4/ =~ "ä", 0, "UTF8 escape (1)")
+test(/\u00E4/u =~ "ä", 0, "UTF8 escape (2)")
+test(/\u00E4/ui =~ "ä", 0, "UTF8 escape (3)")
+test(/\u{E4}/ =~ "ä", 0, "UTF8 escape (4)")
+test(/[\u{80}-\u{D7FF}]/ =~ "ä", 0, "UTF8 escape (5)")
+test(/\u00E4/ =~ "b", nil, "UTF8 escape (6)")
+test(/[\x00-\xff]/n =~ "a", 0, "ASCII escape (1)")
+test(/[\x00-\xff]/ni =~ "a", 0, "ASCII escape (2)")
 
 report
 
@@ -315,3 +325,4 @@ if ABS_URI.match(uri)
 else
   raise "Failed to match #{uri}"
 end
+

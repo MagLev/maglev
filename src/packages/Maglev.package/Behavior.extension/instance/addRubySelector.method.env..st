@@ -1,7 +1,7 @@
 *maglev-runtime
-addRubySelector: selectorSymbol method: aGsMethod env: envId 
+addRubySelector: selectorSymbol method: aGsMethod env: envId
   "aGsMethod may be a SmallInt Ruby protection override"
-  | md pmd tmeth pmeth  |
+  | md pmd tmeth pmeth |
   md := self transientMethodDictForStoreEnv: envId .
   tmeth := md at: selectorSymbol otherwise: nil .
   md at: selectorSymbol put: aGsMethod .
@@ -20,6 +20,6 @@ addRubySelector: selectorSymbol method: aGsMethod env: envId
 " selectorSymbol == #aa_class_method ifTrue:[ self pause ]."
  "TraceRubyMethodDicts ifTrue:[
     GsFile gciLogServer: self name, '  addRubySelector: ' , selectorSymbol printString ,
-        ' methSel ', aGsMethod selector , '  methId:', aGsMethod asOop asString 
+        ' methSel ', aGsMethod selector , '  methId:', aGsMethod asOop asString
   ]."
 

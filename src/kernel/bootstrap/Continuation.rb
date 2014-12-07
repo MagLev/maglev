@@ -8,6 +8,10 @@ class Continuation
   # identical to Smalltalk class RubyContinuation
   primitive_nobridge '__cc_call', 'ccCall:'
 
+  def self.new
+    raise NoMethodError, "undefined method `new' for Continuation:Class"
+  end
+
   def [](*args)
     __run(args)
   end

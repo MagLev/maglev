@@ -8,6 +8,7 @@ end
 
 desc 'Run the test for sinatra_app.rb.'
 task :test do
+  sh 'maglev-gem install sinatra minitest rack-test'
   sh 'maglev-ruby -rubygems sinatra_app_test.rb'
 end
 

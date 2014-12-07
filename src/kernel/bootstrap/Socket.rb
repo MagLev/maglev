@@ -92,9 +92,9 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
 
   def fcntl(op, flags=0)
     # Socket specific implemention for F_SETFL, NONBLOCK
-    op = Type.coerce_to(op, Fixnum, :to_int)
+    op = Maglev::Type.coerce_to(op, Fixnum, :to_int)
     if op._equal?(Fcntl::F_SETFL)
-      flags = Type.coerce_to(flags, Fixnum, :to_int)
+      flags = Maglev::Type.coerce_to(flags, Fixnum, :to_int)
       if (flags & File::NONBLOCK) != 0
         @_st_isRubyBlocking = false
       else
@@ -126,10 +126,12 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
   def self.for_fd(fd)
     # returns nil or an already open Socket
     unless fd._isFixnum
-      TypeError signal:'for_fd expects a Fixnum argument' 
+      TypeError signal:'for_fd expects a Fixnum argument'
     end
     self.__for_fd(fd)
   end
+
+  class_primitive_nobridge '__new_for_fd', '_newSocketForFd:'
 
   def fsync
     if closed?
@@ -158,15 +160,15 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
   def self.getservbyname(service, proto='tcp')
     # returns a port number as a Fixnum , or raises an error
     #   if the service is not found.
-    s = Type.coerce_to(service, String, :to_str)
-    p = Type.coerce_to(proto, String, :to_str)
+    s = Maglev::Type.coerce_to(service, String, :to_str)
+    p = Maglev::Type.coerce_to(proto, String, :to_str)
     __getservbyname(s, p)
   end
 
   def self.getaddrinfo(host, service, family = 0, socktype = 0,
                  protocol = 0, flags = 0)
     unless host._equal?(nil)
-      host = Type.coerce_to(host, String, :to_s)
+      host = Maglev::Type.coerce_to(host, String, :to_s)
     end
     if service._equal?(nil)
       # nil is ok
@@ -193,9 +195,9 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
     unless family._isFixnum
       raise TypeError , 'getaddrinfo: family must be a Fixnum or a String'
     end
-    socktype = Type.coerce_to(socktype, Fixnum, :to_int)
-    protocol = Type.coerce_to(protocol, Fixnum, :to_int)
-    flags = Type.coerce_to(flags, Fixnum, :to_int)
+    socktype = Maglev::Type.coerce_to(socktype, Fixnum, :to_int)
+    protocol = Maglev::Type.coerce_to(protocol, Fixnum, :to_int)
+    flags = Maglev::Type.coerce_to(flags, Fixnum, :to_int)
     args = [ host, serv, family, socktype, protocol, flags]
     if socktype._equal?(0)
       # getaddrinfo() system call may give 'EAI error 9' with hints.ai_socktype==0,
@@ -250,12 +252,12 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
     if host._equal?(nil)
       host = '127.0.0.1'
     else
-      host = Type.coerce_to(host, String, :to_s )
+      host = Maglev::Type.coerce_to(host, String, :to_s )
       if host.__size._equal?(0)
         host = '0.0.0.0'
       end
     end
-    port = Type.coerce_to(port, String, :to_s)  # convert Fixnum to String
+    port = Maglev::Type.coerce_to(port, String, :to_s)  # convert Fixnum to String
     self.__getsockaddr(port, host)
   end
 
@@ -356,7 +358,7 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
   primitive '__listen', 'makeListener:'
 
   def listen(queue_size=10)
-    queue_size = Type.coerce_to(queue_size, Fixnum, :to_int)
+    queue_size = Maglev::Type.coerce_to(queue_size, Fixnum, :to_int)
     if queue_size < 1 || queue_size > 1000
       raise ArgumentError , 'arg to listen must be >= 1 and <= 1000'
     end
@@ -433,19 +435,19 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
     if length._equal?(uu)
       self.recv(4096)
     else
-      length = Type.coerce_to(length, Fixnum, :to_int)
+      length = Maglev::Type.coerce_to(length, Fixnum, :to_int)
       if buffer._equal?(uu)
         buf = String.__new(length)
         self.__read_into(length, buf, length)
       else
-        buffer = Type.coerce_to(a_buffer, String, :to_str)
+        buffer = Maglev::Type.coerce_to(a_buffer, String, :to_str)
         self.__read_into(length, buffer, length)
       end
     end
   end
 
   def read(length)
-    length = Type.coerce_to(length, Fixnum, :to_int)
+    length = Maglev::Type.coerce_to(length, Fixnum, :to_int)
     buf = String.__new(length)
     self.__read_into(length, buf, length)
   end
@@ -454,12 +456,12 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
   primitive '__read_into', 'read:into:minLength:' # returns nil on socket eof
 
   def readpartial(length, buffer=MaglevUndefined)
-    length = Type.coerce_to(length, Fixnum, :to_int)
+    length = Maglev::Type.coerce_to(length, Fixnum, :to_int)
     if buffer._equal?(MaglevUndefined)
       buf = String.__new(length)
       self.__read_into(length, buf, length)
     else
-      buffer = Type.coerce_to(a_buffer, String, :to_str)
+      buffer = Maglev::Type.coerce_to(a_buffer, String, :to_str)
       self.__read_into(length, buffer)
     end
   end
@@ -630,7 +632,7 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
   end
 
   def shutdown(how=2)
-    how = Type.coerce_to(how, Fixnum, :to_int)
+    how = Maglev::Type.coerce_to(how, Fixnum, :to_int)
     if how._equal?(2)
       self.__close_readwrite
     elsif how._equal?(1)
@@ -672,10 +674,10 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
     if length._equal?(uu) || length._equal?(nil)
       len = 1500
     else
-      len = Type.coerce_to(length, Fixnum, :to_int)
+      len = Maglev::Type.coerce_to(length, Fixnum, :to_int)
       raise ArgumentError, "length must not be negative" if len < 0
     end
-    buffer = Type.coerce_to(a_buffer, String, :to_str)
+    buffer = Maglev::Type.coerce_to(a_buffer, String, :to_str)
     self.__read_into(len, buffer, 1)  # grows buffer if needed
     buffer
   end
@@ -688,7 +690,7 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
     if length._equal?(nil)
       len = 4096
     else
-      len = Type.coerce_to(length, Fixnum, :to_int)
+      len = Maglev::Type.coerce_to(length, Fixnum, :to_int)
       raise ArgumentError, "length must not be negative" if len < 0
     end
     str = self.recv(len)
@@ -738,7 +740,7 @@ class IPSocket  # < Socket in Smalltalk bootstrap
   class_primitive '__getaddress', 'getHostAddressByName:'
 
   def self.getaddress(hostname)
-    hostname = Type.coerce_to(hostname, String, :to_str)
+    hostname = Maglev::Type.coerce_to(hostname, String, :to_str)
     addr = self.__getaddress(hostname)
     if addr._equal?(nil)
       detail = self.__last_err_string
@@ -808,10 +810,10 @@ class UDPSocket # < IPSocket in Smalltalk bootstrap
     if hostname._equal?(nil)
       hostname = ''
     else
-      hostname = Type.coerce_to(hostname, String, :to_str)
+      hostname = Maglev::Type.coerce_to(hostname, String, :to_str)
     end
     unless port._equal?(nil)
-      port = Type.coerce_to(port, Fixnum, :to_int)
+      port = Maglev::Type.coerce_to(port, Fixnum, :to_int)
     end
     self.__bind(hostname, port)
     0
@@ -822,8 +824,8 @@ class UDPSocket # < IPSocket in Smalltalk bootstrap
   def connect(hostname, port)
     # hostname  '<broadcast>' maps to INADDR_BROADCAST
     # hostname   ''   maps to INADDR_ANY
-    hostname = Type.coerce_to(hostname, String, :to_str)
-    port = Type.coerce_to(port, Fixnum, :to_int)
+    hostname = Maglev::Type.coerce_to(hostname, String, :to_str)
+    port = Maglev::Type.coerce_to(port, Fixnum, :to_int)
     status = self.__connect(port, hostname)
     if status._equal?(false)
       raise Errno::ECONNREFUSED
@@ -878,7 +880,7 @@ class TCPServer   # < TCPSocket in Smalltalk bootstrap
       port = a2
       # port may be nil or 0 to get a random port
       port = port._equal?(0) ? nil : port
-      hostname = Type.coerce_to(hostname, String, :to_str)
+      hostname = Maglev::Type.coerce_to(hostname, String, :to_str)
       if hostname.length._equal?(0)
         self.__new( 'localhost' , port)
       else
@@ -903,7 +905,7 @@ class UNIXSocket # < Socket in Smalltalk bootstrap
 
   def self.open(path)
     sock = self.__new
-    path = Type.coerce_to(path, String, :to_str)
+    path = Maglev::Type.coerce_to(path, String, :to_str)
     unless sock.__connect(path)
       raise SocketError , "UNIXSocket connect failed for #{path}"
     end
@@ -979,7 +981,7 @@ class UNIXServer # < UNIXSocket in Smalltalk bootstrap
 
   def self.open(path)
     sock = self.__new
-    path = Type.coerce_to(path, String, :to_str)
+    path = Maglev::Type.coerce_to(path, String, :to_str)
     sock.__bind(path)
     sock.__listen(10)  # default queue length 10
     sock
@@ -999,5 +1001,8 @@ class UNIXServer # < UNIXSocket in Smalltalk bootstrap
     @_st_isRubyBlocking = false  # inline set_blocking(false)
     self.accept
   end
+
+  primitive_nobridge '__readable', '_isReadable'
+  primitive_nobridge '__writable', '_isWritable'
 
 end
