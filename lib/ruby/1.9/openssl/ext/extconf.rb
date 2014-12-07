@@ -47,7 +47,7 @@ module GetOpenSSLHeaders
 
   def get_headers(version)
     unless File.directory?("openssl-#{version}")
-      file = "openssl-#{version}.tar.gz"
+      file = "openssl-#{version}j.tar.gz"
       openssl_url = "ftp://ftp.openssl.org/source/#{file}"
       message " Downloading #{openssl_url}\n"
       message " Trying wget.\n"
