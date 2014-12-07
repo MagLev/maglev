@@ -59,7 +59,7 @@ module GetOpenSSLHeaders
           raise "Must have curl or wget"
         end
       end
-      system "tar xzf #{file}"
+      system "tar xzf #{file} && mv openssl-#{version}j openssl-#{version}"
     end
   end
 
