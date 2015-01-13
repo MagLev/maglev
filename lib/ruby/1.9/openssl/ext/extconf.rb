@@ -47,7 +47,8 @@ module GetOpenSSLHeaders
 
   def get_headers(version)
     unless File.directory?("openssl-#{version}")
-      file = "openssl-#{version}j.tar.gz"
+      letter = 'k'
+      file = "openssl-#{version}#{letter}.tar.gz"
       openssl_url = "ftp://ftp.openssl.org/source/#{file}"
       message " Downloading #{openssl_url}\n"
       message " Trying wget.\n"
@@ -59,7 +60,7 @@ module GetOpenSSLHeaders
           raise "Must have curl or wget"
         end
       end
-      system "tar xzf #{file} && mv openssl-#{version}j openssl-#{version}"
+      system "tar xzf #{file} && mv openssl-#{version}#{letter} openssl-#{version}"
     end
   end
 
