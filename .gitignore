@@ -34,6 +34,7 @@ src/test/test_data/Trac781.gz
 rubyspec_temp
 fileintmp
 gemstone
+gemstone_versions
 src/kernel/parser/byacc/*.o
 src/kernel/parser/byacc/config.h
 src/kernel/parser/byacc/config.status
