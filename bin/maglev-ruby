@@ -123,7 +123,7 @@ stoneHost=
 # Allow arguments to be parsed w/o $MAGLEV_HOME being set. Use parseArgsMH
 # as a substitute for MAGLEV_HOME if necessary during arg parsing
 parseArgsMH=$MAGLEV_HOME
-[[ -z $parseArgsMH ]] && parseArgsMH=${0%%/bin/maglev-ruby}
+[[ -z $parseArgsMH ]] && parseArgsMH=${0%%/bin/$COMMAND}
 
 # This function gets called several times
 # 1. Parse $MAGLEV_OPTS

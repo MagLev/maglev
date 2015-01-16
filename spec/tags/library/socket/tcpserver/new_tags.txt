@@ -2,3 +2,4 @@ fails:TCPServer.new binds to INADDR_ANY if the hostname is empty
 fails:TCPServer.new coerces port to string, then determines port from that number or service name
 fails:TCPServer.new raises Errno::EADDRNOTAVAIL when the adress is unknown
 fails:TCPServer.new raises Errno::EADDRINUSE when address is already in use
+fails:TCPServer.new binds to localhost and a port with either IPv4 or IPv6

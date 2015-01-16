@@ -37,9 +37,11 @@ _bindingInfo: aBindingContext
       ].
     ].
   ].
+  " Let's be a little quieter about warnings.
+    See discussion at: https://github.com/MagLev/maglev/issues/64
   warnCba ifNotNil:[ | msg |
     msg := 'binding for eval does not include CopyingBlockArgs yet' .
     Kernel @ruby1:warn: msg .
-  ].
+  ]. "
   ^ { vc . aBindingContext at: 2"methodDefTarget" . nDict  }.
 

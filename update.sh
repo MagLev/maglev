@@ -31,8 +31,8 @@
 # Defaults
 export MAGLEV_SOURCE=$PWD
 export MAGLEV_HOME=$PWD
-export GEMSTONES_HOME=$PWD/..
-export ARCHIVES_HOME=$PWD/..
+export GEMSTONES_HOME=$PWD/gemstone_versions
+export ARCHIVES_HOME=$PWD/gemstone_versions
 export BACKUPS_HOME=$PWD/backups
 export DISABLE_INSTALL_DOC=0
 export SKIP_RC_REMINDER=0
