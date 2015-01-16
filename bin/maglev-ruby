@@ -2,7 +2,7 @@
 #
 # Runs a ruby file using the MagLev VM
 #
-# Copyright 2009-2010 GemStone Systems, Inc. All rights reserved.
+# Copyright 2009-2015 GemTalk Systems, Inc. All rights reserved.
 
 export LANG=C  # see https://github.com/MagLev/maglev/issues/93
 
@@ -150,7 +150,7 @@ function parseArgs {
                 cd ${1:2} || usage "${1:2}: bad directory"
                 ;;
             --copyright)
-                echo "maglev - Copyright 2008-2010 GemStone Systems, Inc."
+                echo "maglev - Copyright 2008-2015 GemTalk Systems, Inc."
                 exit
                 ;;
             -d|--debug)
