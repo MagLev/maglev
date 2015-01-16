@@ -74,8 +74,9 @@ else
     exit 1
 fi
 
-# IMPORTANT: Move to the parent directory of the MagLev git repository
-cd $MAGLEV_HOME/..
+# Move to the versions directory
+mkdir -p $MAGLEV_HOME/gemstone_versions
+cd $MAGLEV_HOME/gemstone_versions
 
 # Download appropriate version of GemStone
 if [ ! -e $gss_file ]; then
