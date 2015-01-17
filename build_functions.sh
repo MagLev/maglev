@@ -10,7 +10,7 @@ function run_topaz()
 {
   typeset IFS
   IFS=$'\n'
-  printf "$*\n" | gs_sh topaz -I "${MAGLEV_HOME}/etc/.topazini" || return $?
+  printf "$*\n" | gs_sh topaz -l -I "${MAGLEV_HOME}/etc/.topazini" || return $?
 }
 
 function run_on_stone()
