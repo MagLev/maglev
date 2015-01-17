@@ -107,7 +107,7 @@ function build_maglev_in_stone()
   typeset __return __max_log
   __max_log=50
   {
-    gs_sh startstone ${STONENAME} -l "$FILEIN_DIR/stone.log" -e "$FILEIN_DIR/filein.ruby.conf" -z "$FILEIN_DIR/filein.ruby.conf" &&
+    gs_sh startstone ${STONENAME} -l "$FILEIN_DIR/stone.log" &&
     gs_sh waitstone ${STONENAME}
   } > "$FILEIN_DIR/startstone_$1.log" 2>&1 ||
   {
