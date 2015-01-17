@@ -60,7 +60,7 @@ function build_maglev_stone_create()
 {
   echo "[Info] Creating new default '${STONENAME}' repository"
   mkdir -p "${MAGLEV_HOME}/etc/conf.d/"
-  mkdir_p "${MAGLEV_HOME}/backups"
+  mkdir -p "${MAGLEV_HOME}/backups"
   cp_template "${MAGLEV_HOME}/rakelib/contrib/ottobehrens/stone.conf.template" "${MAGLEV_HOME}/etc/conf.d/${STONENAME}.conf"
   mkdir -p "${GEMSTONE_DATADIR}/extent"
   mkdir -p "${MAGLEV_HOME}/log/${STONENAME}"
