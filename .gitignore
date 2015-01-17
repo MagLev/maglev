@@ -46,4 +46,5 @@ etc/maglev.hpi.key
 lib/ruby/1.9/openssl/ext/openssl.so
 lib/ruby/1.9/openssl/ext/openssl.dylib
 lib/ruby/1.9/openssl/ext/openssl.bundle
+lib/maglev/gems/1.9
 versions
