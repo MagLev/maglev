@@ -137,7 +137,7 @@ PLATFORM="`uname -sm | tr ' ' '-'`"
 
 gsvers=`grep ^GEMSTONE version.txt | cut -f2 -d-`
 gss_name="GemStone-${gsvers}.${PLATFORM}"
-gss_file="${ARCHIVES_HOME}/${gss_name}.tar.gz"
+gss_file="${gss_name}.tar.gz"
 
 # We're good to go. Let user know.
 machine_name="`uname -n`"
@@ -154,6 +154,7 @@ else
 fi
 
 # Download appropriate version of GemStone
+builtin cd "${GEMSTONES_HOME}"
 if
   [[ -e $gss_file ]]
 then
