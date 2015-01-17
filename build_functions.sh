@@ -142,7 +142,7 @@ function build_maglev_fileinruby()
   outfile="${FILEIN_DIR}/fileinruby.out"
   _commands=(
     "output push ${outfile} only"
-    "set gemstone ${STONE_NAME}"
+    "set gemstone ${STONENAME}"
     "input $imageDir/fileinruby.topaz"
     "output pop"
     "exit"
@@ -165,7 +165,7 @@ function build_maglev_load_file_tree_dir()
   _commands=(
     "output push ${outfile} only"
     "iferr 1 exit 3"
-    "set gemstone ${STONE_NAME} user DataCurator pass swordfish"
+    "set gemstone ${STONENAME} user DataCurator pass swordfish"
     "login"
     "run"
     "|repos|"
