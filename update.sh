@@ -31,8 +31,8 @@
 # Defaults
 export MAGLEV_SOURCE=$PWD
 export MAGLEV_HOME=$PWD
-export GEMSTONES_HOME=$PWD/gemstone_versions
-export ARCHIVES_HOME=$PWD/gemstone_versions
+export GEMSTONES_HOME=$PWD/versions
+export ARCHIVES_HOME=$PWD/versions
 export BACKUPS_HOME=$PWD/backups
 export DISABLE_INSTALL_DOC=0
 export SKIP_RC_REMINDER=0
@@ -108,12 +108,9 @@ echo "$STONENAME" > .stonename
   exit 1
 }
 
-# Check that the parent directory is writable
+# Make the archives directory
 [[ -w "$GEMSTONES_HOME" ]] || {
-  echo "[Error] This script requires write permission on the MagLev parent directory."
-  /bin/ls -ld "$GEMSTONES_HOME"
-  echo "To fix this run: chmod u+w \"$GEMSTONES_HOME\""
-  exit 1
+  mkdir -p "$GEMSTONES_HOME"
 }
 
 # We should run this as a normal user, not root.
