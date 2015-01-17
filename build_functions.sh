@@ -161,7 +161,7 @@ function build_maglev_load_file_tree_dir()
 {
   typeset -a _commands
   typeset outfile
-  outfile= "${FILEIN_DIR}/loadfiletree.out"
+  outfile="${FILEIN_DIR}/loadfiletree.out"
   _commands=(
     "output push ${outfile} only"
     "iferr 1 exit 3"
