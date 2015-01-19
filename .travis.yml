@@ -16,3 +16,10 @@ env:
 notifications:
     email: false
     irc: "irc.freenode.org#maglev-ruby"
+    webhooks:
+      urls:
+        - https://webhooks.gitter.im/e/40b9abc1ab238ef1ebb2
+        on_success: change
+        on_failure: always
+        on_start: false
+
