@@ -198,7 +198,7 @@ function build_maglev()
   typeset _type _return
   for _type in new_extent filein packages install_extent stone_create
   do
-    echo "[INFO] maglev build ${_type//_/ }"
+    echo "[Info] maglev build ${_type//_/ }"
     build_maglev_${_type} || {
       _return=$?
       echo "[Error] Build failed for build_maglev_${_type} with return code ${_return}."
