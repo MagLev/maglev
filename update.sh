@@ -224,7 +224,7 @@ then
   fi
 else
   echo "[Warning] rake not found!"
-  echo "Skipping creation of default 'maglev' repository and HTML documentation."
+  echo "  Skipping backup and HTML documentation."
 fi
 
 [[ "$MAGLEV_SOURCE" == "$MAGLEV_HOME" ]] || {
