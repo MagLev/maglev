@@ -278,7 +278,8 @@ else
           "${MAGLEV_HOME}/bin/rake" rdoc >/dev/null 2>&1
       fi
     else
-      echo "[Warning] Could not build new ruby extent"
+      echo "[Error] Could not build new ruby extent"
+      exit 1
     fi
   else
     echo "[Warning] Can't find ${extent0}: Skip building ruby extent"
