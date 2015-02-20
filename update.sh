@@ -208,7 +208,7 @@ ensure git submodule --quiet update --init
 
 # Check for existence of required executable rake
 if
-  which rake >/dev/null 2>&1
+  which rake > /dev/null 2>&1
 then
   # Backup any existing maglev repository
   if
