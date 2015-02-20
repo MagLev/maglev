@@ -156,7 +156,7 @@ fi
 # Download appropriate version of GemStone
 builtin cd "${GEMSTONES_HOME}"
 if
-  [[ -e $gss_file ]]
+  [[ -e "$gss_file" ]]
 then
   echo "[Info] $gss_file already exists"
   echo "to replace it, remove or rename it and rerun this script"
