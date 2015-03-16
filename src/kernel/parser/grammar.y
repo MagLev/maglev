@@ -587,7 +587,6 @@ static NODE* assignable(NODE **idH, NODE* srcOffset, NODE **valH, rb_parse_state
 %type <num>  f_norm_arg f_arg
 %token tUPLUS           /* unary+ */
 %token tUMINUS          /* unary- */
-%token tUBS             /* unary\ */
 %token tPOW             /* ** */
 %token tCMP             /* <=> */
 %token tEQ              /* == */
@@ -2498,15 +2497,6 @@ method_call     : operation paren_args
                     {
                       yTrace(vps, "method_call: | primary_value tCOLON2 operation3");
                       $$ = RubyParser::new_vcall($1, $3, vps);
-                    }
-
-               | primary_value '\\' operation2
-                    {
-                        rb_compile_error(vps, "\\ operator is rubinius-specific get_reference");
-                    }
-               | tUBS operation2
-                    {
-                        rb_compile_error(vps, "\\ operator is rubinius-specific get_reference");
                     }
 
                 | kSUPER paren_args
@@ -5735,17 +5725,8 @@ static int yylex(rb_parse_state* ps)
             space_seen = 1;
             goto retry; /* skip \\n */
         }
-        *ps->lexvalH = OOP_OF_SMALL_LONG_( ps->tokenOffset()); // srcOffsetSi
-        return tUBS; // yields parse error in Maglev
-// Unary backspace believed rubinius specific
-//      pushback(c, ps);
-//      if(lex_state == EXPR_BEG
-//         || lex_state == EXPR_MID || space_seen) {
-//         SET_lexState( EXPR_DOT);
-//          return tUBS;
-//      }
-//      SET_lexState( EXPR_DOT);
-//      return '\\';
+        pushback(c);
+        return '\\';
 
       case '%':
         if (IS_EXPR_BEG_or_MID(lex_state)) {
