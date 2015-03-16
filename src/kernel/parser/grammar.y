@@ -5740,7 +5740,7 @@ static int yylex(rb_parse_state* ps)
             space_seen = 1;
             goto retry; /* skip \\n */
         }
-        pushback(c);
+        pushback(c, ps);
         return '\\';
 
       case '%':
