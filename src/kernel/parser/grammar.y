@@ -577,8 +577,7 @@ static NODE* assignable(NODE **idH, NODE* srcOffset, NODE **valH, rb_parse_state
 %type <node> mrhs superclass block_call block_command
 %type <node> f_arglist f_args f_optarg f_opt f_block_arg opt_f_block_arg
 %type <node> assoc_list assocs assoc undef_list backref string_dvar
-// renamed block_var to blck_var
-%type <node> for_var blck_var opt_block_var block_par
+%type <node> for_var block_var opt_block_var block_par
 %type <node> brace_block cmd_brace_block do_block lhs none fitem
 %type <node> mlhs mlhs_head mlhs_basic mlhs_entry mlhs_item mlhs_node
 // deleted fsym from next line
@@ -2012,7 +2011,7 @@ primary         : literal
                     }
                 | operation brace_block
                     {
-                      yTrace(vps, "primary: | operation brace_blck");
+                      yTrace(vps, "primary: | operation brace_block");
                       OmScopeType aScope(vps->omPtr);
                       NODE **callH = aScope.add( RubyParser::new_fcall( $1, ram_OOP_NIL, vps));
                       RubyIterRpNode::set_call( $2, *callH, vps);
@@ -2021,7 +2020,7 @@ primary         : literal
                 | method_call
                 | method_call brace_block
                     {
-                      yTrace(vps, "primary: | method_call brace_blck");
+                      yTrace(vps, "primary: | method_call brace_block");
                       if (RubyBlockPassNode::is_a($1, vps)) {
                          rb_compile_error(vps, "both block arg and actual block given");
                       }
@@ -2319,27 +2318,27 @@ block_par       : mlhs_item
                     }
                 ;
 
-blck_var       : block_par
+block_var       : block_par
                     {
-                      yTrace(vps, "blck_var : block_par x");
+                      yTrace(vps, "block_var : block_par x");
                       NODE *ofsO = OOP_OF_SMALL_LONG_(vps->tokenOffset());
                       $$ = RubyParser::new_parasgn( $1, ofsO, vps);
                     }
                 | block_par ','
                     {
-                      yTrace(vps, "blck_var | block_par , x");
+                      yTrace(vps, "block_var | block_par , x");
                       NODE *ofsO = OOP_OF_SMALL_LONG_(vps->tokenOffset());
                       $$ = RubyParser::new_parasgn_trailingComma( $1, ofsO, vps);
                     }
                 | block_par ',' tAMPER lhs
                     {
-                      yTrace(vps, "blck_var | block_par , & lhs x");
+                      yTrace(vps, "block_var | block_par , & lhs x");
                       RubyArrayNode::append_amperLhs($1, $4, vps);
                       $$ = RubyParser::new_parasgn( $1, $3/*srcOffsetSi*/, vps);
                     }
                 | block_par ',' tSTAR lhs ',' tAMPER lhs
                     {
-                      yTrace(vps, "blck_var | block_par , STAR lhs , & lhs x");
+                      yTrace(vps, "block_var | block_par , STAR lhs , & lhs x");
                       OmScopeType aScope(vps->omPtr);
                       NODE **splatH = aScope.add( RubySplatNode::s($4, vps));
                       RubyArrayNode::append($1, *splatH, vps);
@@ -2348,7 +2347,7 @@ blck_var       : block_par
                     }
                 | block_par ',' tSTAR ',' tAMPER lhs
                     {
-                      yTrace(vps, "blck_var | block_par , STAR , & lhs x");
+                      yTrace(vps, "block_var | block_par , STAR , & lhs x");
                       OmScopeType aScope(vps->omPtr);
                       NODE **splatH = aScope.add( RubySplatNode::s(ram_OOP_NIL, vps));
                       RubyArrayNode::append($1, *splatH, vps);
@@ -2357,7 +2356,7 @@ blck_var       : block_par
                     }
                 | block_par ',' tSTAR lhs
                     {
-                      yTrace(vps, "blck_var | block_par , STAR lhs x");
+                      yTrace(vps, "block_var | block_par , STAR lhs x");
                       OmScopeType aScope(vps->omPtr);
                       NODE **splatH = aScope.add( RubySplatNode::s($4, vps));
                       RubyArrayNode::append($1, *splatH, vps);
@@ -2365,7 +2364,7 @@ blck_var       : block_par
                     }
                 | block_par ',' tSTAR
                     {
-                      yTrace(vps, "blck_var | block_par , STAR x");
+                      yTrace(vps, "block_var | block_par , STAR x");
                       OmScopeType aScope(vps->omPtr);
                       NODE **splatH = aScope.add( RubySplatNode::s(ram_OOP_NIL, vps));
                       RubyArrayNode::append($1, *splatH, vps);
@@ -2373,7 +2372,7 @@ blck_var       : block_par
                     }
                 | tSTAR lhs ',' tAMPER lhs
                     {
-                      yTrace(vps, "blck_var | STAR lhs , & lhs x");
+                      yTrace(vps, "block_var | STAR lhs , & lhs x");
                       OmScopeType aScope(vps->omPtr);
                       NODE **splatH = aScope.add( RubySplatNode::s($2, vps));
                       NODE **arrH = aScope.add(RubyArrayNode::s(*splatH, vps));
@@ -2382,7 +2381,7 @@ blck_var       : block_par
                     }
                 | tSTAR ',' tAMPER lhs
                     {
-                      yTrace(vps, "blck_var | STAR , & lhs x");
+                      yTrace(vps, "block_var | STAR , & lhs x");
                       OmScopeType aScope(vps->omPtr);
                       NODE **splatH = aScope.add( RubySplatNode::s(ram_OOP_NIL, vps));
                       NODE **arrH = aScope.add(RubyArrayNode::s(*splatH, vps));
@@ -2391,7 +2390,7 @@ blck_var       : block_par
                     }
                 | tSTAR lhs
                     {
-                      yTrace(vps, "blck_var | STAR lhs x");
+                      yTrace(vps, "block_var | STAR lhs x");
                       OmScopeType aScope(vps->omPtr);
                       NODE **splatH = aScope.add( RubySplatNode::s($2, vps));
                       NODE **arrH = aScope.add(RubyArrayNode::s(*splatH, vps));
@@ -2399,7 +2398,7 @@ blck_var       : block_par
                     }
                 | tSTAR
                     {
-                      yTrace(vps, "blck_var | STAR x");
+                      yTrace(vps, "block_var | STAR x");
                       OmScopeType aScope(vps->omPtr);
                       NODE **splatH = aScope.add( RubySplatNode::s(ram_OOP_NIL, vps));
                       NODE **arrH = aScope.add(RubyArrayNode::s(*splatH, vps));
@@ -2407,7 +2406,7 @@ blck_var       : block_par
                     }
                 | tAMPER lhs
                     {
-                      yTrace(vps, "blck_var | & lhs x");
+                      yTrace(vps, "block_var | & lhs x");
                       OmScopeType aScope(vps->omPtr);
                       NODE **arrH = aScope.add(RubyArrayNode::new_(vps));
                       RubyArrayNode::append_amperLhs(*arrH, $2, vps);
@@ -2426,9 +2425,9 @@ opt_block_var   : none
                       yTrace(vps, "opt_block_var: | tOROP");
                       $$ = ram_OOP_NIL ;
                     }
-                | '|' blck_var '|'
+                | '|' block_var '|'
                     {
-                      yTrace(vps, "opt_block_var: | tPIPE blck_var tPIPE");
+                      yTrace(vps, "opt_block_var: | tPIPE block_var tPIPE");
                       $$ = $2;
                     }
                 ;
@@ -2513,7 +2512,7 @@ method_call     : operation paren_args
 
 brace_block     : '{'
                     {
-                      yTrace(vps, "brace_blck: tLCURLY");
+                      yTrace(vps, "brace_block: tLCURLY");
                       reset_block(vps);
                       // $1 is srcOffsetSi
                     }
@@ -2523,7 +2522,7 @@ brace_block     : '{'
                     }
                   compstmt '}'
                     {
-                      yTrace(vps, "brace_blck: tLCURLY ___ comp_stamt tRCURLY");
+                      yTrace(vps, "brace_block: tLCURLY ___ comp_stamt tRCURLY");
                       rParenLexPop(vps);
                       popBlockVars(vps);
                       $$ = RubyIterRpNode::s($3/*masgn from opt_block_var*/, $5/*compstmt*/, $1/*srcOffsetSi*/,
@@ -2531,7 +2530,7 @@ brace_block     : '{'
                     }
                 | kDO
                     {
-                      yTrace(vps, "brace_blck: | kDO");
+                      yTrace(vps, "brace_block: | kDO");
                       PUSH_LINE(vps, "do");
                       // $1 is RpNameToken of 'do'
                       reset_block(vps);
@@ -2542,7 +2541,7 @@ brace_block     : '{'
                     }
                   compstmt kEND
                     {
-                      yTrace(vps, "brace_blck: | kDO ___ comp_stamt kEND");
+                      yTrace(vps, "brace_block: | kDO ___ comp_stamt kEND");
                       POP_LINE(vps);
                       popBlockVars(vps);
                       omObjSType *srcOfs = RpNameToken::srcOffsetO(vps, $1);
@@ -2977,7 +2976,7 @@ f_args          : f_arg ',' f_optarg ',' f_rest_arg opt_f_block_arg
                     }
                 | f_block_arg
                     {
-                      yTrace(vps, "f_args: |  f_blck_arg");
+                      yTrace(vps, "f_args: |  f_block_arg");
                       OmScopeType aScope(vps->omPtr);
                       NODE **argsH = aScope.add(RubyArgsNode::new_(vps));
                       $$ = RubyArgsNode::add_block_arg(*argsH, $1, vps);
@@ -3090,7 +3089,7 @@ blkarg_mark     : '&'
 
 f_block_arg     : blkarg_mark tIDENTIFIER
                     {
-                      yTrace(vps, "f_blck_arg: blkarg_mark tIDENTIFIER");
+                      yTrace(vps, "f_block_arg: blkarg_mark tIDENTIFIER");
                       NODE *quidO = asQuid($2, vps);
                       if (! is_local_id(quidO)) {
                           rb_compile_error("block argument must be local variable", vps);
@@ -3104,7 +3103,7 @@ f_block_arg     : blkarg_mark tIDENTIFIER
 
 opt_f_block_arg : ',' f_block_arg
                     {
-                      yTrace(vps, "opt_f_block_arg: tCOMMA f_blck_arg");
+                      yTrace(vps, "opt_f_block_arg: tCOMMA f_block_arg");
                       $$ = $2;
                     }
                 | none
