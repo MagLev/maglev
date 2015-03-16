@@ -14,12 +14,12 @@ env:
   # - CI_TESTS=sinatra
   # - CI_TESTS=examples
 notifications:
-    email: false
-    irc: "irc.freenode.org#maglev-ruby"
-    webhooks:
-      urls:
-        - https://webhooks.gitter.im/e/40b9abc1ab238ef1ebb2
-        on_success: change
-        on_failure: always
-        on_start: false
+  email: false
+  irc: "irc.freenode.org#maglev-ruby"
+  webhooks:
+    urls:
+      - https://webhooks.gitter.im/e/40b9abc1ab238ef1ebb2
+    on_success: change
+    on_failure: always
+    on_start: false
 

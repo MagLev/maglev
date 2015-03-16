@@ -3,7 +3,7 @@ set user DataCurator pass swordfish
 login
 run
 |repos|
-repos := MCFileTreeRepository new directory: (FileDirectory on: 'MAGLEV_HOME/src/packages').
+repos := MCFileTreeRepository new directory: (FileDirectory on: '$MAGLEV_HOME/src/packages').
 
 Gofer new
       package: 'Maglev';
