@@ -2498,6 +2498,22 @@ method_call     : operation paren_args
                       $$ = RubyParser::new_vcall($1, $3, vps);
                     }
 
+                | primary_value '.' paren_args
+                    {
+                      yTrace(vps, "method_call: | primary_value tDOT paren_args");
+                      omObjSType *srcOfs = RpNameToken::srcOffsetO(vps, $2);
+                      omObjSType* sym_call = RpNameToken::s("call", srcOfs, vps);
+                      $$ = RubyParser::new_call($1, sym_call, $3, vps);
+                    }
+
+                | primary_value tCOLON2 paren_args
+                    {
+                      yTrace(vps, "method_call: | primary_value tCOLON2 paren_args");
+                      omObjSType *srcOfs = RpNameToken::srcOffsetO(vps, $2);
+                      omObjSType* sym_call = RpNameToken::s("call", srcOfs, vps);
+                      $$ = RubyParser::new_call($1, sym_call, $3, vps);
+                    }
+
                 | kSUPER paren_args
                     {
                       yTrace(vps, "method_call: | kSUPER paren_args");
