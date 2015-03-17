@@ -115,8 +115,10 @@ enum {
 #define DOPRIM_STACK_ADDR(__n) (ARStackPtr + (__n) + FP_primEntrySP_to_argLimit_OFS)
 
 #if defined(FLG_DEBUG)
-void DoPrimCheckNumArgs(om *omPtr, omObjSType **SP, int expectedNumArg);
-#define DOPRIM_ARGS(__omptr, __n) DoPrimCheckNumArgs(__omptr, ARStackPtr, __n)
+// reenable if doing lots of new primitives in the parser; needs a slow build
+// void DoPrimCheckNumArgs(om *omPtr, omObjSType **SP, int expectedNumArg);
+// #define DOPRIM_ARGS(__omptr, __n) DoPrimCheckNumArgs(__omptr, ARStackPtr, __n)
+#define DOPRIM_ARGS(__omptr, __n) { }
 #else
 #define DOPRIM_ARGS(__omptr, __n) { }
 #endif
