@@ -179,6 +179,12 @@ function build_maglev_packages()
   build_maglev_in_stone build_maglev_load_file_tree_dir
 )
 
+function build_maglev_parser()
+{
+  ./src/kernel/parser/parser.sh
+}
+
+
 function build_maglev_install_extent()
 {
   echo "[Info] Build Succeeded"
@@ -196,7 +202,7 @@ function build_maglev_install_extent()
 function build_maglev()
 {
   typeset _type _return
-  for _type in new_extent filein packages install_extent stone_create
+  for _type in parser new_extent filein packages install_extent stone_create
   do
     echo "[Info] maglev build ${_type//_/ }"
     build_maglev_${_type} || {
