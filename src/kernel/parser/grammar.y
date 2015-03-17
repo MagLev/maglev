@@ -2502,14 +2502,14 @@ method_call     : operation paren_args
                     {
                       yTrace(vps, "method_call: | primary_value tDOT paren_args");
                       omObjSType *srcOfs = RpNameToken::srcOffsetO(vps, $2);
-                      $$ = RubyParser::new_call_1($1, a_sym_call, srcOfs, $3, vps);
+                      $$ = RubyParser::new_call_1(& $1, a_sym_call, & $3, srcOfs, vps);
                     }
 
                 | primary_value tCOLON2 paren_args
                     {
                       yTrace(vps, "method_call: | primary_value tCOLON2 paren_args");
                       omObjSType *srcOfs = RpNameToken::srcOffsetO(vps, $2);
-                      $$ = RubyParser::new_call_1($1, a_sym_call, srcOfs, $3, vps);
+                      $$ = RubyParser::new_call_1(& $1, a_sym_call, & $3, srcOfs, vps);
                     }
 
                 | kSUPER paren_args
