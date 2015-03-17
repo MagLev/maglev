@@ -30,7 +30,10 @@ chmod -w rubygrammar.c
 echo "byacc ok"
 
 # for zenspider to get grammatical structure for comparison to MRI
-bison -r all grammar.y && mv grammar.output maglev.output && rm grammar.tab.c
-~/Work/p4/zss/src/ruby_parser/dev/yack.rb maglev.output > maglev.txt
-diff -u ~/Work/p4/zss/src/ruby_parser/dev/yacc18.txt maglev.txt > diff18.diff
-diff -u ~/Work/p4/zss/src/ruby_parser/dev/yacc19.txt maglev.txt > diff19.diff
+if [ -d compare ]; then
+    (cd compare && rake && cp diff*.diff ..)
+
+    GEMSTONE=~/Work/git/GemStone-30866.Darwin-i386
+
+    cc -fmessage-length=0 -Wformat -Wtrigraphs -Wcomment -Wsystem-headers -Wtrigraphs -Wno-aggregate-return -Wswitch -Wshadow -Wunused-value -Wunused-variable -Wunused-label -Wno-unused-function -Wchar-subscripts -Wmissing-braces -Wmultichar -Wparentheses -Wsign-compare -Wsign-promo -Wwrite-strings -Wreturn-type -g -DFLG_DEBUG=1 -m64  -pipe -D_REENTRANT -DNOT_JAVA_VM -D_GNU_SOURCE -pthread  -fPIC -fno-strict-aliasing -fno-exceptions -I. -I$GEMSTONE/include -x c++ -c rubygrammar.c -o rubygrammar.o
+fi
