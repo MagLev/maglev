@@ -22,11 +22,10 @@ if ! test -x ./byacc/yacc; then
   fi
 fi
 
-rm -f rubygrammar.c
+chmod +w rubygrammar.{c,dot,h,output}
+#rm -f rubygrammar.c
 
-cd byacc
-./yacc -d -g -o ../rubygrammar.c -P -t -v ../grammar.y
-cd -
+./byacc/yacc -d -g -o rubygrammar.c -P -t -v grammar.y
 
 if test $? -ne 0; then
   echo "  byacc failed"
