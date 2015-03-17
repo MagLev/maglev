@@ -2502,16 +2502,14 @@ method_call     : operation paren_args
                     {
                       yTrace(vps, "method_call: | primary_value tDOT paren_args");
                       omObjSType *srcOfs = RpNameToken::srcOffsetO(vps, $2);
-                      omObjSType* sym_call = RpNameToken::s("call", srcOfs, vps);
-                      $$ = RubyParser::new_call($1, sym_call, $3, vps);
+                      $$ = RubyParser::new_call_1($1, a_sym_call, srcOfs, $3, vps);
                     }
 
                 | primary_value tCOLON2 paren_args
                     {
                       yTrace(vps, "method_call: | primary_value tCOLON2 paren_args");
                       omObjSType *srcOfs = RpNameToken::srcOffsetO(vps, $2);
-                      omObjSType* sym_call = RpNameToken::s("call", srcOfs, vps);
-                      $$ = RubyParser::new_call($1, sym_call, $3, vps);
+                      $$ = RubyParser::new_call_1($1, a_sym_call, srcOfs, $3, vps);
                     }
 
                 | kSUPER paren_args
@@ -3659,6 +3657,7 @@ static void initAstSymbol(om *omPtr, NODE** symbolsH, AstSymbolEType e_sym)
     case  a_sym_BEGIN:  str = "BEGIN";  break;
     case  a_sym_while:  str = "while";  break;
     case  a_sym_rest_args: str = "rest_args";   break;
+    case  a_sym_call:   str = "call";   break;
 
     case a_sym_INVALID:  return; // leave entry in symbolsH as NIL
 
