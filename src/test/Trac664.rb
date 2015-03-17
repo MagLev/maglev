@@ -24,21 +24,22 @@ unless exp == act
   raise "error: expected #{exp.inspect}  actual: #{act.inspect}"
 end
 
-res = Socket::getaddrinfo("www.vmware.com", "http")
+url = "www.gemtalksystems.com"
+res = Socket::getaddrinfo(url, "http")
 puts res.inspect
 unless res.length >= 1; raise 'err;'; end # 1 on Solaris, 2 on Linux
 
 elem = res[0]
-unless elem[0] == "AF_INET" && elem[1] == 80
+unless %w[ AF_INET AF_INET6 ].include?(elem[0]) && elem[1] == 80
   raise "error: expected 'AF_INET' and port 80: actual #{elem[0]} #{elem[1]}"
 end
 
 # The actual value for this changes depending on whether you are inside or
 # outside of the firewall, so check for either case.
-unless elem[2] =~ /vmware.com/ ||
+unless elem[2] =~ /gemtalksystems.com/ ||
     elem[2] =~ /akamaitechnologies/ ||
-    elem[2] =~ /#{(resolved = `resolveip -s www.vmware.com`.chomp)}/
-  raise "error: vmware.com, akamaitechnologies, or #{resolved}:  actual #{elem[2]}"
+    elem[2] =~ /#{(resolved = `resolveip -s #{url}`.chomp)}/
+  raise "error: gemtalksystems.com, akamaitechnologies, or #{resolved}:  actual #{elem[2]}"
 end
 
 unless elem[3] =~ /\d{2,3}\.\d{1,3}\.\d{1,3}/

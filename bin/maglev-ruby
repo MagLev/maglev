@@ -2,7 +2,7 @@
 #
 # Runs a ruby file using the MagLev VM
 #
-# Copyright 2009-2010 GemStone Systems, Inc. All rights reserved.
+# Copyright 2009-2015 GemTalk Systems, Inc. All rights reserved.
 
 export LANG=C  # see https://github.com/MagLev/maglev/issues/93
 
@@ -123,7 +123,7 @@ stoneHost=
 # Allow arguments to be parsed w/o $MAGLEV_HOME being set. Use parseArgsMH
 # as a substitute for MAGLEV_HOME if necessary during arg parsing
 parseArgsMH=$MAGLEV_HOME
-[[ -z $parseArgsMH ]] && parseArgsMH=${0%%/bin/maglev-ruby}
+[[ -z $parseArgsMH ]] && parseArgsMH=${0%%/bin/$COMMAND}
 
 # This function gets called several times
 # 1. Parse $MAGLEV_OPTS
@@ -150,7 +150,7 @@ function parseArgs {
                 cd ${1:2} || usage "${1:2}: bad directory"
                 ;;
             --copyright)
-                echo "maglev - Copyright 2008-2010 GemStone Systems, Inc."
+                echo "maglev - Copyright 2008-2015 GemTalk Systems, Inc."
                 exit
                 ;;
             -d|--debug)
