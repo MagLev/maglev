@@ -1276,21 +1276,21 @@ fname           : tIDENTIFIER
                     }
                 ;
 
-fitem           : fname
-                    {  // deleted  fsym  : fname
-                       //                | symbol
-                       //                ;
+fsym            : fname
+                    {
                        yTrace(vps, "fitem: fname");
                        $$ = RubySymbolNode::s( RpNameToken::symval($1/*RpNameToken*/, vps), vps);
                     }
-
-fitem           : symbol
+                | symbol
                     {
                        yTrace(vps, "fitem: | symbol");
                        // $$  = NEW_LIT(QUID2SYM($1));
                        $$ = RubySymbolNode::s( $1/*a Symbol*/, vps);
                     }
-                | dsym
+                ;
+
+fitem           : fsym { $$ = $1 } // wtf? why do I need this assignment?
+                | dsym { $$ = $1 }
                 ;
 
 undef_list      : fitem
@@ -1859,11 +1859,13 @@ block_arg       : tAMPER arg_value
                       yTrace(vps, "block_arg: tAMPER arg_value");
                       $$ = RubyBlockPassNode::s( $2 , vps);
                     } ;
+
 opt_block_arg   : ',' block_arg
                     {
                       yTrace(vps, "opt_block_arg: tCOMMA block_arg");
                       $$ = $2;
                     }
+                | ',' { $$ = ram_OOP_NIL }
                 | none
                 ;
 
