@@ -38,15 +38,16 @@ chmod -w rubygrammar.{h,c}
 echo "  byacc ok"
 
 echo "Compiling rubygrammar.o"
-/usr/bin/g++ -fmessage-length=0 -fcheck-new \
-  -Wformat -Wtrigraphs -Wcomment -Wsystem-headers -Wtrigraphs -Wno-aggregate-return \
-  -Wswitch -Wshadow -Wunused-value -Wunused-variable -Wunused-label -Wno-unused-function \
-  -Wchar-subscripts -Wmissing-braces -Wmultichar -Wparentheses -Wsign-compare -Wsign-promo \
-  -Wwrite-strings -Wreturn-type -Wuninitialized -Werror  \
-  -g -O3 -DFLG_FAST=1 \
-  -m64  -pipe -D_REENTRANT -DNOT_JAVA_VM -D_GNU_SOURCE -pthread  -fPIC \
-  -fno-strict-aliasing -fno-exceptions \
-  -I. -I$GEMSTONE/include -x c++ \
+
+CCWARN="-Wchar-subscripts -Wcomment -Werror -Wformat -Wmissing-braces -Wmultichar -Wno-aggregate-return -Wno-c++11-extensions -Wno-constant-logical-operand -Wno-conversion -Wno-deprecated-declarations -Wno-format -Wno-invalid-offsetof -Wno-self-assign-field -Wno-unused-function -Wparentheses -Wreturn-type -Wshadow -Wsign-compare -Wsign-promo -Wswitch -Wsystem-headers -Wtrigraphs -Wunused-label -Wunused-value -Wunused-variable -Wwrite-strings"
+
+# TODO: most of these look like legacy copy&paste.
+CCDEF="-DFLG_DEBUG=1 -D_XOPEN_SOURCE -D_REENTRANT -DNOT_JAVA_VM -D_GNU_SOURCE -D_LARGEFILE64_SOURCE -Dlint"
+
+$CC $CCWARN $CCDEF \
+  -g -m64 -pipe -pthread -fmessage-length=0 -fPIC -fno-strict-aliasing -fno-exceptions \
+  -I. -I$GEMSTONE/include -I/usr/local/Cellar/icu4c/54.1/include \
+  -x c++ \
   -c rubygrammar.c -o rubygrammar.o
 
 if test $? -ne 0; then
@@ -55,15 +56,10 @@ if test $? -ne 0; then
 fi
 
 echo "Compiling rubyast.o"
-/usr/bin/g++ -fmessage-length=0 -fcheck-new \
-  -Wformat -Wtrigraphs -Wcomment -Wsystem-headers -Wtrigraphs -Wno-aggregate-return \
-  -Wswitch -Wshadow -Wunused-value -Wunused-variable -Wunused-label -Wno-unused-function \
-  -Wchar-subscripts -Wmissing-braces -Wmultichar -Wparentheses -Wsign-compare -Wsign-promo \
-  -Wwrite-strings -Wreturn-type -Wuninitialized -Werror  \
-  -g -O3 -DFLG_FAST=1 \
-  -m64  -pipe -D_REENTRANT -DNOT_JAVA_VM -D_GNU_SOURCE -pthread  -fPIC \
-  -fno-strict-aliasing -fno-exceptions \
-  -I. -I$GEMSTONE/include -x c++ \
+$CC $CCWARN $CCDEF \
+  -g -m64 -pipe -pthread -fmessage-length=0 -fPIC -fno-strict-aliasing -fno-exceptions \
+  -I. -I$GEMSTONE/include -I/usr/local/Cellar/icu4c/54.1/include \
+  -x c++ \
   -c rubyast.c -o rubyast.o
 
 if test $? -ne 0; then
@@ -73,11 +69,15 @@ fi
 
 rm -f libmagparse.so
 
+set -xve
+
 echo "Linking libmagparse.so"
-/usr/bin/g++ -shared -Wl,-Bdynamic,-hlibmagparse.so  -Wl,--version-script=magparse.exp \
-  rubyast.o rubygrammar.o  \
-  -m64 -lpthread -lcrypt -ldl -lc -lm -lrt -o libmagparse.so \
-  -Wl,--warn-unresolved-symbols
+$CC \
+  -shared \
+  -m64 -lpthread -ldl -lc -lm -o libmagparse.so \
+  -L$GEMSTONE/lib \
+  -lgcilnk-$GSVERSION \
+  rubyast.o rubygrammar.o
 
 chmod 555 libmagparse.so
 
