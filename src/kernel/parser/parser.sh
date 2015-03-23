@@ -1,8 +1,11 @@
 #!/bin/bash
 
+if [ -z "$CC" ]; then CC=/usr/bin/g++; fi
 PARSERDIR=$(cd $(dirname $0) ; pwd)
 MAGLEV_HOME=$(cd $(dirname $0)/../../.. ; pwd)
 GEMSTONE=$MAGLEV_HOME/gemstone
+# HACK
+GSVERSION=3.1.0.2.1-64
 
 echo "Building the yacc executable"
 
@@ -80,5 +83,5 @@ chmod 555 libmagparse.so
 
 echo "Copying libmagparse.so to $GEMSTONE/lib/"
 chmod +w $GEMSTONE/lib
-rm -f $GEMSTONE/lib/libmagparse-3.1.0.2.1-64.so
+rm -f $GEMSTONE/lib/libmagparse-$GSVERSION.so
 cp libmagparse.so $GEMSTONE/lib/libmagparse-3.1.0.2.1-64.so
