@@ -1289,8 +1289,8 @@ fsym            : fname
                     }
                 ;
 
-fitem           : fsym { $$ = $1 } // wtf? why do I need this assignment?
-                | dsym { $$ = $1 }
+fitem           : fsym { $$ = $1; } // wtf? why do I need this assignment?
+                | dsym { $$ = $1; }
                 ;
 
 undef_list      : fitem
@@ -1865,7 +1865,7 @@ opt_block_arg   : ',' block_arg
                       yTrace(vps, "opt_block_arg: tCOMMA block_arg");
                       $$ = $2;
                     }
-                | ',' { $$ = ram_OOP_NIL }
+                | ',' { $$ = ram_OOP_NIL; }
                 | none
                 ;
 
