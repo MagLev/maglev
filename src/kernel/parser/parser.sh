@@ -1,34 +1,12 @@
 #!/bin/bash
 
 if [ -z "$CC" ]; then CC=/usr/bin/g++; fi
-PARSERDIR=$(cd $(dirname $0) ; pwd)
 MAGLEV_HOME=$(cd $(dirname $0)/../../.. ; pwd)
 GEMSTONE=$MAGLEV_HOME/gemstone
 # HACK
 GSVERSION=3.1.0.2.1-64
 
-echo "Building the yacc executable"
-
-cd $PARSERDIR
-if ! test -x ./byacc/yacc; then
-  cd byacc
-  ./configure
-  if [ -n "$(which gmake)" ]; then
-    gmake
-  else
-    make
-  fi
-  cd -
-  if test $? -ne 0; then
-    echo "compiling byacc failed, please compile it in ${PARSERDIR}/byacc"
-    exit 1
-  fi
-fi
-
-chmod +w rubygrammar.{c,dot,h,output}
-#rm -f rubygrammar.c
-
-./byacc/yacc -d -g -o rubygrammar.c -P -t -v grammar.y
+./yacc.sh
 
 if test $? -ne 0; then
   echo "  byacc failed"
