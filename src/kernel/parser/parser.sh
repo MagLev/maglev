@@ -1,6 +1,7 @@
 #!/bin/bash
 
-if [ -z "$CC" ]; then CC=/usr/bin/g++; fi
+# OSX HACK: hardcoded for homebrew gcc49 package
+if [ -z "$CC" ]; then CC=/usr/local/bin/g++-4.9; fi
 MAGLEV_HOME=$(cd $(dirname $0)/../../.. ; pwd)
 GEMSTONE=$MAGLEV_HOME/gemstone
 # HACK
@@ -53,8 +54,10 @@ echo "Linking libmagparse.so"
 $CC \
   -shared \
   -m64 -lpthread -ldl -lc -lm -o libmagparse.so \
+  -Wl,-flat_namespace \
+  -Wl,-undefined -Wl,warning \
+  -Wl,-exported_symbols_list -Wl,magparse.exp \
   -L$GEMSTONE/lib \
-  -lgcilnk-$GSVERSION \
   rubyast.o rubygrammar.o
 
 chmod 555 libmagparse.so
