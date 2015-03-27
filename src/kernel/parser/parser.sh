@@ -1,11 +1,21 @@
 #!/bin/bash
 
+# ANY error should stop the script and exit non-zero
+# This is why we need to switch to makefiles
+set -e
+# turn on for verbose logging
+# set -xv
+
 # OSX HACK: hardcoded for homebrew gcc49 package
 if [ -z "$CC" ]; then CC=/usr/local/bin/g++-4.9; fi
 MAGLEV_HOME=$(cd $(dirname $0)/../../.. ; pwd)
 GEMSTONE=$MAGLEV_HOME/gemstone
 # HACK
 GSVERSION=3.1.0.2.1-64
+# HACK
+EXT=dylib
+
+cd $(dirname $0)
 
 ./yacc.sh
 
@@ -22,6 +32,9 @@ CCWARN="-Wchar-subscripts -Wcomment -Werror -Wformat -Wmissing-braces -Wmulticha
 
 # TODO: most of these look like legacy copy&paste.
 CCDEF="-DFLG_DEBUG=1 -D_XOPEN_SOURCE -D_REENTRANT -DNOT_JAVA_VM -D_GNU_SOURCE -D_LARGEFILE64_SOURCE -Dlint"
+
+LDFLAGS="-Wl,-flat_namespace -Wl,-undefined -Wl,warning"
+# TODO?: -Wl,-exported_symbols_list -Wl,magparse.exp
 
 $CC $CCWARN $CCDEF \
   -g -m64 -pipe -pthread -fmessage-length=0 -fPIC -fno-strict-aliasing -fno-exceptions \
@@ -46,23 +59,19 @@ if test $? -ne 0; then
   exit 1
 fi
 
-rm -f libmagparse.so
-
-set -xve
+rm -f libmagparse.${EXT}
 
 echo "Linking libmagparse.so"
 $CC \
-  -shared \
-  -m64 -lpthread -ldl -lc -lm -o libmagparse.so \
-  -Wl,-flat_namespace \
-  -Wl,-undefined -Wl,warning \
-  -Wl,-exported_symbols_list -Wl,magparse.exp \
+  -m64 -lpthread -ldl -lc -lm  -o libmagparse.${EXT} \
+  $LDFLAGS \
+  -Wl,-dylib \
   -L$GEMSTONE/lib \
   rubyast.o rubygrammar.o
 
-chmod 555 libmagparse.so
+chmod 555 libmagparse.${EXT}
 
-echo "Copying libmagparse.so to $GEMSTONE/lib/"
+echo "Copying libmagparse.${EXT} to $GEMSTONE/lib/"
 chmod +w $GEMSTONE/lib
-rm -f $GEMSTONE/lib/libmagparse-$GSVERSION.so
-cp libmagparse.so $GEMSTONE/lib/libmagparse-3.1.0.2.1-64.so
+rm -f $GEMSTONE/lib/libmagparse-$GSVERSION.${EXT}
+cp libmagparse.${EXT} $GEMSTONE/lib/libmagparse-3.1.0.2.1-64.${EXT}
