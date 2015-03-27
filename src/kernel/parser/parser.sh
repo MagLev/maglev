@@ -33,8 +33,7 @@ CCWARN="-Wchar-subscripts -Wcomment -Werror -Wformat -Wmissing-braces -Wmulticha
 # TODO: most of these look like legacy copy&paste.
 CCDEF="-DFLG_DEBUG=1 -D_XOPEN_SOURCE -D_REENTRANT -DNOT_JAVA_VM -D_GNU_SOURCE -D_LARGEFILE64_SOURCE -Dlint"
 
-LDFLAGS="-Wl,-flat_namespace -Wl,-undefined -Wl,warning"
-# TODO?: -Wl,-exported_symbols_list -Wl,magparse.exp
+LDFLAGS="-Wl,-flat_namespace -Wl,-undefined -Wl,warning -Wl,-exported_symbols_list -Wl,magparse.osx.exp"
 
 $CC $CCWARN $CCDEF \
   -g -m64 -pipe -pthread -fmessage-length=0 -fPIC -fno-strict-aliasing -fno-exceptions \
