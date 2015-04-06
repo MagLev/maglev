@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# ANY error should stop the script and exit non-zero
+# This is why we need to switch to makefiles
+set -e
+# set -xv
+
 PARSERDIR=$(cd $(dirname $0) ; pwd)
 cd $PARSERDIR
 
@@ -24,9 +29,6 @@ if test $? -ne 0; then
   echo "byacc failed"
   exit 1
 fi
-chmod -w rubygrammar.h
-chmod -w rubygrammar.c
-# no longer copying to server src directory
 
 # for zenspider to get grammatical structure for comparison to MRI
 if [ -d compare ]; then
