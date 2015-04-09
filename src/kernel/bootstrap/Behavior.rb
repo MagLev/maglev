@@ -1,4 +1,4 @@
-++++ obsolete file
+# ++++ obsolete file
 class Behavior
 
 end

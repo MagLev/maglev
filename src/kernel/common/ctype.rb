@@ -57,14 +57,14 @@ module CType
       "\\#"
     elsif isctrl
       case self
-      when ?\n: "\\n"
-      when ?\t: "\\t"
-      when ?\a: "\\a"
-      when ?\v: "\\v"
-      when ?\f: "\\f"
-      when ?\r: "\\r"
-      when ?\e: "\\e"
-      when ?\b: "\\b"
+      when ?\n then "\\n"
+      when ?\t then "\\t"
+      when ?\a then "\\a"
+      when ?\v then "\\v"
+      when ?\f then "\\f"
+      when ?\r then "\\r"
+      when ?\e then "\\e"
+      when ?\b then "\\b"
       end
     elsif self < 32 || self > 126
       str = "\\000"
