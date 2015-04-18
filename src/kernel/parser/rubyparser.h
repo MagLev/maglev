@@ -4,7 +4,7 @@
 
 // portions derived from the Rubinius melbourne parser
 
-#include "om.hf"
+#include "rubyom.hf"
 #include "rubyast.ht"
 
 // typedef int64 quark;
@@ -47,13 +47,13 @@ typedef enum {
 
 class rb_parse_state ;
 
-// class YyStackElement {  // defined in om.hf
+// class YyStackElement {  // defined in rubyom.hf
 // public:
 //   NODE *obj;  
 //   short state;
 //};
 
-// class YyStackData {  // defined in om.hf
+// class YyStackData {  // defined in rubyom.hf
 // public:
 //   YyStackElement *mark;
 //   YyStackElement *base;

@@ -1,0 +1,5 @@
+iferr 1 where  
+iferr 2 stack  
+iferr 3 exit 2
+
+input $imageDir/loadfiletree.gs

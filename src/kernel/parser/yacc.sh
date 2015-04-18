@@ -1,5 +1,10 @@
 #!/bin/bash
 
+# ANY error should stop the script and exit non-zero
+# This is why we need to switch to makefiles
+set -e
+# set -xv
+
 PARSERDIR=$(cd $(dirname $0) ; pwd)
 cd $PARSERDIR
 
@@ -18,26 +23,14 @@ if ! test -x ./byacc/yacc; then
   fi
 fi
 
+rm -f rubygrammar.c rubygrammar.h
 ./byacc/yacc -d -g -o rubygrammar.c -P -t -v grammar.y
 if test $? -ne 0; then
   echo "byacc failed"
   exit 1
 fi
 
-if test -x ../../../../copyChangedParserFilesToServer.sh ; then
-  cd ../../../../
-  ./copyChangedParserFilesToServer.sh -q
-else
-  fileList='rubylex_tab.hc rubyast.c rubyast.hf rubyast.ht
-  rubygrammar.c rubygrammar.h rubyparser.h'
-
-  srcDir=../../../../svn/src
-
-  for each in $fileList
-  do
-    rm -f $srcDir/$each
-    cat generated.txt $each > $srcDir/$each
-    chmod -w $srcDir/$each
-  done
-  echo "byacc ok"
+# for zenspider to get grammatical structure for comparison to MRI
+if [ -d compare ]; then
+    (cd compare && rake && cp diff*.diff ..)
 fi

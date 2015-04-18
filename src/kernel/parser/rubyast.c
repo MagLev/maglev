@@ -1,10 +1,6 @@
-/* Generated file, do not edit.  Editing to be done in git/src/kernel/parser */
-#include "om.hf"
+#include "rubyom.hf"
 #include "rubyparser.h"
 #include "rubyast.hf"
-#include "gemsup.hf"
-#include "comheap.hf"
-#include "om_inline.hf"
 
 omObjSType* RubyNode::basicNew(AstClassEType cls_e, rb_parse_state *ps)
 {
@@ -20,7 +16,7 @@ omObjSType* RubyNode::call(omObjSType *rcvr, AstSelectorEType sel_e, rb_parse_st
     OmScopeType scp(omPtr);
     omObjSType **rcvrH = scp.add(rcvr);
     OopType selId = ps->astSelectorIds[sel_e];
-    return om::IntRecurFromPrim(omPtr, rcvrH, selId);
+    return om::IntRecurFromPrim_(omPtr, rcvrH, selId);
 }
 
 omObjSType* RubyNode::call(omObjSType *rcvr, AstSelectorEType sel_e, omObjSType *arg, rb_parse_state *ps)
@@ -30,7 +26,7 @@ omObjSType* RubyNode::call(omObjSType *rcvr, AstSelectorEType sel_e, omObjSType 
     omObjSType **rcvrH = scp.add(rcvr);
     omObjSType **argH = scp.add(arg);
     OopType selId = ps->astSelectorIds[sel_e];
-    return om::IntRecurFromPrim(omPtr, rcvrH, selId, 1, &argH); 
+    return om::IntRecurFromPrim__(omPtr, rcvrH, selId, 1, &argH); 
 }
 
 omObjSType* RubyNode::call(omObjSType *rcvr, AstSelectorEType sel_e, 
@@ -43,7 +39,7 @@ omObjSType* RubyNode::call(omObjSType *rcvr, AstSelectorEType sel_e,
     aH[0] = scp.add(a);
     aH[1] = scp.add(b);
     OopType selId = ps->astSelectorIds[sel_e];
-    return om::IntRecurFromPrim(omPtr, rcvrH, selId, UTL_ARRAY_LENGTH(aH), aH);
+    return om::IntRecurFromPrim__(omPtr, rcvrH, selId, UTL_ARRAY_LENGTH(aH), aH);
 }
 
 omObjSType* RubyNode::call(omObjSType *rcvr, AstSelectorEType sel_e, 
@@ -57,7 +53,7 @@ omObjSType* RubyNode::call(omObjSType *rcvr, AstSelectorEType sel_e,
     aH[1] = scp.add(b);
     aH[2] = scp.add(c);
     OopType selId = ps->astSelectorIds[sel_e];
-    return om::IntRecurFromPrim(omPtr, rcvrH, selId, UTL_ARRAY_LENGTH(aH), aH);
+    return om::IntRecurFromPrim__(omPtr, rcvrH, selId, UTL_ARRAY_LENGTH(aH), aH);
 }
 
 omObjSType* RubyNode::call(omObjSType *rcvr, AstSelectorEType sel_e, omObjSType *a, 
@@ -72,7 +68,7 @@ omObjSType* RubyNode::call(omObjSType *rcvr, AstSelectorEType sel_e, omObjSType 
     aH[2] = scp.add(c);
     aH[3] = scp.add(d);
     OopType selId = ps->astSelectorIds[sel_e];
-    return om::IntRecurFromPrim(omPtr, rcvrH, selId, UTL_ARRAY_LENGTH(aH), aH);
+    return om::IntRecurFromPrim__(omPtr, rcvrH, selId, UTL_ARRAY_LENGTH(aH), aH);
 }
 
 omObjSType* RubyNode::call(AstClassEType cls_e, AstSelectorEType sel_e, rb_parse_state *ps)
@@ -81,7 +77,7 @@ omObjSType* RubyNode::call(AstClassEType cls_e, AstSelectorEType sel_e, rb_parse
     OmScopeType scp(omPtr);
     omObjSType **clsH = scp.add(om::FetchOop(*ps->astClassesH, cls_e));
     OopType selId = ps->astSelectorIds[sel_e];
-    return om::IntRecurFromPrim(omPtr, clsH, selId, 0, NULL);
+    return om::IntRecurFromPrim__(omPtr, clsH, selId, 0, NULL);
 }
 
 omObjSType* RubyNode::call(AstClassEType cls_e, AstSelectorEType sel_e,
@@ -92,7 +88,7 @@ omObjSType* RubyNode::call(AstClassEType cls_e, AstSelectorEType sel_e,
     omObjSType **argH = scp.add( arg );
     omObjSType **clsH = scp.add(om::FetchOop(*ps->astClassesH, cls_e));
     OopType selId = ps->astSelectorIds[sel_e];
-    return om::IntRecurFromPrim(omPtr, clsH, selId, 1, &argH);
+    return om::IntRecurFromPrim__(omPtr, clsH, selId, 1, &argH);
 }
 
 omObjSType* RubyNode::call(AstClassEType cls_e, AstSelectorEType sel_e,
@@ -105,7 +101,9 @@ omObjSType* RubyNode::call(AstClassEType cls_e, AstSelectorEType sel_e,
     aH[1] = scp.add( b );
     omObjSType **clsH = scp.add(om::FetchOop(*ps->astClassesH, cls_e));
     OopType selId = ps->astSelectorIds[sel_e];
-    return om::IntRecurFromPrim(omPtr, clsH, selId, UTL_ARRAY_LENGTH(aH), aH);
+    int64 numArgs = UTL_ARRAY_LENGTH(aH);
+    omObjSType *res = om::IntRecurFromPrim__(omPtr, clsH, selId, numArgs, aH);
+    return res;
 }
 
 omObjSType* RubyNode::call(AstClassEType cls_e, AstSelectorEType sel_e,
@@ -119,7 +117,7 @@ omObjSType* RubyNode::call(AstClassEType cls_e, AstSelectorEType sel_e,
     aH[2] = scp.add( c );
     omObjSType **clsH = scp.add(om::FetchOop(*ps->astClassesH, cls_e));
     OopType selId = ps->astSelectorIds[sel_e];
-    return om::IntRecurFromPrim(omPtr, clsH, selId, UTL_ARRAY_LENGTH(aH), aH);
+    return om::IntRecurFromPrim__(omPtr, clsH, selId, UTL_ARRAY_LENGTH(aH), aH);
 }
 
 omObjSType* RubyNode::call(AstClassEType cls_e, AstSelectorEType sel_e,
@@ -134,7 +132,7 @@ omObjSType* RubyNode::call(AstClassEType cls_e, AstSelectorEType sel_e,
     aH[3] = scp.add( d );
     omObjSType **clsH = scp.add(om::FetchOop(*ps->astClassesH, cls_e));
     OopType selId = ps->astSelectorIds[sel_e];
-    return om::IntRecurFromPrim(omPtr, clsH, selId, UTL_ARRAY_LENGTH(aH), aH);
+    return om::IntRecurFromPrim__(omPtr, clsH, selId, UTL_ARRAY_LENGTH(aH), aH);
 }
 
 omObjSType* RubyNode::call(AstClassEType cls_e, AstSelectorEType sel_e,
@@ -151,7 +149,7 @@ omObjSType* RubyNode::call(AstClassEType cls_e, AstSelectorEType sel_e,
     aH[4] = scp.add( e );
     omObjSType **clsH = scp.add(om::FetchOop(*ps->astClassesH, cls_e));
     OopType selId = ps->astSelectorIds[sel_e];
-    return om::IntRecurFromPrim(omPtr, clsH, selId, UTL_ARRAY_LENGTH(aH), aH);
+    return om::IntRecurFromPrim__(omPtr, clsH, selId, UTL_ARRAY_LENGTH(aH), aH);
 }
 
 omObjSType* RubyNode::call(AstClassEType cls_e, AstSelectorEType sel_e,
@@ -169,7 +167,7 @@ omObjSType* RubyNode::call(AstClassEType cls_e, AstSelectorEType sel_e,
     aH[5] = scp.add( f );
     omObjSType **clsH = scp.add(om::FetchOop(*ps->astClassesH, cls_e));
     OopType selId = ps->astSelectorIds[sel_e];
-    return om::IntRecurFromPrim(omPtr, clsH, selId, UTL_ARRAY_LENGTH(aH), aH);
+    return om::IntRecurFromPrim__(omPtr, clsH, selId, UTL_ARRAY_LENGTH(aH), aH);
 }
 
 omObjSType* RubyNode::call(AstClassEType cls_e, AstSelectorEType sel_e,
@@ -188,14 +186,14 @@ omObjSType* RubyNode::call(AstClassEType cls_e, AstSelectorEType sel_e,
     aH[6] = scp.add( g );
     omObjSType **clsH = scp.add(om::FetchOop(*ps->astClassesH, cls_e));
     OopType selId = ps->astSelectorIds[sel_e];
-    return om::IntRecurFromPrim(omPtr, clsH, selId, UTL_ARRAY_LENGTH(aH), aH);
+    return om::IntRecurFromPrim__(omPtr, clsH, selId, UTL_ARRAY_LENGTH(aH), aH);
 }
 
 void RubyNode::checkInstanceOf(omObjSType **objH, AstClassEType cls_e, rb_parse_state *ps)
 {
   omObjSType *clsO =  om::FetchOop(*ps->astClassesH, cls_e);
-  if (clsO != ps->omPtr->FetchClassObj(*objH)) {
-    GemSupErr_oo(RT_ERR_BAD_ARG_KIND, *objH, clsO);
+  if (clsO != ps->omPtr->FetchClassObj_(*objH)) {
+    GemSupErr_oo_(RT_ERR_BAD_ARG_KIND, *objH, clsO);
   }
 }
 
@@ -205,7 +203,7 @@ BoolType RubyNode::is_a(omObjSType *o, AstClassEType cls_e, rb_parse_state *ps)
   OmScopeType scp(omPtr);
   omObjSType **objH = scp.add( o);
   omObjSType *cls = om::FetchOop(*ps->astClassesH, cls_e);
-  return cls == omPtr->FetchClassObj(*objH);
+  return cls == omPtr->FetchClassObj_(*objH);
 }
 
 omObjSType* RpNameToken::s(const char* str, omObjSType *srcOfs, rb_parse_state *ps)
@@ -228,7 +226,7 @@ omObjSType* RpNameToken::quidForSym(omObjSType *sym, om *omPtr)
 {
   // result is a SmallInteger
   // used for symbol creation other than via rb_parser_sym()
-  OopType symId = om::objIdOfObj(omPtr, sym);
+  OopType symId = om::objIdOfObj__(omPtr, sym);
   return buildQuid(symId, RpNameToken::tLastToken() + 1, ID_JUNK);
 }
 
@@ -259,7 +257,7 @@ omObjSType* RpNameToken::s(rb_parse_state *ps, omObjSType *quidO)
   omObjSType **clsH = scp.add( om::FetchOop(*ps->astClassesH, my_cls));
   omObjSType **resH = scp.add(om::NewObj(omPtr, clsH));
   omObjSType **tmpH = scp.add( om::LocatePomObj(omPtr, symId));
-  UTL_ASSERT( (*tmpH)->classPtr()->isSymbolCls());
+  UTL_ASSERT( om::isSymbol(*tmpH) );
   om::StoreOop(omPtr, resH, val_ofs, tmpH);
   *tmpH = quidO;
   om::StoreOop(omPtr, resH, quid_ofs, tmpH);

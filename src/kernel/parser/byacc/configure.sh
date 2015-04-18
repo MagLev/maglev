@@ -1,20 +1,19 @@
 #! /bin/bash
-#  MTYPE should normally come from environment set by build.pl
 
-export MTYPE=$machine
+OSTYPE = /usr/bin/bash -norc -noprofile -c 'echo $OSTYPE'
 
-if [ $MTYPE = "13" ]; then
+if [ $OSTYPE = "solaris" ]; then
   export CXX="/opt/sunstudio12.1/bin/CC -features=no%except"
   export CC="/opt/sunstudio12.1/bin/cc "
   export CFLAGS="-g "
   ./configure
   exit 0
 fi
-if  [ $MTYPE = "50" ]; then
+if  [ $OSTYPE = "linux" ]; then
   # linux default to gcc
   export CFLAGS="-O2 -Wall -Werror"
   ./configure
   exit 0
 fi
-echo "unsupported MTYPE $MTYPE"
+echo "unsupported OSTYPE $OSTYPE"
 exit 1

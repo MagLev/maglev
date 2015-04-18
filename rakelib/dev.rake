@@ -160,7 +160,7 @@ end
 def kill_stone(stone, sig='')
   stones = `$GEMSTONE/bin/gslist -clv`
   puts stones
-  pids = stones.grep(/(Stone|cache)\s+#{stone}/) { |l| l.split[3] }
+  pids = stones.lines.grep(/(Stone|cache)\s+#{stone}/) { |l| l.split[3] }
   if pids.empty?
     puts "Nothing to kill for #{stone}"
   else

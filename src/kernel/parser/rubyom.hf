@@ -1,0 +1,340 @@
+#if !defined(RUBYOM_HF)
+#define RUBYOM_HF 1
+
+/*
+ *  File  rubyom.hf  .
+ *  Partially opaque definitions of C++ classes om and omObjSType , and
+ *  definitions of other entry points in libgcilnk.so  which are called
+ *  by the generated C code in rubygrammar.c 
+ */
+
+#include "gcicmn.ht"
+
+#define INTCONST(IC_name, IC_value)  enum { IC_name = (IC_value) }
+#define USHORT_MAX  0xFFFF
+
+#include "opalcls.ht"
+#include "gcistring.hf"
+
+typedef OopType OopNumberType ;
+typedef unsigned char    BoolByteType;
+
+#define TWO_TO_40   1099511627776L
+#define OOP_NUM_MAX (TWO_TO_40 - 1)
+
+enum { OOP_NUM_SHIFT = 8 };
+
+#define OOP_IS_SMALL_INT(x) GCI_OOP_IS_SMALL_INT(x)
+
+#define OOP_IS_RAM_OOP(oop) ((((OopType)oop) & OOP_RAM_TAG_MASK) == OOP_TAG_RAM_OOP)
+
+#define OOP_IS_POM(oop) (( ((OopType)oop) & OOP_POM_TAG_MASK ) != 0)
+
+#define OOP_IS_CHARACTER(x) GCI_OOP_IS_CHAR(x)
+
+#define OOP_TO_CHAR_(anOop) (((OopType)(anOop) >> GCI_OOP_SPECIAL_VALUE_SHIFT) & CHAR32_MAX_VALUE)
+
+/* OOP_NUM_TAG_BITS from gcioop.ht */
+#define OOP_TO_I64(anOop) ((int64)(anOop) >> OOP_NUM_TAG_BITS )
+
+int HostCallDebuggerMsg_fl(const char* msg, const char* filename, int line);
+
+#define UTL_GUARANTEE(x) { \
+  if (! (x)) { \
+    HostCallDebuggerMsg_fl("UTL_GUARANTEE failed", __FILE__, __LINE__); \
+    } \
+  }
+
+#if defined(FLG_DEBUG)
+#define UTL_ASSERT( x ) UTL_GUARANTEE( x )
+#define UTL_IF_DEBUG( x ) { x }
+#define UTL_DEBUG_DEF( x ) x
+#else
+#define UTL_ASSERT( x ) { }
+#define UTL_IF_DEBUG( x ) { }
+#define UTL_DEBUG_DEF( x ) /*  */
+#endif
+
+#define UTL_ARRAY_LENGTH(a) ( sizeof((a)) / sizeof((a)[0]) )
+
+static inline OopNumberType OOP_TO_BIT(OopType anOop)
+{
+  UTL_ASSERT( OOP_IS_POM(anOop));
+  return anOop >> OOP_NUM_SHIFT ;
+}
+
+static inline OopType BIT_TO_OOP(OopNumberType aBitNum)
+{
+  return (aBitNum << OOP_NUM_SHIFT) | OOP_TAG_POM_OOP;
+}
+
+enum {
+  SELECTORID_ENV_shift = 64 - 8,  // for direct operation on OopType
+  COMPILE_ENV_MAX = 255
+};
+
+
+static inline OopType OOP_makeSelectorId(uint64 environId , OopType selObjId)
+{
+  UTL_ASSERT(OOP_IS_POM(selObjId));
+  UTL_ASSERT(environId < COMPILE_ENV_MAX );
+  UTL_ASSERT((selObjId >> OOP_NUM_SHIFT) <= OOP_NUM_MAX);
+  uint64 oopNumMask = OOP_NUM_MAX ;
+  OopType res = ((environId & 0xFF) << (SELECTORID_ENV_shift)) |
+                (selObjId & (oopNumMask << OOP_NUM_SHIFT)) | OOP_TAG_SMALLINT;
+  return res;
+}
+
+
+class omObjSType
+{
+ public:
+  inline OopType classId();
+};
+
+class om;
+
+static inline omObjSType* OOP_OF_SMALL_LONG_(int64 arg)
+{
+  UTL_ASSERT(GCI_I64_IS_SMALL_INT(arg));
+  return (omObjSType*)((arg << 3) | OOP_TAG_SMALLINT) ;
+}
+
+enum {
+  FP_codePtr_OFS = -1, // always a Ram oop of a GsNativeCode or GsNMethod
+  FP_savedFP_OFS =    0,
+  FP_rtnAddr_OFS =    1,  // Solaris native code , stores rtnAddr - 8
+  FP_lastArg_OFS =    2,  // FP_lastArg_OFS + numArgs is offset to receiver
+                 // FP_lastArg_OFS + numArgs - 1 - argIdx is offset to args[argIdx]
+
+  FP_primEntrySP_to_argLimit_OFS = FP_rtnAddr_OFS - FP_codePtr_OFS  // &SP[lastArg] - 1
+};
+
+#define DOPRIM_STACK(__n) (*(ARStackPtr + (__n) + FP_primEntrySP_to_argLimit_OFS))
+
+#define DOPRIM_STACK_ADDR(__n) (ARStackPtr + (__n) + FP_primEntrySP_to_argLimit_OFS)
+
+#if defined(FLG_DEBUG)
+// reenable if doing lots of new primitives in the parser; needs a slow build
+// void DoPrimCheckNumArgs(om *omPtr, omObjSType **SP, int expectedNumArg);
+// #define DOPRIM_ARGS(__omptr, __n) DoPrimCheckNumArgs(__omptr, ARStackPtr, __n)
+#define DOPRIM_ARGS(__omptr, __n) { }
+#else
+#define DOPRIM_ARGS(__omptr, __n) { }
+#endif
+
+#define ramOop(anOop) ((omObjSType*)((uintptr_t)anOop))
+#define ram_OOP_NIL   ramOop(OOP_NIL)
+#define ram_OOP_FALSE ramOop(OOP_FALSE)
+#define ram_OOP_TRUE  ramOop(OOP_TRUE)
+#define ram_OOP_Zero  ramOop(OOP_Zero)
+
+class ComStateType;
+
+class H_CByteArray
+{
+ public:
+   static inline int64 sizeBytes(int64 info) { return info >> 4; }
+};
+
+class OmScopeType
+{
+  intptr_t a;  
+  intptr_t b;
+  intptr_t c; 
+  // intptr_t numAdds;  // not defined in maglev, was for debugging
+
+ public:
+  OmScopeType(om *omPtr) {
+    initialize_(omPtr);
+  }
+  ~ OmScopeType() {   
+    deinitialize_();
+  } 
+  void initialize_(om *omPtr);
+  void deinitialize_(); 
+  omObjSType** add_(omObjSType *obj);
+  inline omObjSType** newHandle() { return add_(ram_OOP_NIL); }
+  inline omObjSType** add(omObjSType *obj) { return add_(obj); }
+};
+
+
+enum { GEN_MAX_RubyFixedArgs = 74    // 'z' - '0' 
+     };
+
+class YyStackElement {  // for Maglev parser
+   // must agree with VM's om.hf, used by omgc.c  
+ public:
+  omObjSType *obj;
+  short state;
+};
+
+class YyStackData {
+   // must agree with VM's om.hf, used by omgc.c  
+ public:
+  YyStackElement *mark;
+  YyStackElement *base;
+  YyStackElement *last;
+  uint  stacksize ;
+
+  void initialize() {
+    mark = NULL;
+    base = NULL;
+    last = NULL;
+    stacksize = 0;
+  }
+
+  void setEmpty() {
+    mark = base - 1;
+  }
+};
+
+class rb_parse_state;
+
+class om
+{
+ public:
+  static OopType objIdOfObj__(om *omPtr, omObjSType* obj);
+
+  static omObjSType* FetchOop(omObjSType* obj, int64 offset); // may cause gc
+  static int64 FetchSize_(omObjSType* obj);
+
+  static void StoreOopR(om *omPtr, omObjSType** objH, int64 offset, omObjSType **valueH); // may cause gc
+  static inline void StoreOop(om *omPtr, omObjSType** objH, int64 offset, omObjSType **valueH) {
+     // possible gc
+     StoreOopR(omPtr, objH, offset, valueH); 
+  }
+
+  static int64 FetchBytes_(omObjSType* obj, int64 offset, int64 count, ByteType *buf);
+
+  static omObjSType* NewObj(om *omPtr, omObjSType **classH);  // may cause gc
+  static omObjSType* NewArray(om *omPtr, int64 idxSize);  // may cause gc
+  static omObjSType* NewString__(om *omPtr, const ByteType *str, int64 size); // may cause gc
+
+  static inline omObjSType* NewString_(om *omPtr, const char* str) {
+    int64 size = strlen(str);
+    return NewString__(omPtr, (ByteType*)str, size);
+  }
+
+  static inline omObjSType* NewString(om *omPtr, int64 size) { // may cause gc
+    return NewString__(omPtr,  NULL, size);
+  }
+
+  static int64 FetchCString_(omObjSType* obj, char *result, int64 resultSizeBytes);
+    // fetch up to resultSizeBytes-1 characters from the object
+    // into result and null terminate result.
+    // returns the number of characters fetched not including the
+    // null terminator.   may cause gc
+
+  static void AppendToString_(om *omPtr, omObjSType **stringH, const char* str, int64 len); // may cause gc
+
+  static inline void AppendToString(om *omPtr, omObjSType **stringH, const char* str) {
+    AppendToString_(omPtr, stringH, str, strlen(str));
+  }
+
+  static int64 AppendToArray(om *omPtr, omObjSType **arrayH, omObjSType **valH);
+    // result is new size of array // may cause gc
+
+  static BoolType IsKindOf_noHist(om *omPtr, omObjSType** objH, omObjSType *cls);
+
+  static omObjSType* FetchOopNoFault(omObjSType* obj, int64 offset); // no gc
+
+  omObjSType* FetchClassObj_(omObjSType* obj);  // no gc
+  static OopType FetchClassId_(omObjSType* obj); // no gc
+
+  static int64 isSymbol(omObjSType *objH); // for Maglev // no gc
+  static int64 isCByteArray(omObjSType *objH); // for Maglev // no gc
+  static int64 strCharSize(omObjSType *objH); // for Maglev // no gc
+
+  static omObjSType* LocatePomObj(om *omPtr, OopType objId);
+
+  
+  static inline int64 FetchSmallInt__(omObjSType* obj, int64 offset) {
+    // fetch specified instVar of obj, which is expected to
+    // be a SmallInteger, and return the int64 value , or -1
+    // no gc
+    omObjSType* val = FetchOopNoFault(obj, offset);
+    if (OOP_IS_SMALL_INT(val)) {
+      int64 value = OOP_TO_I64(val);
+      return value;
+    }
+    return -1;
+  }
+
+  static void corruptObj(omObjSType *obj, const char* reason);
+
+  static inline void StoreSmallInt_(om *omPtr, omObjSType** obj, int64 offset, int64 value) {
+    // may cause gc
+    // store at (FetchSize(*obj)+1) will do auto-grow
+    if (! GCI_I64_IS_SMALL_INT(value)) {
+      corruptObj(*obj, "StoreSmallInt out of range");
+    }
+    omObjSType *val = OOP_OF_SMALL_LONG_(value);
+    StoreOop(omPtr, obj, offset, &val);
+  }
+
+  static inline void StoreSpecial(om *omPtr, omObjSType** obj, int64 offset, OopType value) {
+    // only allows storing a special oop
+    // store at (FetchSize(*obj)+1) will do auto-grow
+    // may cause gc
+    omObjSType *val = ramOop(value);
+    UTL_ASSERT(! OOP_IS_RAM_OOP(val));
+    UTL_ASSERT(! OOP_IS_POM(val));
+    StoreOop(omPtr, obj, offset, &val);
+  }
+
+
+  static omObjSType* IntRecurFromPrim_(om *omPtr, omObjSType**  recH, OopType selectorId);
+  static omObjSType* IntRecurFromPrim__(om *omPtr, omObjSType**  recH, OopType selectorId,
+		int64 numArgs, omObjSType ***handlesArray);
+
+  omObjSType** NewGlobalHandle();
+
+  static uintptr_t FetchCData(omObjSType* obj); // no gc
+ 
+  rb_parse_state* rubyParseState();
+  void set_rubyParseState( rb_parse_state *ps);
+  void set_rubyParseStack( YyStackData *stk);
+  ComStateType* compilerState();
+  
+};
+
+inline OopType omObjSType::classId()
+{
+  UTL_ASSERT(OOP_IS_RAM_OOP(this));
+  return om::FetchClassId_(this);
+}
+
+void GemSupErr_oo_(int errorNumber, omObjSType* arg1, omObjSType* arg2);
+
+void GemErrAnsi(om *omPtr, int errorNumber, const char* reason, const char* detail);
+
+omObjSType*  ObjNewSym(om *omPtr, const char *string);
+omObjSType* ObjExistingCanonicalSym__(om *omPtr, omObjSType **argH);
+omObjSType* ObjCanonicalSymFromCStr(om *omPtr, const ByteType *buf,
+                int64 keyLen, OopType rubyPrefixSymbolId/*maybe OOP_NIL*/ );
+
+char *ComHeapMalloc(ComStateType *cst, unsigned int itsSize );
+  // returned memory is automatically freed at end of a method compilation
+
+void ComHeapInit(ComStateType *cst);
+
+BoolType FloatPrimFetchArg(om *omPtr, omObjSType** objH, double *aDouble);
+
+omObjSType*  FloatPrimDoubleToOop(om *omPtr, double x);
+
+omObjSType*  LrgNegate(om *omPtr, omObjSType** obj );
+omObjSType* LrgRubyStringToInteger(om *omPtr,
+        omObjSType** stringH, int64 radix, int charSize);
+omObjSType* LrgInt64ToOop(om *omPtr, int64 anInt);
+
+omObjSType *MagCompileError902(om *omPtr, omObjSType **ARStackPtr);
+omObjSType *MagParse903(om *omPtr, omObjSType **ARStackPtr);
+
+omObjSType* GemDoSessionSymList( om *omPtr );
+
+omObjSType*  GemSupSearchSymList(om *omPtr,
+                omObjSType** symbolList, omObjSType** Symbol );
+
+
+#endif

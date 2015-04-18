@@ -17,7 +17,10 @@ display resultcheck
 errorcount
 
 !  baseruby.gs does login/logout/commits
-iferr 1 exit 2
+iferr 1 where  
+iferr 2 stack  
+iferr 3 exit 2
+
 input $imageDir/baseruby.gs
 errorcount
 

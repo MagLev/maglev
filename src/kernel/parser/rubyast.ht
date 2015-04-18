@@ -229,6 +229,7 @@ typedef enum {
   a_sym_BEGIN,
   a_sym_while,
   a_sym_rest_args,
+  a_sym_call,
   a_sym_INVALID,
   NUM_AST_SYMBOLS // must be last
 } AstSymbolEType ;

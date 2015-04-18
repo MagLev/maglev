@@ -8,11 +8,11 @@
 
   Copyright (C) 1993-2003 Yukihiro Matsumoto
 
-  Copied from Rubinius source distribution to Maglev sources on 30 July 2010 
+  Copied from Rubinius source distribution to Maglev sources on 30 July 2010
 
   Maglev notes:
     file grammar.y
-    To be used with Maglev's modified version of byacc 
+    To be used with Maglev's modified version of byacc
 
 **********************************************************************/
 
@@ -25,24 +25,16 @@
 #include <errno.h>
 #include <ctype.h>
 #include <string.h>
-// include <stdbool.h>
+#include <limits.h>
 
 // include <assert.h>
 //   use Maglev VM assertion support
 #define assert UTL_ASSERT
 
-#include "om.hf"
+#include "rubyom.hf"
 #include "rubyparser.h"
 #include "rubyast.hf"
-#include "gemsup.hf"
-#include "gemdo.hf"
-#include "object.hf"
-#include "comheap.hf"
 #include "gcifloat.hf"
-#include "floatprim.hf"
-#include "doprimargs.hf"
-#include "intloopsup.hf"
-#include "om_inline.hf"
 #include "unicode/ustring.h"
 #include "unicode/umachine.h"
 #include "unicode/utf.h"
@@ -79,13 +71,13 @@ static NODE* quidToSymbolObj(NODE* q, rb_parse_state *ps)
 {
   if (OOP_IS_SMALL_INT(q)) {
     int64 id = OOP_TO_I64(q);
-    int64 oopNum = id >> ID_symOopNum_SHIFT ; 
+    int64 oopNum = id >> ID_symOopNum_SHIFT ;
     OopType symOid = BIT_TO_OOP(oopNum);
     om *omPtr = ps->omPtr;
     NODE *symO = om::LocatePomObj(omPtr, symOid);
-    UTL_ASSERT( symO->classPtr()->isSymbolCls());
+    UTL_ASSERT( om::isSymbol(symO)) ;
     return symO;
-  } 
+  }
   return RpNameToken::symval(q, ps);
 }
 
@@ -99,7 +91,7 @@ static BoolType v_is_local_id(int64 val)
 
 static BoolType is_local_id(NODE* id) { return v_is_local_id(QUID_to_id(id)); }
 
-static BoolType v_is_global_id(int64 val) 
+static BoolType v_is_global_id(int64 val)
 {
   return ((val >> ID_SCOPE_SHIFT) & ID_SCOPE_MASK)== ID_GLOBAL && v_is_notop_id(val);
 }
@@ -145,7 +137,7 @@ static BoolType is_asgn_or_id(NODE *id)
   int64 scopeVal = (val >> ID_SCOPE_SHIFT) & ID_SCOPE_MASK ;
   return v_is_notop_id(val) && ( scopeVal == ID_GLOBAL ||
                                  scopeVal == ID_INSTANCE ||
-				 scopeVal == ID_CLASS);
+                                 scopeVal == ID_CLASS);
 }
 
 
@@ -157,17 +149,17 @@ static YyStackElement* yygrowstack(rb_parse_state *ps, YyStackElement* markPtr)
     return NULL;
   }
   int newSize = stk->stacksize == 0 ? rb_parse_state::yystack_START_DEPTH
-				: stk->stacksize * 2;
+                                : stk->stacksize * 2;
   if (newSize > rb_parse_state::yystack_MAXDEPTH)
     newSize = rb_parse_state::yystack_MAXDEPTH;
 
   int64 numBytes = sizeof(YyStackElement) * newSize ;
-  YyStackElement *base = (YyStackElement*)UtlMalloc(numBytes, "yygrowstack");
+  YyStackElement *base = (YyStackElement*)malloc(numBytes);
   int64 depth = -1;
   if (stk->stacksize > 0) {
     depth = stk->mark - stk->base;
     memcpy(base, stk->base, sizeof(YyStackElement)*stk->stacksize);
-    UtlFree(stk->base);
+    free(stk->base);
   };
   stk->base = base;
   stk->mark = base + depth;
@@ -242,18 +234,18 @@ static void rb_compile_error_q(rb_parse_state* ps, const char* msg, omObjSType *
   if (OOP_IS_SMALL_INT(quidO)) {
     omObjSType *symO = quidToSymbolObj(quidO, ps);
     om::FetchCString_(symO, buf, sizeof(buf));
-  } 
-  strlcpy(ps->firstErrorReason, msg, sizeof(ps->firstErrorReason)) ; 
+  }
+  strlcpy(ps->firstErrorReason, msg, sizeof(ps->firstErrorReason)) ;
   strlcat(ps->firstErrorReason, ", ", sizeof(ps->firstErrorReason));
-  strlcat(ps->firstErrorReason, buf, sizeof(ps->firstErrorReason)); 
-  yyerror(ps->firstErrorReason, ps); 
+  strlcat(ps->firstErrorReason, buf, sizeof(ps->firstErrorReason));
+  yyerror(ps->firstErrorReason, ps);
 }
 
 static void rb_compile_error(const char* msg, rb_parse_state* ps)
 {
   rb_compile_error(ps, msg);
 }
- 
+
 static void COND_PUSH(rb_parse_state *ps, uint64 n)
 {
   if (! ps->cond_stack.push(n)) {
@@ -274,7 +266,7 @@ static void COND_LEXPOP(rb_parse_state *ps)
   ps->cond_stack.lexPop();
 }
 
-static int64 COND_P(rb_parse_state *ps)        
+static int64 COND_P(rb_parse_state *ps)
 {
   return ps->cond_stack.topBit();
 }
@@ -316,7 +308,7 @@ static void rParenLexPop(rb_parse_state *ps)
   CMDARG_LEXPOP(ps);
 }
 
-static int64 CMDARG_P(rb_parse_state *ps)        
+static int64 CMDARG_P(rb_parse_state *ps)
 {
   return ps->cmdarg_stack.topBit();
 }
@@ -337,7 +329,7 @@ static int tokadd_utf8(rb_parse_state *parse_state, int string_literal, int symb
 
 static NODE* gettable(rb_parse_state *parse_state, NODE **idH);
 
-static void push_start_line(rb_parse_state* ps, int line, const char* which) 
+static void push_start_line(rb_parse_state* ps, int line, const char* which)
 {
   ps->start_lines.push_back(ps, line, which);
 }
@@ -347,10 +339,10 @@ static void PUSH_LINE(rb_parse_state* ps, const char* which)
   push_start_line(ps, ps->ruby_sourceline(), which);
 }
 
-static int POP_LINE(rb_parse_state* ps) 
-{ 
+static int POP_LINE(rb_parse_state* ps)
+{
   // maglev had premature_eof at call sites
-  return ps->start_lines.pop_back(); 
+  return ps->start_lines.pop_back();
 }
 
 static NODE* rb_parser_sym(const char *name, rb_parse_state *ps);
@@ -366,7 +358,7 @@ static void  pop_block_vars(rb_parse_state *parse_state);
 
 static NODE* asQuid(NODE* idO, rb_parse_state *ps);
 
-enum { RE_OPTION_IGNORECASE   = 1, 
+enum { RE_OPTION_IGNORECASE   = 1,
        RE_OPTION_EXTENDED     = 2,
        RE_OPTION_MULTILINE    = 4,
        RE_OPTION_DONT_CAPTURE_GROUP = 0x80,
@@ -403,7 +395,7 @@ static NODE* NEW_STR( bstring *str, rb_parse_state *ps)
 
 int64 RubyLexStrTerm::incrementNest(NODE **objH, int delta, rb_parse_state *ps)
 {
-  int64 v = om::FetchSmallInt_(objH, nest_ofs);
+  int64 v = om::FetchSmallInt__(*objH, nest_ofs);
   v += delta;
   om::StoreSmallInt_(ps->omPtr, objH, nest_ofs, v);
   return v;
@@ -470,8 +462,8 @@ NODE* RubyLexStrTerm::newHereDoc( rb_parse_state *ps,
   d = (d << 32) | (ps->lineStartOffset & 0x7FFFFFFF);
   om::StoreSmallInt_(omPtr, resH, d_ofs, d);
   if (yTraceLevel > 0) {
-    printf("newHereDoc line %d lineStartOffset %ld \n", 
-	ps->lineNumber, ps->lineStartOffset);
+    printf("newHereDoc line %d lineStartOffset %ld \n",
+        ps->lineNumber, ps->lineStartOffset);
   }
   return *resH;
 }
@@ -585,8 +577,7 @@ static NODE* assignable(NODE **idH, NODE* srcOffset, NODE **valH, rb_parse_state
 %type <node> mrhs superclass block_call block_command
 %type <node> f_arglist f_args f_optarg f_opt f_block_arg opt_f_block_arg
 %type <node> assoc_list assocs assoc undef_list backref string_dvar
-// renamed block_var to blck_var
-%type <node> for_var blck_var opt_block_var block_par
+%type <node> for_var block_var opt_block_var block_par
 %type <node> brace_block cmd_brace_block do_block lhs none fitem
 %type <node> mlhs mlhs_head mlhs_basic mlhs_entry mlhs_item mlhs_node
 // deleted fsym from next line
@@ -595,7 +586,6 @@ static NODE* assignable(NODE **idH, NODE* srcOffset, NODE **valH, rb_parse_state
 %type <num>  f_norm_arg f_arg
 %token tUPLUS           /* unary+ */
 %token tUMINUS          /* unary- */
-%token tUBS             /* unary\ */
 %token tPOW             /* ** */
 %token tCMP             /* <=> */
 %token tEQ              /* == */
@@ -665,9 +655,9 @@ program         :  {
                     }
                   compstmt
                     {
-                        //if ($2 && !compile_for_eval) ... 
+                        //if ($2 && !compile_for_eval) ...
                         //     last expression should not be void  ...
-                        //    maglev does this in AST to IR generation 
+                        //    maglev does this in AST to IR generation
                         yTrace(vps,  "program: comp_stamt");
                         vps->class_nest = 0;
                         $$  =  $2;
@@ -690,7 +680,7 @@ bodystmt        : compstmt
                         }
                         if ($4 != ram_OOP_NIL) {  // 4 is a RubyEnsureNode
                             // $4 is receiver block of rubyEnsure:
-                            RubyEnsureNode::set_body( $4, *resH, vps ); 
+                            RubyEnsureNode::set_body( $4, *resH, vps );
                             *resH = $4;
                         }
                         $$ = *resH;
@@ -797,7 +787,7 @@ stmt            : kALIAS fitem {vps->lex_state = EXPR_FNAME;} fitem
                       yTrace(vps, "stmt: | stmt kRESCUE_MOD stmt");
                         OmScopeType aScope(vps->omPtr);
                         omObjSType *srcOfs = RpNameToken::srcOffsetO(vps, $2);
-                        NODE **rescueBodyH = aScope.add( 
+                        NODE **rescueBodyH = aScope.add(
                           RubyRescueBodyNode::s(ram_OOP_NIL, $3, ram_OOP_NIL, srcOfs, vps));
                         $$ = RubyRescueNode::s( $1, *rescueBodyH, ram_OOP_NIL, srcOfs, vps);
                     }
@@ -824,8 +814,8 @@ stmt            : kALIAS fitem {vps->lex_state = EXPR_FNAME;} fitem
                        if (vps->in_def || vps->in_single) {
                             rb_warning(vps, "END in method; use at_exit");
                        }
-                       $$ = RubyIterRpNode::s(ram_OOP_NIL/*no block args*/, $3, $2/*srcOffsetSi*/, 
-						vps, 1/* strlen( '}' ) */ );
+                       $$ = RubyIterRpNode::s(ram_OOP_NIL/*no block args*/, $3, $2/*srcOffsetSi*/,
+                                                vps, 1/* strlen( '}' ) */ );
                     }
                 | lhs '=' command_call
                     {
@@ -861,7 +851,7 @@ stmt            : kALIAS fitem {vps->lex_state = EXPR_FNAME;} fitem
                       $$ = RubyOpAsgnNode::s($1, $3, $4, $5, vps);
                     }
                 | primary_value '.' tCONSTANT tOP_ASGN command_call
-                    {   
+                    {
                       yTrace(vps, "stmt: | primary_value tDOT tCONSTANT tOP_ASGN command_call");
                       // not seen with Ryan's grammar and 1.8.7
                       $$ = RubyOpAsgnNode::s($1, $3, $4, $5, vps);
@@ -894,7 +884,7 @@ stmt            : kALIAS fitem {vps->lex_state = EXPR_FNAME;} fitem
                 | mlhs '=' mrhs
                     {
                         yTrace(vps, "stmt: | mLhs tEQL mrhs");
-			$$ = RubyParser::masgn_append_mrhs($1, $3, vps);   		      
+                        $$ = RubyParser::masgn_append_mrhs($1, $3, vps);
                     }
                 | expr
                 ;
@@ -940,7 +930,7 @@ command_call    : command
                     {
                         yTrace(vps, "command_call: kRETURN call_args");
                         OmScopeType aScope(vps->omPtr);
-			NODE **valH = aScope.add(RubyParser::ret_args($2, vps));
+                        NODE **valH = aScope.add(RubyParser::ret_args($2, vps));
                         $$ = RubyReturnNode::s(valH, $1/*kRETURN token*/, vps);
                     }
                 | kBREAK call_args
@@ -978,18 +968,18 @@ cmd_brace_block : tLBRACE_ARG
                         reset_block(vps);
                         // $1 = int64ToSi(vps->ruby_sourceline() );
                     }
-                  opt_block_var 
-                    { 
+                  opt_block_var
+                    {
                        $$ = ram_OOP_NIL; // getBlockVars not used
                     }
                   compstmt
                   '}'
                     {
-		      yTrace(vps, "cmd_brace_block: ___ comp_stamt tRCURLY");
+                      yTrace(vps, "cmd_brace_block: ___ comp_stamt tRCURLY");
                       rParenLexPop(vps);
-		      popBlockVars(vps);
-		      $$ = RubyIterRpNode::s( $3/*masgn from opt_block_var*/ , $5/*compstmp*/, $1/*srcOffsetSi*/, 
-						vps, 1/* strlen( '}' ) */ );
+                      popBlockVars(vps);
+                      $$ = RubyIterRpNode::s( $3/*masgn from opt_block_var*/ , $5/*compstmp*/, $1/*srcOffsetSi*/,
+                                                vps, 1/* strlen( '}' ) */ );
                     }
                 ;
 
@@ -1047,12 +1037,12 @@ mlhs            : mlhs_basic
 mlhs_entry      : mlhs_basic
                 | tLPAREN mlhs_entry ')'
                     {
-		      yTrace(vps, "mlhs_entry: | tLPAREN mlhs_entry tRPAREN");
+                      yTrace(vps, "mlhs_entry: | tLPAREN mlhs_entry tRPAREN");
                       rParenLexPop(vps);
-		      OmScopeType aScope(vps->omPtr);
-		      NODE **valH = aScope.add( RubyArrayNode::s($2, vps));
+                      OmScopeType aScope(vps->omPtr);
+                      NODE **valH = aScope.add( RubyArrayNode::s($2, vps));
                       omObjSType *srcOfs = RpNameToken::srcOffsetO(vps, $1);
-		      $$ = RubyParser::new_parasgn( *valH, srcOfs, vps);
+                      $$ = RubyParser::new_parasgn( *valH, srcOfs, vps);
                     }
                 ;
 
@@ -1125,15 +1115,15 @@ mlhs_head       : mlhs_item ','
                     }
                 ;
 
-ary_ref	        : '[' aref_args ']'
+ary_ref         : '[' aref_args ']'
                    {
                      rParenLexPop(vps);
                      om *omPtr = vps->omPtr;
-  		     OmScopeType scp(omPtr);
+                     OmScopeType scp(omPtr);
                      omObjSType **resH = scp.add(om::NewArray(omPtr, 2));
                      om::StoreOop(omPtr, resH, 0, & $2 );
                      om::StoreOop(omPtr, resH, 1, & $3 /*srcOffsetSi*/);
-                     $$ = *resH; 
+                     $$ = *resH;
                    }
 
 mlhs_node       : variable
@@ -1152,8 +1142,8 @@ mlhs_node       : variable
                 | primary_value '.' tIDENTIFIER
                     {
                       yTrace(vps, "mlhs_node: | primary_value tDOT tIDENTIFIER");
-                      $$ = RubyAttrAssignNode::s($1, $3/*RpNameToken*/, ram_OOP_NIL, 
-							ram_OOP_NIL, vps);
+                      $$ = RubyAttrAssignNode::s($1, $3/*RpNameToken*/, ram_OOP_NIL,
+                                                        ram_OOP_NIL, vps);
                     }
                 | primary_value tCOLON2 tIDENTIFIER
                     {
@@ -1176,7 +1166,7 @@ mlhs_node       : variable
                 | tCOLON3 tCONSTANT
                     {
                       if (vps->in_def || vps->in_single) {
-			  rb_compile_error(vps, "dynamic constant assignment");
+                          rb_compile_error(vps, "dynamic constant assignment");
                       }
                       $$ = RubyConstDeclNode::colon3( $2/*RpNameToken*/, vps);
                     }
@@ -1219,15 +1209,15 @@ lhs             : variable
                 | primary_value tCOLON2 tCONSTANT
                     {
                       yTrace(vps, "lhs: | primary_value tCOLON2 tCONSTANT");
-		      if (vps->in_def || vps->in_single) {
-			  rb_compile_error(vps, "dynamic constant assignment");
+                      if (vps->in_def || vps->in_single) {
+                          rb_compile_error(vps, "dynamic constant assignment");
                       }
                       $$ = RubyConstDeclNode::colon2($1, $3/*RpNameToken*/, vps);
                     }
                 | tCOLON3 tCONSTANT
                     {
                       if (vps->in_def || vps->in_single) {
-			  rb_compile_error(vps, "dynamic constant assignment");
+                          rb_compile_error(vps, "dynamic constant assignment");
                       }
                       OmScopeType aScope(vps->omPtr);
                       $$ = RubyConstDeclNode::colon3( $2/*RpNameToken*/, vps);
@@ -1251,7 +1241,7 @@ cpath           : tCOLON3 cname
                     {
                       yTrace(vps, "cpath: tCOLON3 cname");
                       // $$  = NEW_COLON3($2);
-   		      $$ = RubyColon3Node::s($2/*RpNameToken*/, vps);
+                      $$ = RubyColon3Node::s($2/*RpNameToken*/, vps);
                     }
                 | cname
                     {
@@ -1263,7 +1253,7 @@ cpath           : tCOLON3 cname
                     {
                       yTrace(vps, "cpath: | primary_value tCOLON2 cname");
                       // $$  = NEW_COLON2($1, $3);
-                      $$ = RubyColon2Node::s($1, $3, vps); 
+                      $$ = RubyColon2Node::s($1, $3, vps);
                     }
                 ;
 
@@ -1286,27 +1276,27 @@ fname           : tIDENTIFIER
                     }
                 ;
 
-fitem           : fname
-                    {  // deleted  fsym  : fname  
-		       //                | symbol
-                       //                ; 
-	               yTrace(vps, "fitem: fname");
+fsym            : fname
+                    {
+                       yTrace(vps, "fitem: fname");
                        $$ = RubySymbolNode::s( RpNameToken::symval($1/*RpNameToken*/, vps), vps);
-		    }
-
-fitem           : symbol
+                    }
+                | symbol
                     {
                        yTrace(vps, "fitem: | symbol");
                        // $$  = NEW_LIT(QUID2SYM($1));
                        $$ = RubySymbolNode::s( $1/*a Symbol*/, vps);
                     }
-                | dsym
+                ;
+
+fitem           : fsym { $$ = $1; } // wtf? why do I need this assignment?
+                | dsym { $$ = $1; }
                 ;
 
 undef_list      : fitem
                     {
                       yTrace(vps, "undef_list: fitem");
-                      $$ = RubyParser::new_undef( $1/*a RubySymbolNode*/, vps); 
+                      $$ = RubyParser::new_undef( $1/*a RubySymbolNode*/, vps);
                     }
                 | undef_list ',' {vps->lex_state = EXPR_FNAME;} fitem
                     {
@@ -1322,7 +1312,7 @@ op              : '|'    { yTrace(vps, "op |");    $$ = RpNameToken::s(a_sym_orO
                 | '&'    { yTrace(vps, "op &");    $$ = RpNameToken::s(a_sym_andOp, $1, vps); }
                 | tCMP   { yTrace(vps, "op tCMP"); $$ = $1/*a RpNameToken*/; }
                 | tEQ    { yTrace(vps, "op tEQ");  $$ = $1/*a RpNameToken*/; }
-                | tEQQ   { yTrace(vps, "op tEQQ"); $$ = $1/*a RpNameToken*/; } 
+                | tEQQ   { yTrace(vps, "op tEQQ"); $$ = $1/*a RpNameToken*/; }
                 | tMATCH { yTrace(vps, "op tMATCH"); $$ = RpNameToken::s(a_sym_tMATCH, $1, vps); }
                 | '>'    { yTrace(vps, "op >");    $$ = RpNameToken::s(a_sym_gt, $1, vps); }
                 | tGEQ   { yTrace(vps, "op tGEQ"); $$ = $1/*a RpNameToken*/; }
@@ -1351,7 +1341,7 @@ reswords        : k__LINE__ | k__FILE__  | klBEGIN | klEND
                 | kFOR | kIN | kMODULE | kNEXT | kNIL | kNOT
                 | kOR | kREDO | kRESCUE | kRETRY | kRETURN | kSELF | kSUPER
                 | kTHEN | kTRUE | kUNDEF | kWHEN | kYIELD
-                | kIF_MOD | kUNLESS_MOD | kWHILE_MOD | kUNTIL_MOD | kRESCUE_MOD
+                | kIF | kUNLESS | kWHILE | kUNTIL
                 ;
 
 arg             : lhs '=' arg
@@ -1364,7 +1354,7 @@ arg             : lhs '=' arg
                       yTrace(vps, "arg: | lhs tEQL arg kRESCUE_MOD arg");
                       OmScopeType aScope(vps->omPtr);
                       omObjSType *srcOfs = RpNameToken::srcOffsetO(vps, $4);
-                      NODE **valH = aScope.add( 
+                      NODE **valH = aScope.add(
                         RubyRescueBodyNode::s(ram_OOP_NIL, $5, ram_OOP_NIL, srcOfs, vps));
                       *valH = RubyRescueNode::s( $3, *valH, ram_OOP_NIL, srcOfs, vps);
                       $$ = RubyParser::node_assign( & $1, $2/*srcOffsetSi*/, *valH, vps);
@@ -1372,10 +1362,10 @@ arg             : lhs '=' arg
                 | var_lhs tOP_ASGN arg
                     {
                       $3 = RubyParser::value_expr($3, vps);
-		      if ($1 != ram_OOP_NIL) {
+                      if ($1 != ram_OOP_NIL) {
                         yTrace(vps, "arg: | varLhs tOP_ASGN arg");
-			$$ = RubyParser::new_op_asgn($1, $2/*RpNameToken*/, $3, vps);
-		      } else {
+                        $$ = RubyParser::new_op_asgn($1, $2/*RpNameToken*/, $3, vps);
+                      } else {
                         yTrace(vps, "arg: | NIL_LHS tOP_ASGN arg");
                         $$ = ram_OOP_NIL;
                       }
@@ -1463,8 +1453,8 @@ arg             : lhs '=' arg
                       yTrace(vps, "arg: | tUMINUS_NUM tINTEGER tPOW arg");
                       OmScopeType aScope(vps->omPtr);
                       NODE **litH = aScope.add(RubyAbstractNumberNode::s( $2, vps));
-                      NODE **valH = aScope.add( 
-			  RubyParser::new_call_1( litH, a_sym_tPOW, & $4, $3/*srcOffsetSi*/, vps));
+                      NODE **valH = aScope.add(
+                          RubyParser::new_call_1( litH, a_sym_tPOW, & $4, $3/*srcOffsetSi*/, vps));
                       NODE **selH = aScope.add( RpNameToken::s(a_sym_tUMINUS, $3, vps));
                       $$ = RubyParser::new_vcall( *valH, *selH , vps);
                     }
@@ -1567,7 +1557,7 @@ arg             : lhs '=' arg
                 | '~' arg
                     {
                       yTrace(vps, "arg: | tTILDE arg");
-                      OmScopeType aScope(vps->omPtr);	// try it without value_expr
+                      OmScopeType aScope(vps->omPtr);   // try it without value_expr
                       NODE **selH = aScope.add( RpNameToken::s(a_sym_tilde, $1, vps));
                       $$ = RubyParser::new_vcall( $2,  *selH, vps);
                     }
@@ -1690,7 +1680,7 @@ opt_paren_args  : none
 call_args       : command
                     {
                       yTrace(vps, "call_args: command");
-		      $$ = RubyRpCallArgs::s( $1, vps);
+                      $$ = RubyRpCallArgs::s( $1, vps);
                     }
                 | args opt_block_arg
                     {
@@ -1705,7 +1695,7 @@ call_args       : command
                       OmScopeType aScope(vps->omPtr);
                       NODE **splatH = aScope.add( RubySplatNode::s($4, vps));
                       RubyRpCallArgs::append_arg( $1, *splatH, vps);
-                      RubyRpCallArgs::append_blkArg( $1, $5, vps);  
+                      RubyRpCallArgs::append_blkArg( $1, $5, vps);
                       $$ = $1 ;
                     }
                 | assocs opt_block_arg
@@ -1804,7 +1794,7 @@ call_args2      : arg_value ',' args opt_block_arg
                       yTrace(vps, "call_args2: | arg_value tCOMMA assocs tCOMMA tSTAR arg_value opt_block_arg");
                       OmScopeType aScope(vps->omPtr);
                       NODE **hashNodeH = aScope.add( RubyHashNode::s($3, vps));
-		      $$ = RubyRpCallArgs::s_arg_arg_splatArg_blkArg($1, *hashNodeH, $6, $7, vps);
+                      $$ = RubyRpCallArgs::s_arg_arg_splatArg_blkArg($1, *hashNodeH, $6, $7, vps);
                     }
                 | arg_value ',' args ',' assocs ',' tSTAR arg_value opt_block_arg
                     {
@@ -1835,15 +1825,15 @@ command_args    :  {
                   open_args
                     {
                       yTrace(vps, "command_args: ___  open_args");
-		      if (! vps->cmdarg_stack.restoreFromSi( $1 )) {
-			rb_compile_error("invalid cmdarg_stack.restore", vps);
-		      }
+                      if (! vps->cmdarg_stack.restoreFromSi( $1 )) {
+                        rb_compile_error("invalid cmdarg_stack.restore", vps);
+                      }
 #if defined(FLG_DEBUG)
   if (debugCmdArg) {
     printf("restored cmdarg_stack 0x%lx\n", vps->cmdarg_stack.word());
   }
 #endif
-		      $$ = $2;
+                      $$ = $2;
                     }
                 ;
 
@@ -1859,8 +1849,8 @@ open_args       : call_args
                     {
                       yTrace(vps, "open_args: ___ tRPAREN");
                       rParenLexPop(vps);
-		      rb_warning(vps, "don't put space before argument parentheses");
-		      $$ = $2;
+                      rb_warning(vps, "don't put space before argument parentheses");
+                      $$ = $2;
                     }
                 ;
 
@@ -1868,12 +1858,14 @@ block_arg       : tAMPER arg_value
                     {
                       yTrace(vps, "block_arg: tAMPER arg_value");
                       $$ = RubyBlockPassNode::s( $2 , vps);
-                    } ; 
+                    } ;
+
 opt_block_arg   : ',' block_arg
                     {
                       yTrace(vps, "opt_block_arg: tCOMMA block_arg");
                       $$ = $2;
                     }
+                | ',' { $$ = ram_OOP_NIL; }
                 | none
                 ;
 
@@ -1929,10 +1921,10 @@ primary         : literal
                   kEND
                     {
                       yTrace(vps, "primary: | kBEGIN body_stamt kEND");
-		      POP_LINE(vps);
-		      if ($3 == ram_OOP_NIL) {
+                      POP_LINE(vps);
+                      if ($3 == ram_OOP_NIL) {
                          $$ = RubyNilNode::new_(vps);
-		      } else {
+                      } else {
                          $$ = RubyBeginNode::s($3, vps);
                       }
                       //  nd_set_line($$, $<num>1);
@@ -1941,8 +1933,8 @@ primary         : literal
                     {
                       yTrace(vps, "primary: ___ opt_nl tRPAREN");
                       rParenLexPop(vps);
-		      rb_warning(vps, "(...) interpreted as grouped expression");
-		      $$ = $2;
+                      rb_warning(vps, "(...) interpreted as grouped expression");
+                      $$ = $2;
                     }
                 | tLPAREN compstmt ')'
                     {
@@ -2021,7 +2013,7 @@ primary         : literal
                     }
                 | operation brace_block
                     {
-                      yTrace(vps, "primary: | operation brace_blck");
+                      yTrace(vps, "primary: | operation brace_block");
                       OmScopeType aScope(vps->omPtr);
                       NODE **callH = aScope.add( RubyParser::new_fcall( $1, ram_OOP_NIL, vps));
                       RubyIterRpNode::set_call( $2, *callH, vps);
@@ -2030,10 +2022,10 @@ primary         : literal
                 | method_call
                 | method_call brace_block
                     {
-                      yTrace(vps, "primary: | method_call brace_blck");
+                      yTrace(vps, "primary: | method_call brace_block");
                       if (RubyBlockPassNode::is_a($1, vps)) {
                          rb_compile_error(vps, "both block arg and actual block given");
-		      }
+                      }
                       RubyIterRpNode::set_call( $2, $1, vps);
                       $$ = $2;
                     }
@@ -2045,7 +2037,7 @@ primary         : literal
                   kEND
                     {
                       yTrace(vps, "primary: | kIF expr_value then comp_stamt if_tail kEND");
-		      POP_LINE(vps);
+                      POP_LINE(vps);
                       omObjSType *srcOfs = RpNameToken::srcOffsetO(vps, $1); // kIF
                       $$ = RubyParser::new_if( $3, $5, $6, srcOfs, vps);
                     }
@@ -2057,9 +2049,9 @@ primary         : literal
                   kEND
                     {
                       yTrace(vps, "primary: | kUNLESS expr_value then comp_stamt opt_else kEND");
-		      POP_LINE(vps);
+                      POP_LINE(vps);
                       omObjSType *srcOfs = RpNameToken::srcOffsetO(vps, $1); // kUNLESS
-		      $$ = RubyParser::new_if( $3, $6, $5, srcOfs, vps);
+                      $$ = RubyParser::new_if( $3, $6, $5, srcOfs, vps);
                     }
                 | kWHILE {
                     yTrace(vps, "primary: | kWHILE");
@@ -2083,10 +2075,10 @@ primary         : literal
                   kEND
                     {
                       yTrace(vps, "kUNTIL ___ comp_stamt kEND");
-		      // maglev had premature_eof() check
-		      POP_LINE(vps);
+                      // maglev had premature_eof() check
+                      POP_LINE(vps);
                       omObjSType *srcOfs = RpNameToken::srcOffsetO(vps, $1); /* of kUNTIL*/
-		      $$ = RubyParser::new_until( $6, $3, srcOfs, vps);
+                      $$ = RubyParser::new_until( $6, $3, srcOfs, vps);
                     }
                 | kCASE {
                     PUSH_LINE(vps, "case");
@@ -2095,11 +2087,11 @@ primary         : literal
                   kEND
                     {
                       yTrace(vps, "primary: | kCASE expr_value opt_termms case_body kEND");
-		      POP_LINE(vps);
+                      POP_LINE(vps);
                       omObjSType *srcOfs = RpNameToken::srcOffsetO(vps, $1); /* of kCASE*/
-		      $$ = RubyCaseNode::s($3, $5, srcOfs, vps);
+                      $$ = RubyCaseNode::s($3, $5, srcOfs, vps);
                     }
-                | kCASE opt_terms { 
+                | kCASE opt_terms {
                     push_start_line(vps, vps->ruby_sourceline() - 1, "case");
                   } case_body kEND
                     {
@@ -2125,15 +2117,15 @@ primary         : literal
                     {
                       yTrace(vps, "primary: kFOR ___ comp_stamt kEND");
                       POP_LINE(vps);
-                      $$ = RubyForNode::s( & $6, & $3, & $9, $1/*for token*/, 
-						vps, 3/* strlen( 'end' ) */ );
+                      $$ = RubyForNode::s( & $6, & $3, & $9, $1/*for token*/,
+                                                vps, 3/* strlen( 'end' ) */ );
                     }
                 | kCLASS cpath superclass
                     {
                       yTrace(vps, "primary: | kCLASS cpath superclass");
-		      PUSH_LINE(vps, "class");
-		      if (vps->in_def || vps->in_single) {
-			  rb_compile_error(vps, "class definition in method body");
+                      PUSH_LINE(vps, "class");
+                      if (vps->in_def || vps->in_single) {
+                          rb_compile_error(vps, "class definition in method body");
                       }
                       vps->class_nest++;
                       local_push(vps, 0);
@@ -2143,7 +2135,7 @@ primary         : literal
                   kEND
                     {
                       yTrace(vps, "primary: | kCLASS ___ body_stamt kEND");
-		      POP_LINE(vps);
+                      POP_LINE(vps);
                       // new_class( path, superclass, body)
                       OmScopeType scp(vps->omPtr);
                       omObjSType *srcOfs = RpNameToken::srcOffsetO(vps, $1);  // of kCLASS
@@ -2156,37 +2148,37 @@ primary         : literal
                 | kCLASS tLSHFT expr
                     {
                       yTrace(vps, "primary: | kCLASS tLSHFT expr");
-		      PUSH_LINE(vps, "class");
-		      $$ = int64ToSi( vps->in_def );
-		      vps->in_def = 0;
+                      PUSH_LINE(vps, "class");
+                      $$ = int64ToSi( vps->in_def );
+                      vps->in_def = 0;
                     }
                   term
                     {
                       yTrace(vps, "primary | kCLASS ___ Term");
-		      $$ = int64ToSi( vps->in_single );
-		      vps->in_single = 0;
-		      vps->class_nest++;
-		      local_push(vps, 0);
+                      $$ = int64ToSi( vps->in_single );
+                      vps->in_single = 0;
+                      vps->class_nest++;
+                      local_push(vps, 0);
                     }
                   bodystmt
                   kEND
                     {
                       yTrace(vps, "primary  | kCLASS ___ body_stamt kEND");
-		      int lineNum = POP_LINE(vps);
+                      int lineNum = POP_LINE(vps);
                       OmScopeType scp(vps->omPtr);
                       NODE **resH = scp.add( RubySClassNode::s(& $3, & $7, $1/*RpNameTokenkCLASS*/, lineNum, vps));
-		      local_pop(vps);
-		      vps->class_nest--;
-		      vps->in_def = siToI64( $4 );
-		      vps->in_single = siToI64( $6) ;
+                      local_pop(vps);
+                      vps->class_nest--;
+                      vps->in_def = siToI64( $4 );
+                      vps->in_single = siToI64( $6) ;
                       $$ = *resH;
                     }
                 | kMODULE cpath
                     {
                       yTrace(vps, "primary: | kMODULE cpath");
-		      PUSH_LINE(vps, "module");
-		      if (vps->in_def || vps->in_single) {
-			  rb_compile_error(vps, "module definition in method body");
+                      PUSH_LINE(vps, "module");
+                      if (vps->in_def || vps->in_single) {
+                          rb_compile_error(vps, "module definition in method body");
                       }
                       vps->class_nest++;
                       local_push(vps, 0);
@@ -2196,62 +2188,62 @@ primary         : literal
                   kEND
                     {
                       yTrace(vps, "primary: | kMODULE ___ body_stamt kEND");
-		      POP_LINE(vps);
+                      POP_LINE(vps);
                       OmScopeType scp(vps->omPtr);
                       omObjSType *srcOfs = RpNameToken::srcOffsetO(vps, $1);  // of kMODULE
                       NODE **resH = scp.add( RubyModuleNode::s( $2, $4, *vps->sourceStrH, srcOfs, vps));
-		      // nd_set_line($$, $<num>3);
-		      local_pop(vps);
-		      vps->class_nest--;
+                      // nd_set_line($$, $<num>3);
+                      local_pop(vps);
+                      vps->class_nest--;
                       $$ = *resH;
                     }
                 | kDEF fname
                     {
                       yTrace(vps, "primary: | kDEF fname");
-		      PUSH_LINE(vps, "def");
-		      $$ = ram_OOP_Zero; // $<id>$ = cur_mid;
-		      // cur_mid = $2;
-		      vps->in_def++;
-		      local_push(vps, 0);
+                      PUSH_LINE(vps, "def");
+                      $$ = ram_OOP_Zero; // $<id>$ = cur_mid;
+                      // cur_mid = $2;
+                      vps->in_def++;
+                      local_push(vps, 0);
                     }
                   f_arglist
                   bodystmt
                   kEND
                     {
                       yTrace(vps, "primary: | kDEF ___ f_arglist body_stamt kEND");
-		      int lineNum = POP_LINE(vps);
+                      int lineNum = POP_LINE(vps);
                       OmScopeType scp(vps->omPtr);
                       omObjSType *srcOfs = RpNameToken::srcOffsetO(vps, $1/*kDEF*/);
                       omObjSType *endOfs = RpNameToken::srcOffsetO(vps, $6/*kEND*/);
-                      NODE **resH = scp.add( RubyParser::new_defn( $2/*fname*/, $4/*arglist*/, 
-					$5/*body*/, srcOfs, lineNum, endOfs, vps));
-		      local_pop(vps);
-		      vps->in_def--;
-		      // cur_mid = $<id>3;
+                      NODE **resH = scp.add( RubyParser::new_defn( $2/*fname*/, $4/*arglist*/,
+                                        $5/*body*/, srcOfs, lineNum, endOfs, vps));
+                      local_pop(vps);
+                      vps->in_def--;
+                      // cur_mid = $<id>3;
                       $$ = *resH;
                     }
                 | kDEF singleton dot_or_colon {vps->lex_state = EXPR_FNAME;} fname
                     {
                       yTrace(vps, "primary: | kDEF ___ fname");
-		      PUSH_LINE(vps, "def");
-		      vps->in_single++;
-		      local_push(vps, 0);
-		      vps->lex_state = EXPR_END; /* force for args */
+                      PUSH_LINE(vps, "def");
+                      vps->in_single++;
+                      local_push(vps, 0);
+                      vps->lex_state = EXPR_END; /* force for args */
                     }
                   f_arglist
                   bodystmt
                   kEND
                     {
                       yTrace(vps, "primary: | kDEF ___ f_arglist body_stamt kEND");
-		      int lineNum = POP_LINE(vps);
+                      int lineNum = POP_LINE(vps);
                       OmScopeType scp(vps->omPtr);
                       omObjSType *srcOfs = RpNameToken::srcOffsetO(vps, $1); // of kDEF
                       omObjSType *endOfs = RpNameToken::srcOffsetO(vps, $9/*kEND*/);
-                      NODE **resH = scp.add( RubyParser::new_defs( $2/*rcvr (the singleton)*/, 
-			         $5/*fname*/, $7/*args*/, $8/*body*/, srcOfs, 
-				  lineNum, endOfs, vps));
-		      local_pop(vps);
-		      vps->in_single--;
+                      NODE **resH = scp.add( RubyParser::new_defs( $2/*rcvr (the singleton)*/,
+                                 $5/*fname*/, $7/*args*/, $8/*body*/, srcOfs,
+                                  lineNum, endOfs, vps));
+                      local_pop(vps);
+                      vps->in_single--;
                       $$ = *resH;
                     }
                 | kBREAK
@@ -2308,7 +2300,7 @@ opt_else        : none
                 | kELSE compstmt
                     {
                       yTrace(vps, "opt_else: | kELSE comp_stamt");
-		      $$ = $2;
+                      $$ = $2;
                     }
                 ;
 
@@ -2318,37 +2310,37 @@ for_var         : lhs
 
 block_par       : mlhs_item
                     {
-		      yTrace(vps, "block_par : mlhs_item");
-		      $$ = RubyArrayNode::s($1, vps);
+                      yTrace(vps, "block_par : mlhs_item");
+                      $$ = RubyArrayNode::s($1, vps);
                     }
                 | block_par ',' mlhs_item
                     {
-		      yTrace(vps, "block_par : block_par , mlhs_item");
-		      $$ = RubyArrayNode::append($1, $3, vps);
+                      yTrace(vps, "block_par : block_par , mlhs_item");
+                      $$ = RubyArrayNode::append($1, $3, vps);
                     }
                 ;
 
-blck_var       : block_par
+block_var       : block_par
                     {
-		      yTrace(vps, "blck_var : block_par x");
+                      yTrace(vps, "block_var : block_par x");
                       NODE *ofsO = OOP_OF_SMALL_LONG_(vps->tokenOffset());
-		      $$ = RubyParser::new_parasgn( $1, ofsO, vps);
+                      $$ = RubyParser::new_parasgn( $1, ofsO, vps);
                     }
                 | block_par ','
                     {
-		      yTrace(vps, "blck_var | block_par , x");
+                      yTrace(vps, "block_var | block_par , x");
                       NODE *ofsO = OOP_OF_SMALL_LONG_(vps->tokenOffset());
-		      $$ = RubyParser::new_parasgn_trailingComma( $1, ofsO, vps);
+                      $$ = RubyParser::new_parasgn_trailingComma( $1, ofsO, vps);
                     }
                 | block_par ',' tAMPER lhs
                     {
-		      yTrace(vps, "blck_var | block_par , & lhs x");
+                      yTrace(vps, "block_var | block_par , & lhs x");
                       RubyArrayNode::append_amperLhs($1, $4, vps);
-                      $$ = RubyParser::new_parasgn( $1, $3/*srcOffsetSi*/, vps);   
+                      $$ = RubyParser::new_parasgn( $1, $3/*srcOffsetSi*/, vps);
                     }
                 | block_par ',' tSTAR lhs ',' tAMPER lhs
                     {
-		      yTrace(vps, "blck_var | block_par , STAR lhs , & lhs x");
+                      yTrace(vps, "block_var | block_par , STAR lhs , & lhs x");
                       OmScopeType aScope(vps->omPtr);
                       NODE **splatH = aScope.add( RubySplatNode::s($4, vps));
                       RubyArrayNode::append($1, *splatH, vps);
@@ -2357,7 +2349,7 @@ blck_var       : block_par
                     }
                 | block_par ',' tSTAR ',' tAMPER lhs
                     {
-		      yTrace(vps, "blck_var | block_par , STAR , & lhs x");
+                      yTrace(vps, "block_var | block_par , STAR , & lhs x");
                       OmScopeType aScope(vps->omPtr);
                       NODE **splatH = aScope.add( RubySplatNode::s(ram_OOP_NIL, vps));
                       RubyArrayNode::append($1, *splatH, vps);
@@ -2366,7 +2358,7 @@ blck_var       : block_par
                     }
                 | block_par ',' tSTAR lhs
                     {
-                      yTrace(vps, "blck_var | block_par , STAR lhs x");
+                      yTrace(vps, "block_var | block_par , STAR lhs x");
                       OmScopeType aScope(vps->omPtr);
                       NODE **splatH = aScope.add( RubySplatNode::s($4, vps));
                       RubyArrayNode::append($1, *splatH, vps);
@@ -2374,7 +2366,7 @@ blck_var       : block_par
                     }
                 | block_par ',' tSTAR
                     {
-                      yTrace(vps, "blck_var | block_par , STAR x");
+                      yTrace(vps, "block_var | block_par , STAR x");
                       OmScopeType aScope(vps->omPtr);
                       NODE **splatH = aScope.add( RubySplatNode::s(ram_OOP_NIL, vps));
                       RubyArrayNode::append($1, *splatH, vps);
@@ -2382,7 +2374,7 @@ blck_var       : block_par
                     }
                 | tSTAR lhs ',' tAMPER lhs
                     {
-                      yTrace(vps, "blck_var | STAR lhs , & lhs x");
+                      yTrace(vps, "block_var | STAR lhs , & lhs x");
                       OmScopeType aScope(vps->omPtr);
                       NODE **splatH = aScope.add( RubySplatNode::s($2, vps));
                       NODE **arrH = aScope.add(RubyArrayNode::s(*splatH, vps));
@@ -2391,7 +2383,7 @@ blck_var       : block_par
                     }
                 | tSTAR ',' tAMPER lhs
                     {
-                      yTrace(vps, "blck_var | STAR , & lhs x");
+                      yTrace(vps, "block_var | STAR , & lhs x");
                       OmScopeType aScope(vps->omPtr);
                       NODE **splatH = aScope.add( RubySplatNode::s(ram_OOP_NIL, vps));
                       NODE **arrH = aScope.add(RubyArrayNode::s(*splatH, vps));
@@ -2400,7 +2392,7 @@ blck_var       : block_par
                     }
                 | tSTAR lhs
                     {
-                      yTrace(vps, "blck_var | STAR lhs x");
+                      yTrace(vps, "block_var | STAR lhs x");
                       OmScopeType aScope(vps->omPtr);
                       NODE **splatH = aScope.add( RubySplatNode::s($2, vps));
                       NODE **arrH = aScope.add(RubyArrayNode::s(*splatH, vps));
@@ -2408,7 +2400,7 @@ blck_var       : block_par
                     }
                 | tSTAR
                     {
-                      yTrace(vps, "blck_var | STAR x");
+                      yTrace(vps, "block_var | STAR x");
                       OmScopeType aScope(vps->omPtr);
                       NODE **splatH = aScope.add( RubySplatNode::s(ram_OOP_NIL, vps));
                       NODE **arrH = aScope.add(RubyArrayNode::s(*splatH, vps));
@@ -2416,7 +2408,7 @@ blck_var       : block_par
                     }
                 | tAMPER lhs
                     {
-                      yTrace(vps, "blck_var | & lhs x");
+                      yTrace(vps, "block_var | & lhs x");
                       OmScopeType aScope(vps->omPtr);
                       NODE **arrH = aScope.add(RubyArrayNode::new_(vps));
                       RubyArrayNode::append_amperLhs(*arrH, $2, vps);
@@ -2435,18 +2427,18 @@ opt_block_var   : none
                       yTrace(vps, "opt_block_var: | tOROP");
                       $$ = ram_OOP_NIL ;
                     }
-                | '|' blck_var '|'
+                | '|' block_var '|'
                     {
-                      yTrace(vps, "opt_block_var: | tPIPE blck_var tPIPE");
-		      $$ = $2;
+                      yTrace(vps, "opt_block_var: | tPIPE block_var tPIPE");
+                      $$ = $2;
                     }
                 ;
 
 do_block        : kDO_BLOCK
                     {
                       yTrace(vps, "do_block: kDO_BLOCK");
-		      PUSH_LINE(vps, "do");
-		      reset_block(vps);
+                      PUSH_LINE(vps, "do");
+                      reset_block(vps);
                       // $1 = int64ToSi(vps->ruby_sourceline() );
                     }
                   opt_block_var
@@ -2458,11 +2450,11 @@ do_block        : kDO_BLOCK
                   kEND
                     {
                       yTrace(vps, "do_block: ___ comp_stamt kEND");
-		      POP_LINE(vps);
+                      POP_LINE(vps);
                       popBlockVars(vps);
                       omObjSType *srcOfs = RpNameToken::srcOffsetO(vps, $1); // of kDO_BLOCK
-                      $$ = RubyIterRpNode::s( $3/*masgn from opt_block_var*/, $5/*compstmt*/, srcOfs, 
-						vps, 3/* strlen( 'end' ) */ );
+                      $$ = RubyIterRpNode::s( $3/*masgn from opt_block_var*/, $5/*compstmt*/, srcOfs,
+                                                vps, 3/* strlen( 'end' ) */ );
                     }
                 ;
 
@@ -2470,7 +2462,7 @@ block_call      : command do_block
                     {
                       yTrace(vps, "block_call: command do_block");
                       if (RubyBlockPassNode::is_a($1, vps)) {
-			 rb_compile_error(vps, "both block arg and actual block given");
+                         rb_compile_error(vps, "both block arg and actual block given");
                       }
                       RubyIterRpNode::set_call( $2, $1, vps);
                       $$ = $2;
@@ -2483,7 +2475,7 @@ block_call      : command do_block
                 | block_call tCOLON2 operation2 opt_paren_args
                     {
                       yTrace(vps, "block_call: block_call tCOLON2 operation2 opt_paren_args");
-		      $$ = RubyParser::new_call($1, $3, $4, vps);
+                      $$ = RubyParser::new_call($1, $3, $4, vps);
                     }
                 ;
 
@@ -2505,18 +2497,23 @@ method_call     : operation paren_args
                 | primary_value tCOLON2 operation3
                     {
                       yTrace(vps, "method_call: | primary_value tCOLON2 operation3");
-		      $$ = RubyParser::new_vcall($1, $3, vps);
+                      $$ = RubyParser::new_vcall($1, $3, vps);
                     }
-       
-               | primary_value '\\' operation2
+
+                | primary_value '.' paren_args
                     {
-                        rb_compile_error(vps, "\\ operator is rubinius-specific get_reference");
+                      yTrace(vps, "method_call: | primary_value tDOT paren_args");
+                      omObjSType *srcOfs = RpNameToken::srcOffsetO(vps, $2);
+                      $$ = RubyParser::new_call_1(& $1, a_sym_call, & $3, srcOfs, vps);
                     }
-               | tUBS operation2
+
+                | primary_value tCOLON2 paren_args
                     {
-                        rb_compile_error(vps, "\\ operator is rubinius-specific get_reference");
+                      yTrace(vps, "method_call: | primary_value tCOLON2 paren_args");
+                      omObjSType *srcOfs = RpNameToken::srcOffsetO(vps, $2);
+                      $$ = RubyParser::new_call_1(& $1, a_sym_call, & $3, srcOfs, vps);
                     }
-       
+
                 | kSUPER paren_args
                     {
                       yTrace(vps, "method_call: | kSUPER paren_args");
@@ -2531,41 +2528,41 @@ method_call     : operation paren_args
 
 brace_block     : '{'
                     {
-                      yTrace(vps, "brace_blck: tLCURLY");
-		      reset_block(vps);
-		      // $1 is srcOffsetSi 
+                      yTrace(vps, "brace_block: tLCURLY");
+                      reset_block(vps);
+                      // $1 is srcOffsetSi
                     }
-                  opt_block_var 
-                    { 
+                  opt_block_var
+                    {
                        $$ = ram_OOP_NIL; // getBlockVars not used
                     }
                   compstmt '}'
                     {
-                      yTrace(vps, "brace_blck: tLCURLY ___ comp_stamt tRCURLY");
+                      yTrace(vps, "brace_block: tLCURLY ___ comp_stamt tRCURLY");
                       rParenLexPop(vps);
                       popBlockVars(vps);
-                      $$ = RubyIterRpNode::s($3/*masgn from opt_block_var*/, $5/*compstmt*/, $1/*srcOffsetSi*/, 
-						vps, 1/* strlen( '}' ) */ );
+                      $$ = RubyIterRpNode::s($3/*masgn from opt_block_var*/, $5/*compstmt*/, $1/*srcOffsetSi*/,
+                                                vps, 1/* strlen( '}' ) */ );
                     }
                 | kDO
                     {
-                      yTrace(vps, "brace_blck: | kDO");
-		      PUSH_LINE(vps, "do");
-		      // $1 is RpNameToken of 'do'
-		      reset_block(vps);
+                      yTrace(vps, "brace_block: | kDO");
+                      PUSH_LINE(vps, "do");
+                      // $1 is RpNameToken of 'do'
+                      reset_block(vps);
                     }
-                  opt_block_var 
+                  opt_block_var
                     {
                        $$ = ram_OOP_NIL; // getBlockVars not used
                     }
                   compstmt kEND
                     {
-                      yTrace(vps, "brace_blck: | kDO ___ comp_stamt kEND");
-		      POP_LINE(vps);
+                      yTrace(vps, "brace_block: | kDO ___ comp_stamt kEND");
+                      POP_LINE(vps);
                       popBlockVars(vps);
                       omObjSType *srcOfs = RpNameToken::srcOffsetO(vps, $1);
-                      $$ = RubyIterRpNode::s($3/*masgn from opt_block_var*/, $5/*compstmt*/, srcOfs, 
-						vps, 3/* strlen( 'end' ) */ );
+                      $$ = RubyIterRpNode::s($3/*masgn from opt_block_var*/, $5/*compstmt*/, srcOfs,
+                                                vps, 3/* strlen( 'end' ) */ );
                     }
                 ;
 
@@ -2582,8 +2579,8 @@ when_args       : args
                     {
                       yTrace(vps, "when_args: args | args tCOMMA tSTAR arg_value");
                       OmScopeType aScope(vps->omPtr);
-                      NODE **whenH = aScope.add( RubyWhenNode::s( & $4, vps->nilH(), vps->nilH(), 
-									$3/*srcOffsetSi of tSTAR*/, vps));
+                      NODE **whenH = aScope.add( RubyWhenNode::s( & $4, vps->nilH(), vps->nilH(),
+                                                                        $3/*srcOffsetSi of tSTAR*/, vps));
                       $$ = RubyParser::list_append($1, *whenH, vps);
                     }
                 | tSTAR arg_value
@@ -2669,7 +2666,7 @@ string          : tCHAR
 string1         : tSTRING_BEG string_contents tSTRING_END
                     {
                       yTrace(vps, "string1: tSTRING_BEG string_contents tSTRING_END");
-		      $$ = $2;
+                      $$ = $2;
                     }
                 ;
 
@@ -2695,7 +2692,7 @@ words           : tWORDS_BEG ' ' tSTRING_END
                 | tWORDS_BEG word_list tSTRING_END
                     {
                       yTrace(vps, "words: | tWORDS_BEG word_list tSTRING_END");
-		      $$ = $2;
+                      $$ = $2;
                     }
                 ;
 
@@ -2715,18 +2712,18 @@ word            : string_content
                 | word string_content
                     {
                       yTrace(vps, "word: | word string_content");
-		      $$ = RubyParser::literal_concat($1, $2, vps);
+                      $$ = RubyParser::literal_concat($1, $2, vps);
                     }
                 ;
 
 qwords          : tQWORDS_BEG ' ' tSTRING_END
                     {
-		      yTrace(vps, "tQWORDS_BEG tSPACE tSTRING_END");
+                      yTrace(vps, "tQWORDS_BEG tSPACE tSTRING_END");
                       $$ = RubyArrayNode::new_(vps);
                     }
                 | tQWORDS_BEG qword_list tSTRING_END
                     {
-		      yTrace(vps, "tQWORDS_BEG qword_list tSTRING_END");
+                      yTrace(vps, "tQWORDS_BEG qword_list tSTRING_END");
                       $$ = $2;
                     }
                 ;
@@ -2734,7 +2731,7 @@ qwords          : tQWORDS_BEG ' ' tSTRING_END
 qword_list      : /* none */
                     {
                       yTrace(vps, "qword_list: none");
-		      $$ = RubyArrayNode::new_(vps); // $$  = 0;
+                      $$ = RubyArrayNode::new_(vps); // $$  = 0;
                     }
                 | qword_list tSTRING_CONTENT ' '
                     {
@@ -2747,75 +2744,75 @@ qword_list      : /* none */
 
 string_contents : /* none */
                     {
-		      yTrace(vps, "string_contents: none");
-		      $$ = RubyStrNode::s( om::NewString(vps->omPtr , 0), vps);
+                      yTrace(vps, "string_contents: none");
+                      $$ = RubyStrNode::s( om::NewString(vps->omPtr , 0), vps);
                     }
                 | string_contents string_content
                     {
                       yTrace(vps, "string_contents: | string_contents string_content");
-		      $$ = RubyParser::literal_concat($1, $2, vps);
+                      $$ = RubyParser::literal_concat($1, $2, vps);
                     }
                 ;
 
 xstring_contents: /* none */
                     {
                       yTrace(vps, "xstring_contents: none");
-		      $$ = ram_OOP_NIL;
+                      $$ = ram_OOP_NIL;
                     }
                 | xstring_contents string_content
                     {
                       yTrace(vps, "xstring_contents: | xstring_contents string_content");
-		      $$ = RubyParser::literal_concat($1, $2, vps);
+                      $$ = RubyParser::literal_concat($1, $2, vps);
                     }
                 ;
 
-string_content  : tSTRING_CONTENT 
+string_content  : tSTRING_CONTENT
                     {
                       yTrace(vps,  "string_content: tSTRING_CONTENT" );
-	              $$ = RubyStrNode::s( $1, vps );
+                      $$ = RubyStrNode::s( $1, vps );
                     }
                 | tSTRING_DVAR
                     {
                       yTrace(vps, "string_content: | tSTRING_DVAR");
-		      vps->lex_state = EXPR_BEG;
+                      vps->lex_state = EXPR_BEG;
                       $$ = vps->clear_lex_strterm();
                     }
                   string_dvar
                     {
                       yTrace(vps, "string_content: | string_dvar");
-		      vps->set_lex_strterm( $2);
-		      $$ = RubyEvStrNode::s($3, vps);
+                      vps->set_lex_strterm( $2);
+                      $$ = RubyEvStrNode::s($3, vps);
                     }
                 | tSTRING_DBEG
                     {
                       yTrace(vps, "string_content: | tSTRING_DBEG");
                       OmScopeType scp(vps->omPtr);
                       NODE **resH = scp.add( vps->clear_lex_strterm());
-		      vps->lex_state = EXPR_BEG;
-		      COND_PUSH(vps, 0);
-		      CMDARG_PUSH(vps, 0);
-		      $$ = *resH;
+                      vps->lex_state = EXPR_BEG;
+                      COND_PUSH(vps, 0);
+                      CMDARG_PUSH(vps, 0);
+                      $$ = *resH;
                     }
                   compstmt '}'
                     {
                       yTrace(vps, "string_content: | tSTRING_DBEG ___ comp_stamt tRCURLY");
-		      vps->set_lex_strterm( $2);
+                      vps->set_lex_strterm( $2);
                       rParenLexPop(vps);
-		      $$ = RubyParser::new_evstr($3, vps);
+                      $$ = RubyParser::new_evstr($3, vps);
                     }
                 ;
 
-string_dvar     : tGVAR 
+string_dvar     : tGVAR
                    {
                       yTrace(vps, "string_dvar: tGVAR");
                       $$ = RubyGlobalVarNode::s( quidToSymbolObj( $1, vps), vps);
                    }
-                | tIVAR 
+                | tIVAR
                    {
                       yTrace(vps, "string_dvar: | tIVAR");
                       $$ = RubyInstVarNode::s( quidToSymbolObj( $1, vps), vps);
                    }
-                | tCVAR 
+                | tCVAR
                    {
                       yTrace(vps, "string_dvar: | tCVAR");
                       $$ = RubyClassVarNode::s( quidToSymbolObj( $1, vps), vps);
@@ -2826,8 +2823,8 @@ string_dvar     : tGVAR
 symbol          : tSYMBEG sym
                     {
                       yTrace(vps, "symbol: tSYMBEG sym");
-		      vps->lex_state = EXPR_END;
-		      $$ = $2;
+                      vps->lex_state = EXPR_END;
+                      $$ = $2;
                     }
                 ;
 
@@ -2840,12 +2837,12 @@ sym             : fname
 dsym            : tSYMBEG xstring_contents tSTRING_END
                     {
                       yTrace(vps, "dsym: tSYMBEG xstring_contents tSTRING_END");
-		      vps->lex_state = EXPR_END;
-		      if ( $2 == ram_OOP_NIL) {
-			rb_compile_error(vps, "empty symbol literal");
-		      } else {
-			$$ = RubyParser::new_dsym($2, vps);
-		      }
+                      vps->lex_state = EXPR_END;
+                      if ( $2 == ram_OOP_NIL) {
+                        rb_compile_error(vps, "empty symbol literal");
+                      } else {
+                        $$ = RubyParser::new_dsym($2, vps);
+                      }
                     }
                 ;
 
@@ -2904,27 +2901,27 @@ var_lhs         : variable
 backref         : tNTH_REF
                   {
                     NODE *ofsO = OOP_OF_SMALL_LONG_(vps->tokenOffset());
-		    $$ = RubyNthRefNode::s($1/*a SmallInt*/, ofsO, vps);
+                    $$ = RubyNthRefNode::s($1/*a SmallInt*/, ofsO, vps);
                   }
-                | tBACK_REF 
+                | tBACK_REF
                   {
-		    $$ = RubyBackRefNode::s($1/*a Character*/, vps);
+                    $$ = RubyBackRefNode::s($1/*a Character*/, vps);
                   }
                 ;
 
 superclass      : term
                     {
                       yTrace(vps, "superclass: Term");
-		      $$ = ram_OOP_NIL;
+                      $$ = ram_OOP_NIL;
                     }
                 | '<'
                     {
-		      vps->lex_state = EXPR_BEG;
+                      vps->lex_state = EXPR_BEG;
                     }
                   expr_value term
                     {
                       yTrace(vps, "superclass: | tLT expr_value Term");
-                      $$ = $3; 
+                      $$ = $3;
                     }
                 | error term { yyerrflag = 0; $$ = ram_OOP_NIL;}
                 ;
@@ -2933,29 +2930,29 @@ f_arglist       : '(' f_args opt_nl ')'
                     {
                       yTrace(vps, "f_arglist: tLPAREN2 f_args opt_nl tRPAREN");
                       rParenLexPop(vps);
-		      $$ = $2;
-		      vps->lex_state = EXPR_BEG;
-		      vps->command_start = TRUE;
+                      $$ = $2;
+                      vps->lex_state = EXPR_BEG;
+                      vps->command_start = TRUE;
                     }
                 | f_args term
                     {
                       yTrace(vps, "f_arglist: | f_args Term");
-		      $$ = $1;
+                      $$ = $1;
                     }
                 ;
 
 f_args          : f_arg ',' f_optarg ',' f_rest_arg opt_f_block_arg
                     {
                       yTrace(vps, "f_args: f_arg tCOMMA f_optarg tCOMMA f_rest_arg opt_f_block_arg");
-		      RubyArgsNode::add_optional_arg($1, $3, vps);
-		      RubyArgsNode::add_star_arg($1, $5, vps);
-		      $$ = RubyArgsNode::add_block_arg($1, $6, vps); // returns first arg
+                      RubyArgsNode::add_optional_arg($1, $3, vps);
+                      RubyArgsNode::add_star_arg($1, $5, vps);
+                      $$ = RubyArgsNode::add_block_arg($1, $6, vps); // returns first arg
                     }
                 | f_arg ',' f_optarg opt_f_block_arg
                     {
                       yTrace(vps, "f_args: | f_arg tCOMMA f_optarg  opt_f_block_arg");
                       RubyArgsNode::add_optional_arg($1, $3, vps);
-		      $$ = RubyArgsNode::add_block_arg($1, $4, vps);
+                      $$ = RubyArgsNode::add_block_arg($1, $4, vps);
                     }
                 | f_arg ',' f_rest_arg opt_f_block_arg
                     {
@@ -2995,7 +2992,7 @@ f_args          : f_arg ',' f_optarg ',' f_rest_arg opt_f_block_arg
                     }
                 | f_block_arg
                     {
-                      yTrace(vps, "f_args: |  f_blck_arg");
+                      yTrace(vps, "f_args: |  f_block_arg");
                       OmScopeType aScope(vps->omPtr);
                       NODE **argsH = aScope.add(RubyArgsNode::new_(vps));
                       $$ = RubyArgsNode::add_block_arg(*argsH, $1, vps);
@@ -3003,7 +3000,7 @@ f_args          : f_arg ',' f_optarg ',' f_rest_arg opt_f_block_arg
                 | /* none */
                     {
                       yTrace(vps, "f_args: | <nothing>");
-		      $$ = RubyArgsNode::new_(vps);
+                      $$ = RubyArgsNode::new_(vps);
                     }
                 ;
 
@@ -3028,27 +3025,27 @@ f_norm_arg      : tCONSTANT
                       yTrace(vps, "f_norm_arg: | tIDENTIFIER");
                       OmScopeType aScope(vps->omPtr);
                       NODE *quidO = asQuid($1, vps);
-		      if (! is_local_id(quidO)) {
-			  rb_compile_error_q(vps, "formal argument must be local variable", quidO);
-		      } else if (local_id(vps, quidO)) {
-			  rb_compile_error_q(vps, "duplicate argument name", quidO);
+                      if (! is_local_id(quidO)) {
+                          rb_compile_error_q(vps, "formal argument must be local variable", quidO);
+                      } else if (local_id(vps, quidO)) {
+                          rb_compile_error_q(vps, "duplicate argument name", quidO);
                       }
-		      local_cnt(vps, quidO);
-		      $$ = $1 ;
+                      local_cnt(vps, quidO);
+                      $$ = $1 ;
                     }
                 ;
 
 f_arg           : f_norm_arg
-		    { yTrace(vps, "f_arg: f_norm_arg");
+                    { yTrace(vps, "f_arg: f_norm_arg");
                       OmScopeType aScope(vps->omPtr);
                       NODE **argsH = aScope.add(RubyArgsNode::new_(vps));
                       $$ = RubyArgsNode::add_arg(argsH, $1/*RpNameToken*/, vps);  // returns first arg
-                    } 
-                      
+                    }
+
                 | f_arg ',' f_norm_arg
                     {
                       yTrace(vps, "f_arg: | f_arg tCOMMA f_norm_arg");
-                      $$ = RubyArgsNode::add_arg(& $1, $3/*RpNameToken*/, vps); 
+                      $$ = RubyArgsNode::add_arg(& $1, $3/*RpNameToken*/, vps);
                     }
                 ;
 
@@ -3057,13 +3054,13 @@ f_opt           : tIDENTIFIER '=' arg_value
                       yTrace(vps, "f_opt: tIDENTIFIER tEQL arg_value");
                       OmScopeType aScope(vps->omPtr);
                       NODE *quidO = asQuid($1, vps);
-		      if (! is_local_id(quidO)) {
-			  rb_compile_error_q(vps, "formal argument must be local variable", quidO);
-		      } else if (local_id(vps, quidO)) {
-			  rb_compile_error_q(vps, "duplicate optional argument name", quidO);
-                      } 
+                      if (! is_local_id(quidO)) {
+                          rb_compile_error_q(vps, "formal argument must be local variable", quidO);
+                      } else if (local_id(vps, quidO)) {
+                          rb_compile_error_q(vps, "duplicate optional argument name", quidO);
+                      }
                       NODE **thirdH = aScope.add($3);
-		      $$ = assignable(& $1, $2/*srcOffsetSi*/, thirdH, vps);
+                      $$ = assignable(& $1, $2/*srcOffsetSi*/, thirdH, vps);
                     }
                 ;
 
@@ -3087,13 +3084,13 @@ f_rest_arg      : restarg_mark tIDENTIFIER
                     {
                       yTrace(vps, "f_rest_arg: restarg_mark tIDENTIFIER");
                       NODE *quidO = asQuid($2, vps);
-		      if (! is_local_id(quidO)) {
-			  rb_compile_error("rest argument must be local variable", vps);
-		      } else if (local_id(vps, quidO)) {
-			  rb_compile_error("duplicate rest argument name", vps);
+                      if (! is_local_id(quidO)) {
+                          rb_compile_error("rest argument must be local variable", vps);
+                      } else if (local_id(vps, quidO)) {
+                          rb_compile_error("duplicate rest argument name", vps);
                       }
-		      local_cnt(vps, quidO);
-		      $$ = $2 /* a RpNameToken or quid*/;
+                      local_cnt(vps, quidO);
+                      $$ = $2 /* a RpNameToken or quid*/;
                     }
                 | restarg_mark
                     {
@@ -3108,21 +3105,21 @@ blkarg_mark     : '&'
 
 f_block_arg     : blkarg_mark tIDENTIFIER
                     {
-                      yTrace(vps, "f_blck_arg: blkarg_mark tIDENTIFIER");
+                      yTrace(vps, "f_block_arg: blkarg_mark tIDENTIFIER");
                       NODE *quidO = asQuid($2, vps);
-		      if (! is_local_id(quidO)) {
-			  rb_compile_error("block argument must be local variable", vps);
-		      } else if (local_id(vps, quidO)) {
-			  rb_compile_error("duplicate block argument name", vps);
+                      if (! is_local_id(quidO)) {
+                          rb_compile_error("block argument must be local variable", vps);
+                      } else if (local_id(vps, quidO)) {
+                          rb_compile_error("duplicate block argument name", vps);
                       }
-		      local_cnt(vps, quidO);
-		      $$ = RubyBlockArgNode::s(RpNameToken::symval($2, vps), vps);
+                      local_cnt(vps, quidO);
+                      $$ = RubyBlockArgNode::s(RpNameToken::symval($2, vps), vps);
                     }
                 ;
 
 opt_f_block_arg : ',' f_block_arg
                     {
-                      yTrace(vps, "opt_f_block_arg: tCOMMA f_blck_arg");
+                      yTrace(vps, "opt_f_block_arg: tCOMMA f_block_arg");
                       $$ = $2;
                     }
                 | none
@@ -3158,7 +3155,7 @@ assoc_list      : none
                 | assocs trailer
                     {
                       yTrace(vps, "assoc_list: | assocs trailer");
-		      $$ = $1;
+                      $$ = $1;
                     }
                 | args trailer
                     {
@@ -3247,7 +3244,7 @@ enum {
   alpha_MASK =     0x1, // bits in ps->charTypes array
   digit_MASK =     0x2,
   ALNUM_MASK =     0x3,
-  identchar_MASK = 0x4, 
+  identchar_MASK = 0x4,
   upper_MASK     = 0x8,
   xdigit_MASK                = 0x10,
   space_MASK                 = 0x20,
@@ -3288,12 +3285,12 @@ static void initCharTypes(rb_parse_state *ps)
   ps->charTypes[0]        |= tokadd_string_special_MASK;
 }
 
-static inline int isAlpha(ByteType c, rb_parse_state *ps) 
+static inline int isAlpha(ByteType c, rb_parse_state *ps)
 {
   return ps->charTypes[c] & alpha_MASK ;
 }
 
-static inline int isAlphaNumeric(ByteType c, rb_parse_state *ps) 
+static inline int isAlphaNumeric(ByteType c, rb_parse_state *ps)
 {
   return ps->charTypes[c] & ALNUM_MASK ;
 }
@@ -3338,7 +3335,7 @@ static bool lex_getline(rb_parse_state *ps)
   while (ptr < limit) {
     char ch = *ptr;
     ptr += 1;
-    if (ch == '\n') 
+    if (ch == '\n')
       break;
   }
   ps->sourcePtr = ptr;
@@ -3360,7 +3357,7 @@ omObjSType* RubyArgsNode::add_arg(omObjSType **instH, omObjSType *arg, rb_parse_
     if (OOP_IS_SMALL_INT(arg)) {
       if (ps->errorCount == 0) {
         rb_compile_error(ps, "illegal formal argument");
-      } 
+      }
       return *instH;
     }
     omObjSType *res = RubyNode::call(*instH, sel_add_arg, arg, ps);
@@ -3371,14 +3368,14 @@ omObjSType* RubyArgsNode::add_arg(omObjSType **instH, omObjSType *arg, rb_parse_
     if (nArgs > GEN_MAX_RubyFixedArgs) {
       char msg[128];
       snprintf(msg, sizeof(msg),
-	   "more than %d formal arguments", GEN_MAX_RubyFixedArgs);
+           "more than %d formal arguments", GEN_MAX_RubyFixedArgs);
       rb_compile_error(ps, msg);
     }
     return *instH;
 }
 
 omObjSType* RubyParser::node_assign(omObjSType **lhsH, omObjSType* srcOfs, omObjSType *rhs,
-			rb_parse_state *ps) 
+                        rb_parse_state *ps)
 {
   if (OOP_IS_SMALL_INT(rhs)) {
     if (ps->errorCount == 0) {
@@ -3394,7 +3391,7 @@ static BoolType is_notop_id(NODE* id) {
   return (val & ID_TOK_MASK) > tLAST_TOKEN ;
 }
 
-static BoolType v_is_notop_id(int64 val) 
+static BoolType v_is_notop_id(int64 val)
 {
   return (val & ID_TOK_MASK) > tLAST_TOKEN ;
 }
@@ -3405,7 +3402,7 @@ static void resolveAstClass(om *omPtr, NODE **astClassesH, AstClassEType e_cls)
   switch (e_cls) {
     case  cls_RubyAbstractLiteralNode: nam = "RubyAbstractLiteralNode"; break;
     case  cls_RubyAbstractNumberNode: nam = "RubyAbstractNumberNode"; break;
-    case  cls_RubyAliasNode: 		nam = "RubyAliasNode"; break;
+    case  cls_RubyAliasNode:            nam = "RubyAliasNode"; break;
     case  cls_RubyAndNode: nam = "RubyAndNode"; break;
     case  cls_RubyArgsNode: nam = "RubyArgsNode"; break;
     case  cls_RubyArrayNode: nam = "RubyArrayNode"; break;
@@ -3479,8 +3476,8 @@ static void resolveAstClass(om *omPtr, NODE **astClassesH, AstClassEType e_cls)
   if (assoc == ram_OOP_NIL) {
      GemErrAnsi(omPtr, ERR_ArgumentError, "resolveAstClass class not found: ", nam);
   }
-  NODE **clsH = aScope.add( om::FetchOop(assoc, OC_ASSOCIATION_VALUE)); 
-  om::StoreOop(omPtr, astClassesH, e_cls, clsH); 
+  NODE **clsH = aScope.add( om::FetchOop(assoc, OC_ASSOCIATION_VALUE));
+  om::StoreOop(omPtr, astClassesH, e_cls, clsH);
 }
 
 
@@ -3488,81 +3485,81 @@ static BoolType initAstSelector(om *omPtr, OopType *selectorIds, AstSelectorETyp
 {
   const char *str = NULL;
   switch (e_sel) {
-    case sel_add_arg: 		str = "add_arg:"; 	break;
-    case sel_add_block_arg: 	str = "add_block_arg:"; break;
-    case sel_add_optional_arg: 	str = "add_optional_arg:"; 	break;
-    case sel_add_star_arg: 	str = "add_star_arg:"; 	break;
-    case sel__append: 		str = "_append:"; 	break;
-    case sel__appendAll: 	str = "_appendAll:"; break;
+    case sel_add_arg:           str = "add_arg:";       break;
+    case sel_add_block_arg:     str = "add_block_arg:"; break;
+    case sel_add_optional_arg:  str = "add_optional_arg:";      break;
+    case sel_add_star_arg:      str = "add_star_arg:";  break;
+    case sel__append:           str = "_append:";       break;
+    case sel__appendAll:        str = "_appendAll:"; break;
     case sel__append_amperLhs:  str = "_appendAmperLhs:";  break;
-    case sel_append_arg: 	str = "append_arg:"; break;
+    case sel_append_arg:        str = "append_arg:"; break;
     case sel_append_arg_blkArg: str = "append_arg:blkArg:"; break;
     case sel_append_arg_splatArg_blkArg: str = "append_arg:splatArg:blkArg:"; break;
-    case sel_append_blkArg: 	str = "append_blk_arg:"; break;
-    case sel_append_splatArg: 	str = "append_splatArg:"; break;
+    case sel_append_blkArg:     str = "append_blk_arg:"; break;
+    case sel_append_splatArg:   str = "append_splatArg:"; break;
     case sel_append_splatArg_blk:  str = "append_splatArg:blk:"; break;
-    case sel_append_to_block: 	str = "append_to_block:"; break;
+    case sel_append_to_block:   str = "append_to_block:"; break;
     case sel_appendTo_evstr2dstr: str = "appendTo:evstr2dstr:";  break;
-    case sel_arrayLength: 	str = "arrayLength"; break;
-    case sel_block_append: 	str = "block_append:tail:"; break;
-    case sel_colon2_name:	str = "colon2:name:"; break;
-    case sel_colon3:		str = "colon3:"; break;
+    case sel_arrayLength:       str = "arrayLength"; break;
+    case sel_block_append:      str = "block_append:tail:"; break;
+    case sel_colon2_name:       str = "colon2:name:"; break;
+    case sel_colon3:            str = "colon3:"; break;
     case sel_callNode_:         str = "callNode:"; break;
-    case sel_backref_error: 	str = "backref_error:" ; break;
+    case sel_backref_error:     str = "backref_error:" ; break;
     case sel_bodyNode_:         str = "bodyNode:"; break;
     case sel_includesTemp_:   str = "includesTemp:"; break;
     case sel_get_match_node:   str = "get_match_node:rhs:ofs:"; break;
-    case sel_list_append: 	str = "list_append:item:"; break;
-    case sel_list_prepend: 	str = "list_prepend:item:"; break;
+    case sel_list_append:       str = "list_append:item:"; break;
+    case sel_list_prepend:      str = "list_prepend:item:"; break;
     case sel_literal_concat:   str = "literal_concat:tail:"; break;
-    case sel_logop: 		str = "logop:left:right:"; break;
+    case sel_logop:             str = "logop:left:right:"; break;
     case sel_masgn_append_arg: str = "masgn_append_arg:right:"; break;
     case sel_masgn_append_mrhs: str = "masgn_append_mrhs:right:"; break;
-    case sel__new: 		str = "_new"; break;
-    case sel__new_: 		str = "_new:"; break;
-    case sel__new_with: 	str = "_new:with:"; break;
-    case sel_new_aref: 		str = "new_aref:args:ofs:"; break;
-    case sel_new_call: 		str = "new_call:sel:arg:"; break;
-    case sel_new_call_1: 	str = "new_call_1:sel:arg:"; break;
+    case sel__new:              str = "_new"; break;
+    case sel__new_:             str = "_new:"; break;
+    case sel__new_with:         str = "_new:with:"; break;
+    case sel_new_aref:          str = "new_aref:args:ofs:"; break;
+    case sel_new_call:          str = "new_call:sel:arg:"; break;
+    case sel_new_call_1:        str = "new_call_1:sel:arg:"; break;
     case sel_new_call_braceBlock: str = "new_call_braceBlock:sel:args:blkArg:"; break;
-    case sel_new_defn: 	str = "new_defn:args:body:ofs:startLine:endOfs:"; break;
-    case sel_new_defs: 	str = "new_defs:name:args:body:ofs:startLine:endOfs:"; break;
-    case sel_new_dsym:  	str = "new_dsym:"; break;
-    case sel_new_evstr: 	str = "new_evstr:"; break;
-    case sel_new_fcall: 	str = "new_fcall:arg:"; break;
+    case sel_new_defn:  str = "new_defn:args:body:ofs:startLine:endOfs:"; break;
+    case sel_new_defs:  str = "new_defs:name:args:body:ofs:startLine:endOfs:"; break;
+    case sel_new_dsym:          str = "new_dsym:"; break;
+    case sel_new_evstr:         str = "new_evstr:"; break;
+    case sel_new_fcall:         str = "new_fcall:arg:"; break;
     case sel_new_fcall_braceBlock: str = "new_fcall_braceBlock:args:blkArg:"; break;
-    case sel_new_if: 		str = "new_if:t:f:ofs:"; break;
-    case sel_new_op_asgn: 	str = "new_op_asgn:sel:arg:"; break;
-    case sel_new_parasgn: 	str = "new_parasgn:ofs:comma:"; break;
-    case sel_new_regexp: 	str = "new_regexp:options:"; break;
-    case sel_new_string: 	str = "new_string:"; break;
-    case sel_new_super: 	str = "new_super:ofs:"; break;
-    case sel_new_undef: 	str = "new_undef:ofs:"; break;
-    case sel_new_until: 	str = "new_until:expr:ofs:"; break;
-    case sel_new_vcall: 	str = "new_vcall:sel:"; break;
-    case sel_new_while: 	str = "new_while:expr:ofs:"; break;
-    case sel_new_xstring: 	str = "new_xstring:"; break;
-    case sel_new_yield: 	str = "new_yield:ofs:"; break;
-    case sel_node_assign: 	str = "node_assign:ofs:rhs:"; break;
-    case sel_opt_rescue: 	str = "opt_rescue:var:body:rescue:ofs:"; break;
-    case sel_ret_args: 		str = "ret_args:"; break;
-    case sel_s_a: 		str = "s_a:"; break;
-    case sel_s_a_b: 		str = "s_a:b:"; break;
-    case sel_s_a_b_c: 		str = "s_a:b:c:"; break;
-    case sel_s_a_b_c_d: 	str = "s_a:b:c:d:"; break;
-    case sel_s_a_b_c_d_e: 	str = "s_a:b:c:d:e:"; break;
-    case sel_s_splat_blk:	str = "s_splat:blk:"; break;
-    case sel_s_a_blk:		str = "s_a:blk:"; break;
-    case sel_s_a_splat_blk:	str = "s_a:splat:blk:"; break;
-    case sel_s_a_b_blk:		str = "s_a:b:blk:"; break;
-    case sel_s_a_b_splat_blk:	str = "s_a:b:splat:blk:"; break;
-    case sel_a_all_b_blk:	str = "s_a:all:b:blk:"; break;
-    case sel_a_all_b_splat_blk:	str = "s_a:all:b:splat:blk:"; break;
+    case sel_new_if:            str = "new_if:t:f:ofs:"; break;
+    case sel_new_op_asgn:       str = "new_op_asgn:sel:arg:"; break;
+    case sel_new_parasgn:       str = "new_parasgn:ofs:comma:"; break;
+    case sel_new_regexp:        str = "new_regexp:options:"; break;
+    case sel_new_string:        str = "new_string:"; break;
+    case sel_new_super:         str = "new_super:ofs:"; break;
+    case sel_new_undef:         str = "new_undef:ofs:"; break;
+    case sel_new_until:         str = "new_until:expr:ofs:"; break;
+    case sel_new_vcall:         str = "new_vcall:sel:"; break;
+    case sel_new_while:         str = "new_while:expr:ofs:"; break;
+    case sel_new_xstring:       str = "new_xstring:"; break;
+    case sel_new_yield:         str = "new_yield:ofs:"; break;
+    case sel_node_assign:       str = "node_assign:ofs:rhs:"; break;
+    case sel_opt_rescue:        str = "opt_rescue:var:body:rescue:ofs:"; break;
+    case sel_ret_args:          str = "ret_args:"; break;
+    case sel_s_a:               str = "s_a:"; break;
+    case sel_s_a_b:             str = "s_a:b:"; break;
+    case sel_s_a_b_c:           str = "s_a:b:c:"; break;
+    case sel_s_a_b_c_d:         str = "s_a:b:c:d:"; break;
+    case sel_s_a_b_c_d_e:       str = "s_a:b:c:d:e:"; break;
+    case sel_s_splat_blk:       str = "s_splat:blk:"; break;
+    case sel_s_a_blk:           str = "s_a:blk:"; break;
+    case sel_s_a_splat_blk:     str = "s_a:splat:blk:"; break;
+    case sel_s_a_b_blk:         str = "s_a:b:blk:"; break;
+    case sel_s_a_b_splat_blk:   str = "s_a:b:splat:blk:"; break;
+    case sel_a_all_b_blk:       str = "s_a:all:b:blk:"; break;
+    case sel_a_all_b_splat_blk: str = "s_a:all:b:splat:blk:"; break;
     case sel_sym_srcOffset:     str = "sym:srcOffset:"; break;
-    case sel_setParen:     	str = "setParen"; break;
-    case sel_sym_ofs_val: 	str = "sym:ofs:val:"; break;
+    case sel_setParen:          str = "setParen"; break;
+    case sel_sym_ofs_val:       str = "sym:ofs:val:"; break;
     case sel_uplus_production : str = "uplus_production:ofs:"; break;
-    case sel_value_expr: 	str = "value_expr:"; break;
+    case sel_value_expr:        str = "value_expr:"; break;
 #if !defined(FLG_LINT_SWITCHES)
     default:
 #endif
@@ -3571,12 +3568,12 @@ static BoolType initAstSelector(om *omPtr, OopType *selectorIds, AstSelectorETyp
   }
   OmScopeType aScope(omPtr);
   NODE **strH = aScope.add( om::NewString_(omPtr, str));
-  NODE* symO = ObjExistingCanonicalSym(omPtr, strH);
+  NODE* symO = ObjExistingCanonicalSym__(omPtr, strH);
   if (symO == NULL) {
     printf( "non-existant symbol %s in initAstSelector\n", str);
     return FALSE;
   }
-  OopType selObjId = om::objIdOfObj( symO);
+  OopType selObjId = om::objIdOfObj__(omPtr, symO);
   selectorIds[e_sel] = OOP_makeSelectorId(0, selObjId);
   return TRUE;
 }
@@ -3585,12 +3582,12 @@ static void initAstSymbol(om *omPtr, NODE** symbolsH, AstSymbolEType e_sym)
 {
   const char* str = NULL;
   switch (e_sym) {
-    case a_sym_or: 	str = "or"; 	break; 
+    case a_sym_or:      str = "or";     break;
     case a_sym_orOp: str = "|"; break;
     case a_sym_OOR: str = "||"; break;
     case a_sym_upArrow: str = "^"; break;
     case a_sym_andOp: str = "&"; break;
-    case a_sym_and:   str = "and"; 	break; 
+    case a_sym_and:   str = "and";      break;
     case a_sym_AAND: str = "&&"; break;
     case a_sym_tCMP : str = "<=>"; break;
     case a_sym_tEQ  : str = "=="; break;
@@ -3642,26 +3639,27 @@ static void initAstSymbol(om *omPtr, NODE** symbolsH, AstSymbolEType e_sym)
     case a_sym_when:    str = "when";           break;
     case a_sym_yield:   str = "yield";          break;
 
-    case  a_sym_end: 	str = "end"; 	break; 
-    case  a_sym_else: 	str = "else"; 	break; 
-    case  a_sym_module: str = "module"; 	break; 
-    case  a_sym_elsif: 	str = "elsif"; 	break; 
-    case  a_sym_def: 	str = "def"; 	break; 
-    case  a_sym_rescue: str = "rescue"; 	break; 
-    case  a_sym_then: 	str = "then"; 	break; 
-    case  a_sym_self: 	str = "self"; 	break; 
-    case  a_sym_if: 	str = "if"; 	break; 
-    case  a_sym_do: 	str = "do"; 	break; 
-    case  a_sym_nil: 	str = "nil"; 	break; 
-    case  a_sym_until: 	str = "until"; 	break; 
-    case  a_sym_unless: str = "unless"; 	break; 
-    case  a_sym_begin: 	str = "begin"; 	break; 
-    case  a_sym__LINE_: str = "__LINE__"; 	break; 
-    case  a_sym__FILE_: str = "__FILE__"; 	break; 
-    case  a_sym_END: 	str = "END"; 	break; 
-    case  a_sym_BEGIN: 	str = "BEGIN"; 	break; 
-    case  a_sym_while: 	str = "while"; 	break; 
-    case  a_sym_rest_args: str = "rest_args"; 	break; 
+    case  a_sym_end:    str = "end";    break;
+    case  a_sym_else:   str = "else";   break;
+    case  a_sym_module: str = "module";         break;
+    case  a_sym_elsif:  str = "elsif";  break;
+    case  a_sym_def:    str = "def";    break;
+    case  a_sym_rescue: str = "rescue";         break;
+    case  a_sym_then:   str = "then";   break;
+    case  a_sym_self:   str = "self";   break;
+    case  a_sym_if:     str = "if";     break;
+    case  a_sym_do:     str = "do";     break;
+    case  a_sym_nil:    str = "nil";    break;
+    case  a_sym_until:  str = "until";  break;
+    case  a_sym_unless: str = "unless";         break;
+    case  a_sym_begin:  str = "begin";  break;
+    case  a_sym__LINE_: str = "__LINE__";       break;
+    case  a_sym__FILE_: str = "__FILE__";       break;
+    case  a_sym_END:    str = "END";    break;
+    case  a_sym_BEGIN:  str = "BEGIN";  break;
+    case  a_sym_while:  str = "while";  break;
+    case  a_sym_rest_args: str = "rest_args";   break;
+    case  a_sym_call:   str = "call";   break;
 
     case a_sym_INVALID:  return; // leave entry in symbolsH as NIL
 
@@ -3681,24 +3679,24 @@ static void initAstSymbol(om *omPtr, NODE** symbolsH, AstSymbolEType e_sym)
 
 static void sessionInit(om *omPtr, rb_parse_state *ps)
 {
-  omPtr->rubyParseState = ps;
+  omPtr->set_rubyParseState( ps);
   ps->omPtr = omPtr;
 
   ps->yystack.initialize();
   yygrowstack(ps, NULL);
-  omPtr->rubyParseStack = &ps->yystack ;
+  omPtr->set_rubyParseStack(&ps->yystack) ;
 
   ps->astClassesH = omPtr->NewGlobalHandle();
   *ps->astClassesH = om::NewArray(omPtr, NUM_AST_CLASSES);
 
   ps->astSymbolsH = omPtr->NewGlobalHandle();
   *ps->astSymbolsH = om::NewArray(omPtr, NUM_AST_SYMBOLS);
- 
+
   int id = 0;
   while (id < NUM_AST_CLASSES) {
     resolveAstClass(omPtr, ps->astClassesH, (AstClassEType)id);
     id += 1;
-  } 
+  }
   id = 0;
   BoolType ok = TRUE;
   while (id < NUM_AST_SELECTORS) {
@@ -3723,17 +3721,17 @@ omObjSType *MagCompileError902(om *omPtr, omObjSType **ARStackPtr)
   omObjSType **strH = DOPRIM_STACK_ADDR(2);
   omObjSType *isWarningOop = DOPRIM_STACK(1);
 
-  rb_parse_state *ps = (rb_parse_state*) omPtr->rubyParseState;
-  if (ps == NULL || ! ps->parserActive) 
+  rb_parse_state *ps = omPtr->rubyParseState();
+  if (ps == NULL || ! ps->parserActive)
     return ram_OOP_FALSE; // caller should signal an Exception
-  
+
   omObjSType *strO = *strH;
-  if (! OOP_IS_RAM_OOP(strO) || strO->classPtr()->strCharSize() != 1)
+  if ( om::strCharSize(strO) != 1)
     return NULL;
 
   int64 strSize = om::FetchSize_(strO);
   char *cStr = ComHeapMalloc(ps->cst, strSize + 1);
-  om::FetchCString_(strO, cStr, strSize + 1);  
+  om::FetchCString_(strO, cStr, strSize + 1);
   if (isWarningOop == ram_OOP_TRUE) {
     rb_warning(ps, cStr);
   } else if (isWarningOop == ram_OOP_FALSE) {
@@ -3779,24 +3777,24 @@ omObjSType *MagParse903(om *omPtr, omObjSType **ARStackPtr)
     GemErrAnsi(omPtr, ERR_ArgumentError, NULL, "Parser lineNumber arg must be in range 0..0x7FFFFFFF");
   }
   { omObjSType *cbytesO = *cbytesH;
-    if (! OOP_IS_RAM_OOP(cbytesO) || !  cbytesO->classPtr()->isCByteArray())
+    if (! om::isCByteArray(cbytesO) )
       return NULL;
   }
   { omObjSType *srcO = *sourceH;
-    if (! OOP_IS_RAM_OOP(srcO) || srcO->classPtr()->strCharSize() != 1) 
+    if (om::strCharSize(srcO) != 1)
       return NULL;
-  } 
+  }
   { omObjSType *fileO = *fileNameH;
-    if (! OOP_IS_RAM_OOP(fileO) || fileO->classPtr()->strCharSize() != 1) 
+    if (om::strCharSize(fileO) != 1)
       return NULL;
-  } 
-  rb_parse_state *ps = (rb_parse_state*) omPtr->rubyParseState;
+  }
+  rb_parse_state *ps = omPtr->rubyParseState();
   if (ps == NULL) {
     // this path executed on first parse during session only
-    ps = (rb_parse_state*)UtlMalloc( sizeof(*ps), "MagParseInitialize");
+    ps = (rb_parse_state*)malloc( sizeof(*ps) );
     sessionInit(omPtr, ps);
-    omPtr->rubyParseState = ps;
-    omPtr->rubyParseStack = &ps->yystack ;
+    omPtr->set_rubyParseState( ps);
+    omPtr->set_rubyParseStack(&ps->yystack) ;
   } else if (ps->parserActive) {
     GemErrAnsi(omPtr, ERR_ArgumentError, NULL, "reentrant invocation of parser not supported");
   }
@@ -3810,7 +3808,7 @@ omObjSType *MagParse903(om *omPtr, omObjSType **ARStackPtr)
   /* Setup an initial empty scope. */
   OmScopeType oScope(ps->omPtr);
 
-  ps->cst = &omPtr->workspace()->compilerState;
+  ps->cst = omPtr->compilerState();
   ComHeapInit(ps->cst);
 
   // initialize handles
@@ -3829,14 +3827,14 @@ omObjSType *MagParse903(om *omPtr, omObjSType **ARStackPtr)
     if (! OOP_IS_RAM_OOP(evScope)) { // class RubyEvalScope in mcz only
       return NULL;
     }
-    ps->evalScopeH = oScope.add(evScope); 
+    ps->evalScopeH = oScope.add(evScope);
   }
   ps->lex_pbeg = NULL;
   ps->lex_p = NULL;
   ps->lex_pend = NULL;
   { NODE *cbytesO = *cbytesH;
-    UTL_ASSERT(OOP_IS_RAM_OOP(cbytesO) && cbytesO->classPtr()->isCByteArray());
-    int64 info = om::FetchSmallInt_(cbytesH, OC_CByteArray_info);
+    UTL_ASSERT(om::isCByteArray(cbytesO));
+    int64 info = om::FetchSmallInt__(*cbytesH, OC_CByteArray_info);
     cbytesO = *cbytesH;
     int64 srcSize = H_CByteArray::sizeBytes(info);
     if ((uint64)srcSize > INT_MAX) {
@@ -3914,26 +3912,26 @@ omObjSType *MagParse903(om *omPtr, omObjSType **ARStackPtr)
     if (ps->firstErrorReason[0] != '\0') {
       errStr = ps->firstErrorReason;
     } else {
-      errStr = "syntax error"; 
+      errStr = "syntax error";
     }
     snprintf(buf, sizeof(buf), "%s:%d: %s", ps->sourceFileName, lineNum, errStr);
-    om::AppendToString(omPtr, resH, buf); 
+    om::AppendToString(omPtr, resH, buf);
     if (ps->atEof) {
       StartPosition *strt = ps->start_lines.back();
       if (strt != NULL) {
-        snprintf(buf, sizeof(buf), 
+        snprintf(buf, sizeof(buf),
           "\nunexpected EOF at line %d, missing 'end' for %s on line %d",
-          	ps->lineNumber, strt->kind, strt->line );
+                ps->lineNumber, strt->kind, strt->line );
       } else {
         snprintf(buf, sizeof(buf), "\nunexpected EOF at line %d",
-          	ps->lineNumber );
+                ps->lineNumber );
       }
-      om::AppendToString(omPtr, resH, buf); 
+      om::AppendToString(omPtr, resH, buf);
     }
   }
   // destroy ComHeaps (AST all in object memory now)
   ComHeapInit(ps->cst);
-  return *resH; 
+  return *resH;
 }
 
 // --------------- begin lexer  implementation
@@ -3944,7 +3942,7 @@ static int nextc(rb_parse_state *parse_state)
 
     if (parse_state->lex_p == parse_state->lex_pend) {
         if (! lex_getline(parse_state)) {
-          return -1;  // EOF 
+          return -1;  // EOF
         }
         if (parse_state->heredoc_end > 0) {
             parse_state->lineNumber = parse_state->heredoc_end;
@@ -3954,8 +3952,8 @@ static int nextc(rb_parse_state *parse_state)
 
         // This code is setup so that lex_pend can be compared to
         // the data in lex_lastline. Thats important, otherwise
-        // the heredoc code breaks. 
-   
+        // the heredoc code breaks.
+
         if (parse_state->lex_lastline != &parse_state->line_buffer) {
           parse_state->lex_lastline = &parse_state->line_buffer;
         }
@@ -3965,7 +3963,7 @@ static int nextc(rb_parse_state *parse_state)
         parse_state->lex_pend = parse_state->lex_p + bstring::blength(v);
     }
     c = (unsigned char)*(parse_state->lex_p++);
-    if (c == '\r' && parse_state->lex_p < parse_state->lex_pend 
+    if (c == '\r' && parse_state->lex_p < parse_state->lex_pend
                   && *(parse_state->lex_p) == '\n') {
         parse_state->lex_p++;
         c = '\n';
@@ -3988,15 +3986,15 @@ static void pushback(int c, rb_parse_state *parse_state)
     parse_state->lex_p--;
 }
 
-static BoolType was_bol(rb_parse_state *parse_state) 
+static BoolType was_bol(rb_parse_state *parse_state)
 {
-  // Indicates if we're currently at the beginning of a line. 
+  // Indicates if we're currently at the beginning of a line.
   return parse_state->lex_p == (parse_state->lex_pbeg + 1);
 }
 
-static BoolType peek(int c, rb_parse_state *parse_state) 
+static BoolType peek(int c, rb_parse_state *parse_state)
 {
-  return parse_state->lex_p != parse_state->lex_pend 
+  return parse_state->lex_p != parse_state->lex_pend
             && c == *(parse_state->lex_p);
 }
 
@@ -4008,8 +4006,8 @@ static BoolType ch_equals(int expected_c, int c)
 /* The token buffer. It's just a global string that has
    functions to build up the string easily. */
 
-static inline void tokfix(rb_parse_state *ps) 
-{ 
+static inline void tokfix(rb_parse_state *ps)
+{
   ps->tokenbuf[ps->tokidx] = '\0';
 }
 
@@ -4017,7 +4015,7 @@ static inline char* tok(rb_parse_state *ps) { return ps->tokenbuf; }
 
 static inline intptr_t toklen(rb_parse_state *ps) { return ps->tokidx; }
 
-static inline char toklast(rb_parse_state *ps) 
+static inline char toklast(rb_parse_state *ps)
 {
   intptr_t idx = ps->tokidx;
   return idx > 0 ? ps->tokenbuf[idx-1] : 0 ;
@@ -4058,7 +4056,7 @@ static void tokadd(char c, rb_parse_state *ps)
     ps->tokenbuf = buf;
     ps->toksiz = newSize;
   }
-  ps->tokidx = idx; 
+  ps->tokidx = idx;
 }
 
 #define tokcopy(n, ps) memcpy(tokspace(n, ps), ps->lex_p - (n), (n))
@@ -4117,7 +4115,7 @@ static int tokadd_utf8(rb_parse_state *ps, int string_literal, int symbol_litera
 
     if(regexp_literal) tokadd('}', ps);
     nextc(ps);
-  } else {			/* handle \uxxxx form */
+  } else {                      /* handle \uxxxx form */
     codepoint = scan_hex(ps->lex_p, 4, &numlen);
     if(numlen < 4) {
       rb_compile_error("invalid Unicode escape", ps);
@@ -4406,7 +4404,7 @@ typedef enum {
 } string_type ;
 
 static int tokadd_string(int func, int term, int paren, NODE **strTermH,
-				rb_parse_state *ps)
+                                rb_parse_state *ps)
 {
     int c;
 
@@ -4456,7 +4454,7 @@ static int tokadd_string(int func, int term, int paren, NODE **strTermH,
                     tokadd('\\', ps);
                     break;
                   }
-                  tokadd_utf8(ps, 1, func & STR_FUNC_SYMBOL, 
+                  tokadd_utf8(ps, 1, func & STR_FUNC_SYMBOL,
                                      func & STR_FUNC_REGEXP);
                   continue;
 
@@ -4555,7 +4553,7 @@ static int parse_string(NODE** quoteH/* a RubyLexStrTerm*/ , rb_parse_state *ps)
 static int heredoc_identifier(rb_parse_state *ps)
 {
   // Called when the lexer detects a heredoc is beginning. This pulls
-  // in more characters and detects what kind of heredoc it is. 
+  // in more characters and detects what kind of heredoc it is.
 
     int c = nextc(ps);
     int term = 0;
@@ -4637,7 +4635,7 @@ static int heredoc_identifier(rb_parse_state *ps)
        the heredoc identifier that we watch the stream for to
        detect the end of the heredoc. */
 
-    ps->set_lex_strterm(  RubyLexStrTerm::newHereDoc(ps, 
+    ps->set_lex_strterm(  RubyLexStrTerm::newHereDoc(ps,
                                tok(ps), toklen(ps), /* nd_lit*/
                                len /* nd_nth */ ,  ps->lex_lastline/*nd_orig*/));
     return term == '`' ? tXSTRING_BEG : tSTRING_BEG;
@@ -4664,7 +4662,7 @@ static int here_document(NODE **hereH, rb_parse_state *ps)
 {
   // Called when the lexer knows it's inside a heredoc. This function
   // is responsible for detecting an expandions (ie #{}) in the heredoc
-  //  and emitting a lex token and also detecting the end of the heredoc. 
+  //  and emitting a lex token and also detecting the end of the heredoc.
 
     om *omPtr = ps->omPtr;
     OmScopeType scp(omPtr);
@@ -4682,8 +4680,8 @@ static int here_document(NODE **hereH, rb_parse_state *ps)
     /* indicates if we should search for expansions. */
     int indent = func & STR_FUNC_INDENT;
     if (yTraceLevel > 0) {
-      printf("here_document line %d lineStartOffset %ld eos %s len %ld indent %d \n", 
-	ps->lineNumber, ps->lineStartOffset, eos, len, indent);
+      printf("here_document line %d lineStartOffset %ld eos %s len %ld indent %d \n",
+        ps->lineNumber, ps->lineStartOffset, eos, len, indent);
     }
     NODE **strValH = scp.newHandle();
 
@@ -4702,7 +4700,7 @@ static int here_document(NODE **hereH, rb_parse_state *ps)
        it means only 1 character has been consumed. */
 
     if (was_bol(ps) && whole_match_p(eos, len, indent, ps)) {
-        if (yTraceLevel > 0) { 
+        if (yTraceLevel > 0) {
           printf("here_document returns tSTRING_END\n");
         }
         heredoc_restore(ps);
@@ -4728,9 +4726,9 @@ static int here_document(NODE **hereH, rb_parse_state *ps)
                     --pend;
                 }
             }
-            om::AppendToString(omPtr, strValH, p, pend - p);
+            om::AppendToString_(omPtr, strValH, p, pend - p);
             if (pend < ps->lex_pend) {
-              om::AppendToString(omPtr, strValH, "\n", 1);
+              om::AppendToString_(omPtr, strValH, "\n", 1);
             }
             ps->lex_p = ps->lex_pend;
             if (nextc(ps) == -1) {
@@ -4745,12 +4743,12 @@ static int here_document(NODE **hereH, rb_parse_state *ps)
               case '$':
               case '@':
                 pushback(c, ps);
-                if (yTraceLevel > 0) { 
+                if (yTraceLevel > 0) {
                   printf("here_document returns tSTRING_DVAR\n");
                 }
                 return tSTRING_DVAR;
               case '{':
-                if (yTraceLevel > 0) { 
+                if (yTraceLevel > 0) {
                   printf("here_document returns tSTRING_DBEG\n");
                 }
                 return tSTRING_DBEG;
@@ -4773,7 +4771,7 @@ static int here_document(NODE **hereH, rb_parse_state *ps)
                 *ps->lexvalH = NEW_STR(tok(ps), toklen(ps), ps);
                 if (yTraceLevel > 0) {
                   char buf[1024];
-                  om::FetchCString_(*ps->lexvalH, buf, sizeof(buf)); 
+                  om::FetchCString_(*ps->lexvalH, buf, sizeof(buf));
                   printf("here_document returns tSTRING_CONTENT, %s\n", buf);
                 }
                 return tSTRING_CONTENT;
@@ -4830,12 +4828,12 @@ static int IS_EXPR_BEG_or_FNAME_DOT_CLASS(int lex_state)
 static int IS_EXPR_BEG_or_MID(int lex_state)
 {
   return lex_state & (EXPR_BEG | EXPR_MID);
-} 
+}
 
 static int IS_EXPR_BEG_or_MID_or_CLASS(int lex_state)
 {
   return lex_state & (EXPR_BEG | EXPR_MID | EXPR_CLASS);
-} 
+}
 
 static int IS_EXPR_END_or_ENDARG(int lex_state)
 {
@@ -4848,18 +4846,18 @@ static int IS_EXPR_BEG_or_MID_DOT_ARG_CMDARG(int lex_state)
 }
 
 static int IS_noneOf_EXPR_END_or_DOT_ENDARG_CLASS(int lex_state)
-{  
+{
   return (lex_state & (EXPR_END | EXPR_DOT | EXPR_ENDARG | EXPR_CLASS)) == 0;
 }
 
-static char* parse_comment(struct rb_parse_state* parse_state) 
+static char* parse_comment(struct rb_parse_state* parse_state)
 {
   // return NULL or start of a magic comment( prefixed by "-*-" after the # )
   int len = parse_state->lex_pend - parse_state->lex_p;
 
   char* str = parse_state->lex_p;
   while (len-- > 0 && isSpace(str[0], parse_state)) {
-    // skip white space after the # 
+    // skip white space after the #
     str++;
   }
 
@@ -4874,9 +4872,9 @@ static NODE* newInteger(rb_parse_state *ps, int radix)
 {
   int64 len = toklen(ps);
   if (len < 10) { // within a SmallInteger
-    tokfix(ps); 
+    tokfix(ps);
     errno = 0;
-    int64 val = strtol(tok(ps), NULL, radix); 
+    int64 val = strtol(tok(ps), NULL, radix);
     if (errno != 0) {
       rb_compile_error(ps, "invalid integer literal format");
     }
@@ -4903,7 +4901,7 @@ static int yylex(rb_parse_state* ps)
     int cmd_state;
     LexStateKind last_state;
 
-    // c = nextc();			// Rubinius has commented out (uncomment for debug?)
+    // c = nextc();                     // Rubinius has commented out (uncomment for debug?)
     // printf("lex char: %c\n", c);
     // pushback(c, parse_state);
 
@@ -4916,8 +4914,8 @@ static int yylex(rb_parse_state* ps)
 }
 
     if (ps->inStrTerm) {
-      NODE **lex_strtermH = ps->lex_strtermH; 
-      NODE *lex_strtermO = *lex_strtermH; 
+      NODE **lex_strtermH = ps->lex_strtermH;
+      NODE *lex_strtermO = *lex_strtermH;
       int token;
       if ( RubyLexStrTerm::kind(lex_strtermO) == NODE_HEREDOC) {
         token = here_document(lex_strtermH, ps);
@@ -4926,8 +4924,8 @@ static int yylex(rb_parse_state* ps)
           SET_lexState(EXPR_END);
         }
       } else {
-	token = parse_string(lex_strtermH, ps);
-	if (token == tSTRING_END || token == tREGEXP_END) {
+        token = parse_string(lex_strtermH, ps);
+        if (token == tSTRING_END || token == tREGEXP_END) {
           ps->clear_lex_strterm();
           SET_lexState( EXPR_END);
         }
@@ -4969,7 +4967,7 @@ static int yylex(rb_parse_state* ps)
             om *omPtr = ps->omPtr;
             if (*magicCommentsH == ram_OOP_NIL) {
               *magicCommentsH = om::NewArray(omPtr, 0);
-            }  
+            }
             OmScopeType scp(omPtr);
             NODE **lineH = scp.add(om::NewString__(omPtr, (ByteType*)str, len));
             om::AppendToArray(omPtr, magicCommentsH, lineH);
@@ -5014,11 +5012,11 @@ static int yylex(rb_parse_state* ps)
                 c = '*';
             }
         }
-        if (IS_EXPR_FNAME_or_DOT(lex_state)) { 
+        if (IS_EXPR_FNAME_or_DOT(lex_state)) {
           SET_lexState( EXPR_ARG);
         } else {
-          SET_lexState( EXPR_BEG); 
-        } 
+          SET_lexState( EXPR_BEG);
+        }
         *ps->lexvalH = OOP_OF_SMALL_LONG_( ps->tokenOffset()); // srcOffsetSi of tPOW, tSTAR or '*'
         return c;
 
@@ -5038,7 +5036,7 @@ static int yylex(rb_parse_state* ps)
       case '=':
         if (was_bol(ps)) {
             /* skip embedded rd document */
-            if (strncmp(ps->lex_p, "begin", 5) == 0 
+            if (strncmp(ps->lex_p, "begin", 5) == 0
                  && isSpace(ps->lex_p[5], ps)) {
                 for (;;) {
                     ps->lex_p = ps->lex_pend;
@@ -5049,8 +5047,8 @@ static int yylex(rb_parse_state* ps)
                     }
                     if (c != '=') continue;
                     if (strncmp(ps->lex_p, "end", 3) == 0 &&
-                        (ps->lex_p + 3 == ps->lex_pend || 
-			   isSpace(ps->lex_p[3], ps))) {
+                        (ps->lex_p + 3 == ps->lex_pend ||
+                           isSpace(ps->lex_p[3], ps))) {
                         break;
                     }
                 }
@@ -5076,15 +5074,15 @@ static int yylex(rb_parse_state* ps)
             return tEQ;
         }
         if (c == '~') {
-            *ps->lexvalH = OOP_OF_SMALL_LONG_( ps->tokenOffset()); 
+            *ps->lexvalH = OOP_OF_SMALL_LONG_( ps->tokenOffset());
             return tMATCH;
         }
         else if (c == '>') {
-            *ps->lexvalH = OOP_OF_SMALL_LONG_( ps->tokenOffset()); 
+            *ps->lexvalH = OOP_OF_SMALL_LONG_( ps->tokenOffset());
             return tASSOC;
         }
         pushback(c, ps);
-        *ps->lexvalH = OOP_OF_SMALL_LONG_( ps->tokenOffset()); 
+        *ps->lexvalH = OOP_OF_SMALL_LONG_( ps->tokenOffset());
         return '=';
 
       case '<':
@@ -5092,11 +5090,11 @@ static int yylex(rb_parse_state* ps)
         if (c == '<' &&
             IS_noneOf_EXPR_END_or_DOT_ENDARG_CLASS(lex_state) &&
             (! IS_ARG(lex_state) || space_seen)) {
-	  int token = heredoc_identifier(ps);
-	  if (token) return token;
+          int token = heredoc_identifier(ps);
+          if (token) return token;
         }
         if (IS_EXPR_FNAME_or_DOT(lex_state)) {
-	    SET_lexState( EXPR_ARG);
+            SET_lexState( EXPR_ARG);
         } else {
             SET_lexState( EXPR_BEG);
         }
@@ -5121,7 +5119,7 @@ static int yylex(rb_parse_state* ps)
             return tLSHFT;
         }
         pushback(c, ps);
-        *ps->lexvalH = OOP_OF_SMALL_LONG_( ps->tokenOffset()); 
+        *ps->lexvalH = OOP_OF_SMALL_LONG_( ps->tokenOffset());
         return '<';
 
       case '>':
@@ -5146,7 +5144,7 @@ static int yylex(rb_parse_state* ps)
             return tRSHFT;
         }
         pushback(c, ps);
-        *ps->lexvalH = OOP_OF_SMALL_LONG_( ps->tokenOffset()); // srcOffsetSi 
+        *ps->lexvalH = OOP_OF_SMALL_LONG_( ps->tokenOffset()); // srcOffsetSi
         return '>';
 
       case '"':
@@ -5231,7 +5229,7 @@ static int yylex(rb_parse_state* ps)
             goto ternary;
         }
         else if ( is_identchar(c, ps) /* was (ISALNUM(c) || c == '_')  */
-                   && ps->lex_p < ps->lex_pend 
+                   && ps->lex_p < ps->lex_pend
                    && is_identchar(*(ps->lex_p),  ps)) {
             goto ternary;
         }
@@ -5313,7 +5311,7 @@ static int yylex(rb_parse_state* ps)
         return '|';
 
       case '+': {
-        int aResult = lexPlusMinus(ps, space_seen, '+', tUPLUS); 
+        int aResult = lexPlusMinus(ps, space_seen, '+', tUPLUS);
         if (aResult < 0) {
           UTL_ASSERT(aResult == -1);
           goto start_num;
@@ -5483,7 +5481,7 @@ static int yylex(rb_parse_state* ps)
                 }
                 else {
                     pushback(c, ps);
-                    *ps->lexvalH = ram_OOP_Zero ; 
+                    *ps->lexvalH = ram_OOP_Zero ;
                     return tINTEGER;
                 }
             }
@@ -5585,7 +5583,7 @@ static int yylex(rb_parse_state* ps)
       case ':':
         c = nextc(ps);
         if (c == ':') {
-            if (IS_EXPR_BEG_or_MID_or_CLASS(lex_state) || 
+            if (IS_EXPR_BEG_or_MID_or_CLASS(lex_state) ||
                 (IS_ARG(lex_state) && space_seen)) {
                SET_lexState( EXPR_BEG);
                *ps->lexvalH = OOP_OF_SMALL_LONG_( ps->tokenOffset());
@@ -5596,7 +5594,7 @@ static int yylex(rb_parse_state* ps)
             return tCOLON2;
         }
         if (IS_EXPR_END_or_ENDARG(lex_state)
-		||  isSpace(c, ps)) {
+                ||  isSpace(c, ps)) {
             pushback(c, ps);
             SET_lexState( EXPR_BEG);
             *ps->lexvalH = OOP_OF_SMALL_LONG_( ps->tokenOffset());
@@ -5743,17 +5741,8 @@ static int yylex(rb_parse_state* ps)
             space_seen = 1;
             goto retry; /* skip \\n */
         }
-        *ps->lexvalH = OOP_OF_SMALL_LONG_( ps->tokenOffset()); // srcOffsetSi
-        return tUBS; // yields parse error in Maglev
-// Unary backspace believed rubinius specific
-//      pushback(c, ps);
-//      if(lex_state == EXPR_BEG
-//         || lex_state == EXPR_MID || space_seen) {
-//         SET_lexState( EXPR_DOT);
-//          return tUBS;
-//      }
-//      SET_lexState( EXPR_DOT);
-//      return '\\';
+        pushback(c, ps);
+        return '\\';
 
       case '%':
         if (IS_EXPR_BEG_or_MID(lex_state)) {
@@ -5914,11 +5903,11 @@ static int yylex(rb_parse_state* ps)
           case '`':             /* $`: string before last match */
           case '\'':            /* $': string after last match */
           case '+':             /* $+: string matches last paren. */
-	    if (last_state == EXPR_FNAME) {
-		tokadd((char)'$', ps);
-		tokadd(c, ps);
-		goto HAVE_gvar;
-	    }
+            if (last_state == EXPR_FNAME) {
+                tokadd((char)'$', ps);
+                tokadd(c, ps);
+                goto HAVE_gvar;
+            }
             *ps->lexvalH = ramOop( GCI_CHR_TO_OOP(c));
             return tBACK_REF;
 
@@ -5931,7 +5920,7 @@ static int yylex(rb_parse_state* ps)
                 c = nextc(ps);
             } while ( isDigit(c, ps));
             pushback(c, ps);
-	    if (last_state == EXPR_FNAME) {
+            if (last_state == EXPR_FNAME) {
               goto HAVE_gvar;
             }
             tokfix(ps);
@@ -5977,7 +5966,7 @@ static int yylex(rb_parse_state* ps)
       case '_':
         if (was_bol(ps) && whole_match_p("__END__", 7, 0, ps)) {
             ps->end_seen = 1;
-            return 0; // rubinius returned -1; 
+            return 0; // rubinius returned -1;
                 // maglev returns 0 to avoid < 0 check in customized byacc state machine
         }
         startToken(ps);
@@ -6007,7 +5996,7 @@ static int yylex(rb_parse_state* ps)
         }
         c = nextc(ps);
     } while (is_identchar(c, ps));
-    if ((c == '!' || c == '?') && is_identchar(tok(ps)[0], ps) 
+    if ((c == '!' || c == '?') && is_identchar(tok(ps)[0], ps)
            && !peek('=', ps)) {
         tokadd((char)c, ps);
     }
@@ -6047,7 +6036,7 @@ static int yylex(rb_parse_state* ps)
                     if (c  == '=' && ps->lex_p != ps->lex_pend ) {
                       int p_c = *(ps->lex_p) ; // actual peek
                       if (! ch_equals('~', p_c) && ! ch_equals('>', p_c) &&
-                          (! ch_equals('=', p_c ) || 
+                          (! ch_equals('=', p_c ) ||
                            (ps->lex_p + 1 < ps->lex_pend && (ps->lex_p)[1] == '>'))) {
                         result = tIDENTIFIER;
                         needsNameToken = TRUE;
@@ -6073,14 +6062,14 @@ static int yylex(rb_parse_state* ps)
                 if (ch_equals(':', p_c) && !(ps->lex_p + 1 < ps->lex_pend && (ps->lex_p)[1] == ':')) {
                     lex_state = EXPR_BEG;
                     nextc(ps);
-                    NODE* symqO = rb_parser_sym( tok(ps) , ps); 
+                    NODE* symqO = rb_parser_sym( tok(ps) , ps);
                     *ps->lexvalH = RpNameToken::s( ps, symqO );
                     return tLABEL;
                 }
             }
 
             if (lex_state != EXPR_DOT) {
-                // See if it is a reserved word. 
+                // See if it is a reserved word.
                 const kwtable *kw = mel_reserved_word(tok(ps), toklen(ps));
                 if (kw) {
                     int64 resWordOffset = ps->lineStartOffset + ps->tokStartDelta; // zero based
@@ -6090,7 +6079,7 @@ static int yylex(rb_parse_state* ps)
                     omObjSType *srcOfs = OOP_OF_SMALL_LONG_(resWordOffset + 1); // one based
                     AstSymbolEType a_sym = kw->a_sym;
                     *ps->lexvalH = RpNameToken::s(a_sym, srcOfs, ps);
-                    
+
                     int kwIdZero = kw->id[0];
                     if (state == EXPR_FNAME) {
                         // Hack. Ignore the different variants of do
@@ -6111,8 +6100,8 @@ static int yylex(rb_parse_state* ps)
                     }
                     int kwIdOne = kw->id[1];
                     if (kwIdZero != kwIdOne) {
-			SET_lexState( EXPR_BEG);
-		    }
+                        SET_lexState( EXPR_BEG);
+                    }
                     return kwIdOne;
                 }
             }
@@ -6129,27 +6118,27 @@ static int yylex(rb_parse_state* ps)
                 SET_lexState( EXPR_END);
             }
         }
-        NODE* symqO = rb_parser_sym( tok(ps) , ps); 
+        NODE* symqO = rb_parser_sym( tok(ps) , ps);
         // symqO is a SmallInteger always
         if (needsNameToken) {
           *ps->lexvalH = RpNameToken::s( ps, symqO );
         } else {
           *ps->lexvalH = symqO;
         }
-        if (is_local_id(symqO) && 
-            last_state != EXPR_DOT && 
+        if (is_local_id(symqO) &&
+            last_state != EXPR_DOT &&
             local_id(ps, symqO)) {
           SET_lexState( EXPR_END);
         }
 
 //         if (is_local_id(pslval->id) && local_id(pslval->id)) {  // commented out in Ribinius
-//             SET_lexState( EXPR_END); 
-//         } 
+//             SET_lexState( EXPR_END);
+//         }
 
         return result;
     }
   /* end of yylex*/
-} 
+}
 
 static int lexPlusMinus(rb_parse_state* ps, int space_seen, int aResult, int unaryResult)
 {
@@ -6158,7 +6147,7 @@ static int lexPlusMinus(rb_parse_state* ps, int space_seen, int aResult, int una
    UTL_ASSERT(aResult == '+' || aResult == '-');
    UTL_ASSERT((aResult == '+' ) == (unaryResult == tUPLUS));
 
-        LexStateKind lex_state = ps->lex_state;   
+        LexStateKind lex_state = ps->lex_state;
         int c = nextc(ps);
         if (IS_EXPR_FNAME_or_DOT(lex_state)) {
             SET_lexState( EXPR_ARG);
@@ -6226,22 +6215,22 @@ static NODE* gettable(rb_parse_state *ps, NODE** idH)
     int64 id = OOP_TO_I64(idO);
     if (id < tLAST_TOKEN) {
       if (id == kSELF) {
-	  return RubySelfNode::new_(ps);
+          return RubySelfNode::new_(ps);
       }
       else if (id == kNIL) {
-	  return RubyNilNode::new_(ps);
+          return RubyNilNode::new_(ps);
       }
       else if (id == kTRUE) {
-	  return RubyTrueNode::new_(ps);
+          return RubyTrueNode::new_(ps);
       }
       else if (id == kFALSE) {
-	  return RubyFalseNode::new_(ps);
+          return RubyFalseNode::new_(ps);
       }
       else if (id == k__FILE__) {
-	  return RubyStrNode::s( *ps->fileNameH , ps);
+          return RubyStrNode::s( *ps->fileNameH , ps);
       }
       else if (id == k__LINE__) {
-	  return RubyAbstractNumberNode::s( ps->ruby_sourceline(), ps);
+          return RubyAbstractNumberNode::s( ps->ruby_sourceline(), ps);
       }
     }
     if (v_is_local_id(id)) {
@@ -6255,7 +6244,7 @@ static NODE* gettable(rb_parse_state *ps, NODE** idH)
         return RubyParser::new_vcall( *selfH, *idH, ps);
     }
     else if (v_is_global_id(id)) {
-        return RubyGlobalVarNode::s( quidToSymbolObj(idO, ps), ps);  
+        return RubyGlobalVarNode::s( quidToSymbolObj(idO, ps), ps);
     }
     else if (v_is_instance_id(id)) {
         return RubyInstVarNode::s( quidToSymbolObj(idO, ps), ps);
@@ -6271,7 +6260,7 @@ static NODE* gettable(rb_parse_state *ps, NODE** idH)
   return ram_OOP_NIL;
 }
 
-static void reset_block(rb_parse_state *parse_state) 
+static void reset_block(rb_parse_state *parse_state)
 {
   LocalState *vars = parse_state->variables;
   if (vars->block_vars == NULL) {
@@ -6330,7 +6319,7 @@ void VarTable::removeLast()
 
 void VarTable::grow(rb_parse_state *ps)
 {
-  QUID *nList = (QUID*)ComHeapMalloc(&ps->omPtr->workspace()->compilerState, sizeof(QUID) * allocatedSize * 2);
+  QUID *nList = (QUID*)ComHeapMalloc(ps->omPtr->compilerState(), sizeof(QUID) * allocatedSize * 2);
   memcpy(nList, list, sizeof(QUID) * this->size);
   allocatedSize = allocatedSize * 2;
   list = nList;
@@ -6338,7 +6327,7 @@ void VarTable::grow(rb_parse_state *ps)
 
 #if 0
 NOT USED
-NODE*  VarTable::asArrayOfSymbols(rb_parse_state *ps) 
+NODE*  VarTable::asArrayOfSymbols(rb_parse_state *ps)
 {
   // returns an Array of Symbols
   om *omPtr = ps->omPtr;
@@ -6358,7 +6347,7 @@ NODE*  VarTable::asArrayOfSymbols(rb_parse_state *ps)
 
 static void popBlockVars(rb_parse_state *ps)
 {
-  // replaces Rubinius extract_block_vars 
+  // replaces Rubinius extract_block_vars
   LocalState* vars = ps->variables;
   vars->block_vars = vars->block_vars->pop() ;
 }
@@ -6618,7 +6607,7 @@ static NODE* rb_parser_sym(const char *name, rb_parse_state *ps)
             for (;;) {
               const char* tblName = op_tbl[i].name;
               char tbFirstCh = tblName[0];
-              if (tbFirstCh == '\0') 
+              if (tbFirstCh == '\0')
                 break;
               if (tbFirstCh == firstChar && strcmp(tblName, name) == 0) {
                 tval = op_tbl[i].token;
@@ -6641,7 +6630,7 @@ static NODE* rb_parser_sym(const char *name, rb_parse_state *ps)
     while (m <= (name + lastIdx)  && is_identchar(*m, ps)) {
         m += mbclen(*m);
     }
-    if (*m) { 
+    if (*m) {
       id = ID_JUNK;
     }
     tval = tLAST_TOKEN + 1 ;
@@ -6652,9 +6641,9 @@ haveOperator: ;
       UTL_ASSERT(symO != ram_OOP_NIL);
     } else {
       symO = ObjCanonicalSymFromCStr(ps->omPtr, (ByteType*)name, lastIdx + 1,
-					       OOP_NIL);
+                                               OOP_NIL);
     };
-    OopType symId = om::objIdOfObj(symO);
+    OopType symId = om::objIdOfObj__(ps->omPtr, symO);
     return RpNameToken::buildQuid(symId, tval, id);
 }
 
@@ -6712,18 +6701,18 @@ static void yyStateError(int64 yystate, int yychar, rb_parse_state*ps)
     for (int ch = 0; ch <= YYMAXTOKEN; ch++) {
       int x = shiftB + ch;
       if (x <= YYTABLESIZE) {
-	int yChk = unifiedTable[x + checkBASE];
-	if (yChk == ch) {
-	  expectedToks[expCount] = ch; // would shift
-	  expCount += 1;
-	} else {
+        int yChk = unifiedTable[x + checkBASE];
+        if (yChk == ch) {
+          expectedToks[expCount] = ch; // would shift
+          expCount += 1;
+        } else {
           x = reduceB + ch;
           if (x <= YYTABLESIZE) {
-	    yChk = unifiedTable[x + checkBASE];
-	    if (yChk == ch) {
-	      expectedToks[expCount] = ch; // would reduce
-	      expCount += 1;
-	    }  
+            yChk = unifiedTable[x + checkBASE];
+            if (yChk == ch) {
+              expectedToks[expCount] = ch; // would reduce
+              expCount += 1;
+            }
           }
         }
       }
@@ -6740,7 +6729,7 @@ static void yyStateError(int64 yystate, int yychar, rb_parse_state*ps)
           "syntax error, unexpected %s ", tokName);
     } else {
       const char* sMsg = expCount == 0 ? "details not available"
-             : (expCount > 1 ? "expected one of " : "expected " );		
+             : (expCount > 1 ? "expected one of " : "expected " );
       snprintf(ps->firstErrorReason, sizeof(ps->firstErrorReason),
           "syntax error, found %s , %s" , tokName, sMsg);
     }
@@ -6754,4 +6743,3 @@ static void yyStateError(int64 yystate, int yychar, rb_parse_state*ps)
     yyerror("syntax error", ps);
   }
 }
-

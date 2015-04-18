@@ -375,7 +375,6 @@ category: 'Instance creation'
 set compile_env: 0
 method: RubyHash
 initHash
-	| firstAssoc lastAssoc |
 	self hasNestedHashes: false.
 	self initDeque.
 	self bitmask: 32767.
