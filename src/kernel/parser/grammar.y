@@ -41,6 +41,8 @@
 
 #include "rubygrammar.h"
 
+#define IS_BEG() (lex_state == EXPR_BEG || lex_state == EXPR_MID || lex_state == EXPR_VALUE || lex_state == EXPR_CLASS)
+
 #ifndef isnumber
 #define isnumber isdigit
 #endif
@@ -5677,19 +5679,14 @@ static int yylex(rb_parse_state* ps)
         return '~';
 
       case '(':
-        ps->command_start = TRUE;
-        if (IS_EXPR_BEG_or_MID(lex_state)) {
+        if (IS_BEG()) {
             c = tLPAREN;
         }
         else if (space_seen) {
-            if (lex_state == EXPR_CMDARG) {
-                c = tLPAREN_ARG;
-            }
-            else if (lex_state == EXPR_ARG) {
-                rb_warning(ps, "don't put space before argument parentheses");
-                c = '(';
-            }
+          c = tLPAREN_ARG;
         }
+
+        // TODO: paren_nest++;
         COND_PUSH(ps, 0);
         CMDARG_PUSH(ps, 0);
         SET_lexState( EXPR_BEG);
@@ -6060,7 +6057,7 @@ static int yylex(rb_parse_state* ps)
             if ((lex_state == EXPR_BEG && !cmd_state) || IS_ARG(lex_state)) {
                 int p_c = *(ps->lex_p); // actual peek
                 if (ch_equals(':', p_c) && !(ps->lex_p + 1 < ps->lex_pend && (ps->lex_p)[1] == ':')) {
-                    lex_state = EXPR_BEG;
+                    SET_lexState(EXPR_BEG);
                     nextc(ps);
                     NODE* symqO = rb_parser_sym( tok(ps) , ps);
                     *ps->lexvalH = RpNameToken::s( ps, symqO );

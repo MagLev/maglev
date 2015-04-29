@@ -38,11 +38,13 @@ typedef enum {
   EXPR_END =       2,  /* newline significant, +/- is a operator. */
   EXPR_ARG =       4,  /* newline significant, +/- is a operator. */
   EXPR_CMDARG =    8,  /* newline significant, +/- is a operator. */
-  EXPR_ENDARG = 0x10,  /* newline significant, +/- is a operator. */
+  EXPR_ENDARG = 0x10,  /* newline significant, +/- is a operator, and unbound braces */
   EXPR_MID =    0x20,  /* newline significant, +/- is a operator. */
   EXPR_FNAME =  0x40,  /* ignore newline, no reserved words. */
   EXPR_DOT =    0x80,  /* right after `.' or `::', no reserved words. */
-  EXPR_CLASS = 0x100   /* immediate after `class', no here document. */
+  EXPR_CLASS = 0x100,  /* immediate after `class', no here document. */
+  EXPR_VALUE = 0x200,  /* like EXPR_BEG but label is disallowed */
+  EXPR_ENDFN = 0x400   /* newline significant, +/- is a operator, and unbound braces */
 } LexStateKind;
 
 class rb_parse_state ;
