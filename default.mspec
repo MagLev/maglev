@@ -10,7 +10,6 @@ class MSpecScript
   lang_files = ['spec/rubyspec/language',
                 "^spec/rubyspec/language/array_spec.rb",
                 "^spec/rubyspec/language/case_spec.rb",
-                "^spec/rubyspec/language/ensure_spec.rb",
                 "^spec/rubyspec/language/literal_lambda_spec.rb",
                 "^spec/rubyspec/language/for_spec.rb",
                 "^spec/rubyspec/language/block_spec.rb",
@@ -41,7 +40,6 @@ class MSpecScript
                 "^spec/rubyspec/core/symbol/encoding_spec.rb",
                 "^spec/rubyspec/core/symbol/length_spec.rb",
                 "^spec/rubyspec/core/symbol/size_spec.rb",
-                "^spec/rubyspec/core/thread/abort_on_exception_spec.rb",
                 "^spec/rubyspec/core/thread/wakeup_spec.rb"]
 
   lib_files = ['spec/rubyspec/library',
