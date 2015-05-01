@@ -42,7 +42,7 @@ class Hash
   end
 
   def default_proc=(value)
-    raise (TypeError, "wrong default_proc type #{value.class} (expected Proc)") if !value.kind_of?(Proc) and !value.kind_of?(ExecBlock)
+    raise(TypeError, "wrong default_proc type #{value.class} (expected Proc)") if !value.kind_of?(Proc) and !value.kind_of?(ExecBlock)
     @_st_defaultProc = value
     @_st_default = nil
   end

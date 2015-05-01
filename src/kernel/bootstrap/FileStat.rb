@@ -110,13 +110,13 @@ class File
 
   def ftype
     case @_st_mode & S_IFMT
-    when S_IFBLK : 'blockSpecial'
-    when S_IFCHR : 'characterSpecial'
-    when S_IFDIR : 'directory'
-    when S_IFIFO : 'fifo'
-    when S_IFLNK : 'link'
-    when S_IFREG : 'file'
-    when S_IFSOCK : 'socket'
+    when S_IFBLK  then 'blockSpecial'
+    when S_IFCHR  then 'characterSpecial'
+    when S_IFDIR  then 'directory'
+    when S_IFIFO  then 'fifo'
+    when S_IFLNK  then 'link'
+    when S_IFREG  then 'file'
+    when S_IFSOCK then 'socket'
     else 'unknown'
     end
   end
