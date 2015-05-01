@@ -6086,6 +6086,12 @@ static int yylex(rb_parse_state* ps)
                     int64 resWordOffset = ps->lineStartOffset + ps->tokStartDelta; // zero based
                     LexStateKind state = lex_state;
                     SET_lexState( kw->state);
+                    if (state == EXPR_FNAME) {
+                      NODE* symqO = rb_parser_sym( kw->name , ps);
+                      *ps->lexvalH = RpNameToken::s( ps, symqO );
+
+                      return kw->id[0];
+                    }
 
                     omObjSType *srcOfs = OOP_OF_SMALL_LONG_(resWordOffset + 1); // one based
                     AstSymbolEType a_sym = kw->a_sym;
