@@ -42,6 +42,12 @@
 #include "rubygrammar.h"
 
 #define IS_BEG() (lex_state == EXPR_BEG || lex_state == EXPR_MID || lex_state == EXPR_VALUE || lex_state == EXPR_CLASS)
+#define IS_END() (lex_state == EXPR_END || lex_state == EXPR_ENDARG || lex_state == EXPR_ENDFN)
+#define ISASCII(c) isascii((int)(unsigned char)(c))
+#define ISSPACE(c) (ISASCII(c) && isspace((int)(unsigned char)(c)))
+#define IS_LABEL_POSSIBLE() ((lex_state == EXPR_BEG && !cmd_state) || IS_ARG(lex_state))
+#define IS_SPCARG(c) (IS_ARG(ps->lex_state) && space_seen && !ISSPACE(c))
+
 
 #ifndef isnumber
 #define isnumber isdigit
@@ -3236,7 +3242,7 @@ none            : /* none */ {  yTrace(vps, "none:");  $$ = ram_OOP_NIL; }
 
 
 #undef ISALPHA
-#undef ISSPACE
+// #undef ISSPACE
 #undef ISALNUM
 #undef ISDIGIT
 #undef ISXDIGIT
@@ -5089,9 +5095,12 @@ static int yylex(rb_parse_state* ps)
 
       case '<':
         c = nextc(ps);
+
         if (c == '<' &&
-            IS_noneOf_EXPR_END_or_DOT_ENDARG_CLASS(lex_state) &&
-            (! IS_ARG(lex_state) || space_seen)) {
+            lex_state != EXPR_DOT &&
+            lex_state != EXPR_CLASS &&
+            !IS_END() &&
+            (!IS_ARG(lex_state) || space_seen)) {
           int token = heredoc_identifier(ps);
           if (token) return token;
         }
@@ -5178,7 +5187,7 @@ static int yylex(rb_parse_state* ps)
         return tSTRING_BEG;
 
       case '?':
-        if (IS_EXPR_END_or_ENDARG(lex_state)) {
+        if (IS_END()) {
             SET_lexState( EXPR_BEG);
             *ps->lexvalH = OOP_OF_SMALL_LONG_( ps->tokenOffset());
             return '?';
@@ -5578,7 +5587,12 @@ static int yylex(rb_parse_state* ps)
         //  can trigger other grammar actions such as closing a non-parenthesized
         //  list of args for a method call. doing the POP here  can result
         //  in POP re-ordering that disagrees with the grammar.
-        SET_lexState( EXPR_END);
+        if (c == ')') {
+          SET_lexState(EXPR_ENDFN);
+        } else {
+          SET_lexState(EXPR_ENDARG);
+        }
+
         *ps->lexvalH = OOP_OF_SMALL_LONG_( ps->tokenOffset()); // srcOffsetSi
         return c;
 
@@ -5595,8 +5609,7 @@ static int yylex(rb_parse_state* ps)
             *ps->lexvalH = OOP_OF_SMALL_LONG_( ps->tokenOffset());
             return tCOLON2;
         }
-        if (IS_EXPR_END_or_ENDARG(lex_state)
-                ||  isSpace(c, ps)) {
+        if (IS_END() || isSpace(c, ps)) {
             pushback(c, ps);
             SET_lexState( EXPR_BEG);
             *ps->lexvalH = OOP_OF_SMALL_LONG_( ps->tokenOffset());
@@ -5682,7 +5695,7 @@ static int yylex(rb_parse_state* ps)
         if (IS_BEG()) {
             c = tLPAREN;
         }
-        else if (space_seen) {
+        else if (IS_SPCARG(-1)) {
           c = tLPAREN_ARG;
         }
 
@@ -5720,7 +5733,7 @@ static int yylex(rb_parse_state* ps)
         return c;
 
       case '{':
-        if (IS_ARG_or_END(lex_state))
+        if (IS_ARG_or_END(lex_state) || lex_state == EXPR_ENDFN)
             c = '{';          /* block (primary) */
         else if (lex_state == EXPR_ENDARG)
             c = tLBRACE_ARG;  /* block (expr) */
@@ -6054,7 +6067,8 @@ static int yylex(rb_parse_state* ps)
                     needsNameToken = TRUE;
                 }
             }
-            if ((lex_state == EXPR_BEG && !cmd_state) || IS_ARG(lex_state)) {
+
+            if (IS_LABEL_POSSIBLE()) {
                 int p_c = *(ps->lex_p); // actual peek
                 if (ch_equals(':', p_c) && !(ps->lex_p + 1 < ps->lex_pend && (ps->lex_p)[1] == ':')) {
                     SET_lexState(EXPR_BEG);
