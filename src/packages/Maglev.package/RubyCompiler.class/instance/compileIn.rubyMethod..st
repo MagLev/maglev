@@ -8,7 +8,7 @@ compileIn: aClass rubyMethod: aNode
                 rubyMethod: aNode env: envId  .
    selPrefix ifNotNil:[
      "ruby_selector_suffix dependent , use perform to bypass protection"
-     aClass with: selPrefix perform: #'method_added#1__' env: 1 .
+     cls with: selPrefix perform: #'method_added#1__' env: 1 .
    ].
    ^ nil  "per ruby specs, a  'def'  returns nil"
 
