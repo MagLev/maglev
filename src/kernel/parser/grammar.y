@@ -1271,14 +1271,14 @@ fname           : tIDENTIFIER
                 | op
                     {
                       yTrace(vps, "fname: tIDENTIFIER | tCONSTANT | tFID | op");
-                      vps->lex_state = EXPR_END;
+                      vps->lex_state = EXPR_ENDFN;
                       // $$  = convert_op($1);
                       $$ = $1; // a RpNameToken
                     }
                 | reswords
                     {
                       yTrace(vps, "fname: | reswords");
-                      vps->lex_state = EXPR_END;
+                      vps->lex_state = EXPR_ENDFN;
                       // $$  = $<id>1;
                       $$ = $1; // a RpNameToken or a String
                     }
@@ -2236,7 +2236,7 @@ primary         : literal
                       PUSH_LINE(vps, "def");
                       vps->in_single++;
                       local_push(vps, 0);
-                      vps->lex_state = EXPR_END; /* force for args */
+                      vps->lex_state = EXPR_ENDFN; /* force for args */
                     }
                   f_arglist
                   bodystmt
@@ -3883,7 +3883,6 @@ omObjSType *MagParse903(om *omPtr, omObjSType **ARStackPtr)
     }
 #endif
   };
-  ps->command_start = TRUE;
 
   // debug_lines = 0;
   ps->compile_for_eval = 0;
@@ -4983,6 +4982,12 @@ static int yylex(rb_parse_state* ps)
         ps->lex_p = ps->lex_pend;
         /* fall through */
       case '\n':
+        // TODO:
+        // case EXPR_BEG:
+        // case EXPR_FNAME:
+        // case EXPR_DOT:
+        // case EXPR_CLASS:
+        // case EXPR_VALUE:
         if (IS_EXPR_BEG_or_FNAME_DOT_CLASS(lex_state)) {
             goto retry;
         }
@@ -5164,7 +5169,7 @@ static int yylex(rb_parse_state* ps)
 
       case '`':
         if (lex_state == EXPR_FNAME) {
-            SET_lexState( EXPR_END);
+            SET_lexState(EXPR_ENDFN);
             *ps->lexvalH = OOP_OF_SMALL_LONG_( ps->tokenOffset());
             return c;
         }
@@ -5742,6 +5747,7 @@ static int yylex(rb_parse_state* ps)
         COND_PUSH(ps, 0);
         CMDARG_PUSH(ps, 0);
         SET_lexState( EXPR_BEG);
+        // TODO: if (c != tLBRACE) set_command_start(6, ps, TRUE);
         *ps->lexvalH = OOP_OF_SMALL_LONG_( ps->tokenOffset()); // srcOffsetSi
         return c;
 
@@ -6104,7 +6110,7 @@ static int yylex(rb_parse_state* ps)
                         if (kwIdZero == kDO) return kDO;
                     }
                     if (kwIdZero == kDO) {
-                        // ps->command_start = TRUE;   // rubinius Sep 20, 2010
+                        ps->command_start = TRUE;
                         if (COND_P(ps)) return kDO_COND;
                         if (CMDARG_P(ps) && state != EXPR_CMDARG)
                             return kDO_BLOCK;
@@ -6123,7 +6129,7 @@ static int yylex(rb_parse_state* ps)
                 }
             }
 
-            if (IS_EXPR_BEG_or_MID_DOT_ARG_CMDARG(lex_state)) {
+            if (IS_BEG() || lex_state == EXPR_DOT || IS_ARG(lex_state)) {
                 if (cmd_state) {
                     SET_lexState( EXPR_CMDARG);
                 }
