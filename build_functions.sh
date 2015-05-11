@@ -181,7 +181,7 @@ function build_maglev_packages()
 
 function build_maglev_parser()
 {
-  ./src/kernel/parser/parser.sh
+  make -C ./src/kernel/parser all
 }
 
 
