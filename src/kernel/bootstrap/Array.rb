@@ -1374,6 +1374,13 @@ class Array
 
   def pack(template_str)
     template_str = Maglev::Type.coerce_to(template_str, String, :to_str)
+    if template_str =~ /<|>/
+      template_str = template_str.
+                     gsub("S<", "v").
+                     gsub("L<", "V").
+                     gsub("S>", "n").
+                     gsub("L>", "N")
+    end
     self.__pack(template_str)
   end
 
