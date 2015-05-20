@@ -2012,7 +2012,18 @@ class String
     str.__tr_s!(from, to) || str
   end
 
-  primitive 'unpack', 'rubyUnpack:'
+  def unpack(template_str)
+    if template_str =~ /<|>/
+      template_str = template_str.
+                     gsub("S<", "v").
+                     gsub("L<", "V").
+                     gsub("S>", "n").
+                     gsub("L>", "N")
+    end
+    self.__unpack(template_str)
+  end
+
+  primitive '__unpack', 'rubyUnpack:'
 
   primitive 'upcase', 'asUppercase'   # no taint propagation
 
