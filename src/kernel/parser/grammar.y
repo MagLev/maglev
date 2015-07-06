@@ -163,6 +163,9 @@ static YyStackElement* yygrowstack(rb_parse_state *ps, YyStackElement* markPtr)
 
   int64 numBytes = sizeof(YyStackElement) * newSize ;
   YyStackElement *base = (YyStackElement*)malloc(numBytes);
+  if (base == NULL)
+    return NULL;    // do not delete, we want to report malloc failures,
+                    //   not get SEGV
   int64 depth = -1;
   if (stk->stacksize > 0) {
     depth = stk->mark - stk->base;
@@ -2862,7 +2865,7 @@ numeric         : tINTEGER
                       om *omPtr = vps->omPtr;
                       OmScopeType aScope(omPtr);
                       NODE **aH = aScope.add($2);
-                      $$ = LrgNegate(omPtr, aH);
+                      $$ = LrgNegate_(omPtr, aH);
                     }
                 | tUMINUS_NUM tFLOAT           %prec tLOWEST
                     {
@@ -3691,7 +3694,10 @@ static void sessionInit(om *omPtr, rb_parse_state *ps)
   ps->omPtr = omPtr;
 
   ps->yystack.initialize();
-  yygrowstack(ps, NULL);
+  YyStackElement *elem = yygrowstack(ps, NULL);
+  if (elem == NULL) {
+    GemErrAnsi(omPtr, ERR_ArgumentError, NULL, "malloc failure in sessionInit/yygrowstack");
+  }
   omPtr->set_rubyParseStack(&ps->yystack) ;
 
   ps->astClassesH = omPtr->NewGlobalHandle();
@@ -4674,7 +4680,7 @@ static int here_document(NODE **hereH, rb_parse_state *ps)
     om *omPtr = ps->omPtr;
     OmScopeType scp(omPtr);
     NODE **ndLitH = scp.add(RubyLexStrTerm::ndLit(*hereH));
-    int64 len = om::FetchSize_(*ndLitH);
+    intptr_t len = om::FetchSize_(*ndLitH);
 
     /* eos == the heredoc ident that we found when the heredoc started */
     char *eos = ComHeapMalloc(ps->cst, len + 1);
