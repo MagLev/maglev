@@ -296,7 +296,6 @@ class om
   void set_rubyParseState( rb_parse_state *ps);
   void set_rubyParseStack( YyStackData *stk);
   ComStateType* compilerState();
-  
 };
 
 inline OopType omObjSType::classId()
@@ -323,7 +322,7 @@ BoolType FloatPrimFetchArg(om *omPtr, omObjSType** objH, double *aDouble);
 
 omObjSType*  FloatPrimDoubleToOop(om *omPtr, double x);
 
-omObjSType*  LrgNegate(om *omPtr, omObjSType** obj );
+omObjSType*  LrgNegate_(om *omPtr, omObjSType** obj );
 omObjSType* LrgRubyStringToInteger(om *omPtr,
         omObjSType** stringH, int64 radix, int charSize);
 omObjSType* LrgInt64ToOop(om *omPtr, int64 anInt);
