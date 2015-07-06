@@ -124,7 +124,7 @@ const char *body_1[] =
 
 const char *body_2[] =
 {
-    "    int64 yym, yyn, yystate;",
+    "    intptr_t yym, yyn, yystate;",
     /* deleted getenv(YYDEBUG) code */
     "",
     "    yynerrs = 0;",
@@ -164,7 +164,7 @@ const char *body_2[] =
     "      if ((uint64)yyn <= YYTABLESIZE) {",
     "        int yChk = unifiedTable[yyn + checkBASE]; /*yycheck[yyn]*/ ",
     "        if (yChk == yychar) {",
-    "          int64 new_state = unifiedTable[yyn + tableBASE]; /* yytable[yyn]*/",
+    "          intptr_t new_state = unifiedTable[yyn + tableBASE]; /* yytable[yyn]*/",
     "#if YYDEBUG",
     "          if (yydebug) { ",
     "            printf(\"%sdebug: state %ld, shifting to state %ld\\n\",",
@@ -216,7 +216,7 @@ const char *body_2[] =
     "          if ((uint64)yyn <= YYTABLESIZE) {",
     "            int yChk = unifiedTable[yyn + checkBASE]; /*yycheck[yyn]*/",
     "            if (yChk == YYERRCODE) {",
-    "              int64 new_state = unifiedTable[yyn + tableBASE]; /*yytable[yyn]*/",
+    "              intptr_t new_state = unifiedTable[yyn + tableBASE]; /*yytable[yyn]*/",
     "#if YYDEBUG",
     "              if (yydebug) {",
     "                  printf(\"%sdebug: state %d, error recovery shifting to state %ld\\n\",",
