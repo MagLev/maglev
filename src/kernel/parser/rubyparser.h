@@ -1,4 +1,3 @@
-/* Generated file, do not edit.  Editing to be done in git/src/kernel/parser */
 #if !defined(RUBYPARSER_H)
 #define RUBYPARSER_H 1
 
@@ -347,7 +346,7 @@ class rb_parse_state
   intptr_t  lineStartOffset; // zero based
   intptr_t  tokStartDelta;
 
-  int64 tokenOffset() {
+  intptr_t tokenOffset() {
     // offset of start of token in bytes
     return lineStartOffset + lex_p - 1 - lex_pbeg ;
   }
