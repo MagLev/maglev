@@ -2,13 +2,6 @@
 
 #include "defs.h"
 
-/*  The definition of yysccsid in the banner should be replaced with	*/
-/*  a #pragma ident directive if the target C compiler supports		*/
-/*  #pragma ident directives.						*/
-/*									*/
-/*  If the skeleton is changed, the banner should be changed so that	*/
-/*  the altered version can be easily distinguished from the original.	*/
-/*									*/
 /*  The #defines included with the banner are there because they are	*/
 /*  useful in subsequent code.  The macros #defined in the header or	*/
 /*  the body either are not useful outside of semantic actions or	*/
@@ -16,10 +9,6 @@
 
 const char *banner[] =
 {
-    "#ifndef lint",
-    "static const char yysccsid[] = \"@(#)yaccpar	1.9 (Berkeley) 02/21/93\";",
-    "#endif",
-    "",
     "#define YYBYACC 1",
     CONCAT1("#define YYMAJOR ", YYMAJOR),
     CONCAT1("#define YYMINOR ", YYMINOR),
@@ -124,7 +113,7 @@ const char *body_1[] =
 
 const char *body_2[] =
 {
-    "    int64 yym, yyn, yystate;",
+    "    intptr_t yym, yyn, yystate;",
     /* deleted getenv(YYDEBUG) code */
     "",
     "    yynerrs = 0;",
@@ -164,7 +153,7 @@ const char *body_2[] =
     "      if ((uint64)yyn <= YYTABLESIZE) {",
     "        int yChk = unifiedTable[yyn + checkBASE]; /*yycheck[yyn]*/ ",
     "        if (yChk == yychar) {",
-    "          int64 new_state = unifiedTable[yyn + tableBASE]; /* yytable[yyn]*/",
+    "          intptr_t new_state = unifiedTable[yyn + tableBASE]; /* yytable[yyn]*/",
     "#if YYDEBUG",
     "          if (yydebug) { ",
     "            printf(\"%sdebug: state %ld, shifting to state %ld\\n\",",
@@ -216,7 +205,7 @@ const char *body_2[] =
     "          if ((uint64)yyn <= YYTABLESIZE) {",
     "            int yChk = unifiedTable[yyn + checkBASE]; /*yycheck[yyn]*/",
     "            if (yChk == YYERRCODE) {",
-    "              int64 new_state = unifiedTable[yyn + tableBASE]; /*yytable[yyn]*/",
+    "              intptr_t new_state = unifiedTable[yyn + tableBASE]; /*yytable[yyn]*/",
     "#if YYDEBUG",
     "              if (yydebug) {",
     "                  printf(\"%sdebug: state %d, error recovery shifting to state %ld\\n\",",

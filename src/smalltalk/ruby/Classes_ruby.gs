@@ -341,7 +341,9 @@ lineNum _validateClass: SmallInteger .
 fileName ifNotNil:[ fileName _validateClass: String ].
 yTraceLevel _validateClass: SmallInteger .
 warnBool _validateClass: Boolean .
-aRubyEvalScope _validateClass: (System myUserProfile resolveSymbol:#RubyEvalScope) value .
+aRubyEvalScope ifNotNil:[ aRubyEvalScope _validateClass: (System myUserProfile resolveSymbol:#RubyEvalScope) value ] .
+
+"if we get here, check that $GEMSTONE/lib/libmagparse is not the dummy library."
 self _primitiveFailed: #parse:cBytes:line:file:yTrace:warnings:evalScope:
      args: { sourceString . sourceCByteArray . lineNum . 
              fileName . yTraceLevel . warnBool . aRubyEvalScope }
