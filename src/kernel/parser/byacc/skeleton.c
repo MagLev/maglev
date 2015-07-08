@@ -2,6 +2,11 @@
 
 #include "defs.h"
 
+/*  The #defines included with the banner are there because they are	*/
+/*  useful in subsequent code.  The macros #defined in the header or	*/
+/*  the body either are not useful outside of semantic actions or	*/
+/*  are conditional.							*/
+
 const char *banner[] =
 {
     "#define YYBYACC 1",
