@@ -27,7 +27,7 @@ else
   $(error UNKNOWN OS: $(OS))
 endif
 
-CCWARN      := -Wchar-subscripts -Wcomment -Wmissing-braces -Wmultichar -Wno-aggregate-return -Wno-unused-function -Wparentheses -Wreturn-type -Wshadow -Wsign-compare -Wsign-promo -Wswitch -Wsystem-headers -Wtrigraphs -Wtrigraphs -Wunused-label -Wunused-value -Wunused-variable -Wwrite-strings $(OSCCWARN)
+CCWARN      := -Wchar-subscripts -Wcomment -Werror -Wmissing-braces -Wmultichar -Wno-aggregate-return -Wno-unused-function -Wparentheses -Wreturn-type -Wshadow -Wsign-compare -Wsign-promo -Wswitch -Wsystem-headers -Wtrigraphs -Wtrigraphs -Wunused-label -Wunused-value -Wunused-variable -Wwrite-strings $(OSCCWARN)
 CCDEF       := -DFLG_FAST=1 -DNOT_JAVA_VM -D_GNU_SOURCE -D_REENTRANT
 CCINC       := -I$(GEMSTONE)/include $(ICU_INCL) -I. $(OSCCINC)
 CFLAGS      := $(CCDEF) $(CCINC) $(CCWARN) -fPIC -fcheck-new -fmessage-length=0 -fno-exceptions -fno-strict-aliasing $(COPTIMIZE_FLAGS) -m64 -pipe -pthread -x c++
