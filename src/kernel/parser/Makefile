@@ -7,7 +7,7 @@ ifeq "$(GEMSTONE)" ""
 else
   ICU_INCL := -I$(GEMSTONE)/../../icu/source/common
 endif
-GSVERSION   := 3.1.0.2.2-64
+GSVERSION   := 3.1.0.2.3-64
 
 CC        := /usr/bin/g++
 COPTIMIZE_FLAGS := -O3 -g -Wuninitialized
