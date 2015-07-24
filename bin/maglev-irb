@@ -24,7 +24,7 @@ end
 #     end
 
 require "irb"
-
+require "rubygems"
 
 if __FILE__ == $0
   IRB.start(__FILE__)
