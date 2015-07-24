@@ -281,6 +281,15 @@ module Enumerable
     self
   end
 
+  def each_with_object(memo, &block)
+    unless block_given?
+      # returns an Enumerator	for 1.8.7
+      return self.to_a.each_with_object(memo)
+    end
+    self.each { |o| block.call(o, memo) }
+    self
+  end
+
   #  call-seq:
   #    e.each_slice(n) {...}
   #    e.each_slice(n)
