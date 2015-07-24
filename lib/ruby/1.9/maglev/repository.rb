@@ -33,6 +33,8 @@ module Maglev
     # elements then the entire Repository will be scanned once for each
     # group of 2000 unique elements, or fraction thereof.
     #
+    primitive_nobridge 'full_backup_to', 'fullBackupCompressedTo:'
     primitive_nobridge 'list_instances', 'listInstances:'
+    primitive_nobridge 'restore_from_backup', 'restoreFromBackup:'
   end
 end
