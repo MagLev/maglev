@@ -19,4 +19,4 @@ if [ -z "$MAGLEV_HOME" ]; then
   fi
 fi
 
-$MAGLEV_HOME/bin/maglev-ruby "$@" $MAGLEV_HOME/bin/maglev.rb
+$MAGLEV_HOME/bin/maglev-ruby "$@" $MAGLEV_HOME/bin/maglev_irb.rb
