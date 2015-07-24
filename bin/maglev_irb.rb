@@ -1,8 +1,5 @@
 # -*- ruby -*-
-#
-# Note: This script will not work if maglev-ruby is not in your path.
-#     So you should add something like the following line to your .bashrc
-#     export PATH=$MAGLEV_HOME/bin:$PATH
+# This file is read by the maglev-irb shell script.
 #
 #   irb.rb - intaractive ruby
 #     $Release Version: 0.9.5 $
@@ -18,12 +15,7 @@ end
 
 # MAGLEV_DEBUG_IRB = true # uncomment here and in irb.rb to debug
 
-# def to_s
-#     "main"
-#     end
-
 require "irb"
-
 
 if __FILE__ == $0
   IRB.start(__FILE__)
@@ -35,4 +27,3 @@ else
     IRB.setup(__FILE__)
   end
 end
-

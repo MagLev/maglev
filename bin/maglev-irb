@@ -19,4 +19,6 @@ if [ -z "$MAGLEV_HOME" ]; then
   fi
 fi
 
-$MAGLEV_HOME/bin/maglev-ruby "$@" $MAGLEV_HOME/bin/maglev_irb.rb
+# By execing maglev-ruby, irb now accepts VM arguments such as --stonehost,
+# --tocsz etc, and parsing of ENV variables such as $MAGLEV_OPTS.
+exec $MAGLEV_HOME/bin/maglev-ruby "$@" $MAGLEV_HOME/bin/maglev_irb.rb
