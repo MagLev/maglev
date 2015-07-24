@@ -281,13 +281,12 @@ module Enumerable
     self
   end
 
-  def each_with_object(memo, &block)
-    unless block_given?
-      # returns an Enumerator	for 1.8.7
-      return self.to_a.each_with_object(memo)
+  def each_with_object(memo)
+    return to_enum(:each_with_object, memo) { enumerator_size } unless block_given?
+    each do |obj|
+      yield obj, memo
     end
-    self.each { |o| block.call(o, memo) }
-    self
+    memo
   end
 
   #  call-seq:
