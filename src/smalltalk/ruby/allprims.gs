@@ -36,6 +36,13 @@ logout
 set user DataCurator pass swordfish
 login
 run
+  "For issue 269, make Object's env 1 superclass ProtoObject before
+   Object includes Kernel"
+  Object persistentRubySuperclass: 1 put: ProtoObject .
+  true
+%
+commit
+run
  RubyBridge initialize . "reset generic bridge methods"
  RubyContext commitTransaction  .
 %
