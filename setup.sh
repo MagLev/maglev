@@ -33,9 +33,6 @@ PLATFORM="`uname -sm | tr ' ' '-'`"
 machine_name="`uname -n`"
 echo "[Info] Configuring $machine_name to run MagLev"
 
-# Do a trivial sudo to test we can and get the password prompt out of the way
-sudo date
-
 # Figure out how much total memory is installed
 echo "[Info] Setting up shared memory"
 #
