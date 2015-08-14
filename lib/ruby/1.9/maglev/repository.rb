@@ -35,6 +35,9 @@ module Maglev
     #
     primitive_nobridge 'list_instances', 'listInstances:'
 
+
+    # Usage: Maglev::Repository.instance.full_backup_to("/tmp/maglev_backup.gz")
+    #
     # Writes a full backup file containing the most recently committed
     # version of the receiver as of the time the method is executed.
     #
@@ -72,9 +75,12 @@ module Maglev
     # updating the Multithreaded Scan Tuning methods.
     #
     # A GciHardBreak during this method will terminate the session.
+    #
     primitive_nobridge 'full_backup_to', 'fullBackupCompressedTo:'
 
 
+    # Usage: Maglev::Repository.instance.restore_from_backup("/tmp/maglev_backup.gz")
+    #
     # Disables logins and starts a full restore of the repository based
     # on the contents of the specified backup file.
 
@@ -119,6 +125,7 @@ module Maglev
     # number of extents in the repository, with a minimum of 2 sessions and
     # a maximum of 16.  The performance can be modified during the run by
     # updating the Multithreaded Scan Tuning methods.
+    #
     primitive_nobridge 'restore_from_backup', 'restoreFromBackup:'
   end
 end
