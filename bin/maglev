@@ -211,7 +211,7 @@ destroy() {
 }
 
 startnetldi() {
-  $GEMSTONE/bin/startnetldi -p50379:50379 -g -a $USER | grep Info].*server
+  $GEMSTONE/bin/startnetldi -g -a $USER | grep Info].*server
 }
 
 stopnetldi() {
