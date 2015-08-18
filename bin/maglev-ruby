@@ -118,7 +118,7 @@ sawDashE=
 searchPathFlag=
 quietFlag=
 netldiname="gs64ldi"
-stoneHost=
+stoneHost=$STONEHOST # Use the STONEHOST env variable if available
 
 # Allow arguments to be parsed w/o $MAGLEV_HOME being set. Use parseArgsMH
 # as a substitute for MAGLEV_HOME if necessary during arg parsing
