@@ -694,6 +694,53 @@ class Object
   #   if requested?
   ############################################################
 
+  # Swaps the identities of the receiver and the argument.
+  #
+  # Intended only for experienced MagLev programmers who need to migrate
+  # instances of one class to another.
+  #
+  # The sender is responsible for checking the consistency of the class
+  # histories of the argument and the receiver.  This method makes no
+  # such checks (not applicable to MagLev).
+  #
+  # The argument, the receiver, or both are permitted to be invariant.
+  #
+  # Neither the argument nor the receiver may be special objects (instances of
+  # classes such as SmallInteger, Character, or Boolean).  Also, neither may be
+  # instances of a class that is a kind of
+  #
+  #    GsProcess, VariableContext, BlockClosure, GsSocket, GsFile, GsNMethod,
+  #    CLibrary, CFunction, CPointer, CByteArray, Regexp, or GsCompilerNode.
+  #
+  # Neither the argument nor the receiver may be a kind of Bag that has
+  # indexes built on it.  If either the receiver or the argument (or
+  # both) participate in an index, then either both must be in byte
+  # format or neither must be in byte format.  That is, one cannot be in
+  # byte format if the other is not also.  To avoid the error conditions
+  # triggered by presence of indexes, remove the indexes from the
+  # relevant NSCs prior to invoking this method.
+  #
+  # Neither the argument nor the receiver may exist as self below the
+  # sender of a become: message on the active MagLev stack.
+  #
+  # Once the identities have been swapped, the argument and receiver may
+  # no longer satisfy the constraints of objects that reference them.
+  # This condition can lead to the failure of subsequent index creation
+  # attempts.  The MagLev programmer is responsible for correcting broken
+  # constraints.
+  #
+  # Any clusterIds that belong to an object on disk remain with the
+  # object.  That is, the clusterIds do not follow the identities when
+  # they are swapped.
+  #
+  # The ObjectSecurityPolicies of the objects do not follow the
+  # identities when they are swapped.
+  #
+  # As of Gs64 v3.0, tags are no longer swapped between the objects, they
+  # are treated same as instance variables.
+  #
+  primitive_nobridge 'become', 'become:'
+
   # returns true if the receiver existed in GemStone at the time the
   # current transaction began.  Returns false otherwise.
   primitive_nobridge 'committed?', 'isCommitted'
