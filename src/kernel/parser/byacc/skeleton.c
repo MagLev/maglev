@@ -21,6 +21,9 @@ const char *banner[] =
     /* define yyerrok        (yyerrflag = 0) , */
     /* define YYRECOVERING() (yyerrflag != 0) */ 
     "",
+    "#define __STDC_FORMAT_MACROS 1 /* For C++ < C++11*/",
+    "#define __STDC_LIMIT_MACROS 1 /* For C++ < C++11*/",
+    "#define __STDC_CONSTANT_MACROS 1 /* For C++ < C++11*/",
     0
 };
 
@@ -92,8 +95,6 @@ const char *body_1[] =
     "",
     "#if YYDEBUG",
     "#include <stdio.h>		/* needed for printf */",
-    "#define __STDC_FORMAT_MACROS 1 /* For C++ < C++11*/",
-    "#define __STDC_CONSTANT_MACROS 1 /* For C++ < C++11*/",
     "#include <inttypes.h>      /* needed for PRIdPTR */",
     "#endif",
     "",
