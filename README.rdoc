@@ -10,30 +10,43 @@ src="https://travis-ci.org/MagLev/maglev.png?branch=master" alt="Build Status" /
 
 == Install MagLev
 There are several ways to install MagLev:
-* Use the installer
+* Install from GitHub
 * Install with Ruby Version Manager (RVM)
 * Install with ruby-build/rbenv
-* Install from GitHub
+* Use the installer
 
-=== Install a specific version of MagLev from a .tar.gz archive
+=== Install from GitHub
 
-1. Download and unzip
-   {MagLev-installer.zip}[http://glass-downloads.gemstone.com/maglev/MagLev-installer.zip]
-1. Run
-     ./installMaglev.sh [VERSION]
-   Where VERSION is the specific MagLev revsion you wish to install, e.g. 1.0.0
+This version is best for MagLev contributors and for developers who want to
+live on the bleeding edge or use git functionality. It can be less stable
+than the .tar.gz version.
 
-   <tt>installMaglev.sh</tt> runs one-time machine checks and configuration
-   that ensure your hardware will run MagLev.  These mostly relate to
-   shared memory settings. It's safe to run multiple times and it won't
-   overwrite things it's already done.
+Create a new directory on a local (not NFS) file system to hold the
+MagLev source tree and other files. Change to that directory, then:
 
-The installer is somewhat verbose. That's so you can more easily debug
-installation problems.
+1. Clone the MagLev github repository
+     git clone git://github.com/MagLev/maglev.git
+1. Install the VM.  If this is the first time you're installing MagLev,
+   run:
+     ./install.sh
+   If you've already run <tt>installMaglev.sh</tt> on the machine, then you
+   can use the update script:
+     ./update.sh
 
-Note: Reverting to an older version is as simple as stopping MagLev,
-changing <tt>$MAGLEV_HOME</tt> to point to the prior version, and
-restarting.
+To use MagLev, you need to run <tt>install.sh</tt> at least once.  After
+that, every time you <tt>git pull</tt>, you need to run <tt>update.sh</tt>
+to ensure you have the corresponding GemStone 3.x binaries. Otherwise, you
+might get version skew that prevents MagLev from running correctly.  Watch
+{@MagLev}[https://twitter.com/maglev] for any 'git only' updates,
+but if you're more than one update behind you still might need to run
+<tt>update.sh</tt>.  You don't need to know a version number to install.
+The installer/updater figures that out from the version.txt file.
+
+You'll have all the functionality of git, but unless you create a new
+clone for each release, you may be unable to revert to an earlier version.
+Why? The install/update script creates a new copy of the MagLev data
+repository including persistent kernel code. The scripts make one level of
+backup, but we are not providing migration scripts.
 
 === Install with Ruby Version Manager (RVM)
 
@@ -70,8 +83,8 @@ shell script instead.
 
 === Install with ruby-build/rbenv
 
-{ruby-build}[https://github.com/sstephenson/ruby-build] is a plugin for {rbenv}[https://github.com/sstephenson/rbenv] 
-that compiles and installs different Ruby implementations on Unix-like systems. 
+{ruby-build}[https://github.com/sstephenson/ruby-build] is a plugin for {rbenv}[https://github.com/sstephenson/rbenv]
+that compiles and installs different Ruby implementations on Unix-like systems.
 rbenv lets you switch among different implementations of Ruby easily.
 
 You can install MagLev with rbenv:
@@ -93,35 +106,22 @@ You will have to start and stop the MagLev server using
 
 The <b>ProTip</b> above for RVM still applies.
 
-=== Install from GitHub
+=== Install a specific version of MagLev from a .tar.gz archive
 
-This version is best for MagLev contributors and for developers who want to
-live on the bleeding edge or use git functionality. It can be less stable
-than the .tar.gz version.
+1. Download and unzip
+   {MagLev-installer.zip}[http://glass-downloads.gemstone.com/maglev/MagLev-installer.zip]
+1. Run
+     ./installMaglev.sh [VERSION]
+   Where VERSION is the specific MagLev revsion you wish to install, e.g. 1.0.0
 
-Create a new directory on a local (not NFS) file system to hold the
-MagLev source tree and other files. Change to that directory, then:
+   <tt>installMaglev.sh</tt> runs one-time machine checks and configuration
+   that ensure your hardware will run MagLev.  These mostly relate to
+   shared memory settings. It's safe to run multiple times and it won't
+   overwrite things it's already done.
 
-1. Clone the MagLev github repository
-     git clone git://github.com/MagLev/maglev.git
-1. Install the VM.  If this is the first time you're installing MagLev,
-   run:
-     ./install.sh
-   If you've already run <tt>installMaglev.sh</tt> on the machine, then you
-   can use the update script:
-     ./update.sh
+The installer is somewhat verbose. That's so you can more easily debug
+installation problems.
 
-To use MagLev, you need to run <tt>install.sh</tt> at least once.  After
-that, every time you <tt>git pull</tt>, you need to run <tt>update.sh</tt>
-to ensure you have the corresponding GemStone 3.x binaries. Otherwise, you
-might get version skew that prevents MagLev from running correctly.  Watch
-{@MagLev}[https://twitter.com/maglev] for any 'git only' updates, 
-but if you're more than one update behind you still might need to run 
-<tt>update.sh</tt>.  You don't need to know a version number to install. 
-The installer/updater figures that out from the version.txt file.
-
-You'll have all the functionality of git, but unless you create a new
-clone for each release, you may be unable to revert to an earlier version.
-Why? The install/update script creates a new copy of the MagLev data
-repository including persistent kernel code. The scripts make one level of
-backup, but we are not providing migration scripts.
+Note: Reverting to an older version is as simple as stopping MagLev,
+changing <tt>$MAGLEV_HOME</tt> to point to the prior version, and
+restarting.
