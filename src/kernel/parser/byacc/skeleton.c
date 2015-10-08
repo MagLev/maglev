@@ -21,6 +21,9 @@ const char *banner[] =
     /* define yyerrok        (yyerrflag = 0) , */
     /* define YYRECOVERING() (yyerrflag != 0) */ 
     "",
+    "#define __STDC_FORMAT_MACROS 1 /* For C++ < C++11*/",
+    "#define __STDC_LIMIT_MACROS 1 /* For C++ < C++11*/",
+    "#define __STDC_CONSTANT_MACROS 1 /* For C++ < C++11*/",
     0
 };
 
@@ -92,6 +95,7 @@ const char *body_1[] =
     "",
     "#if YYDEBUG",
     "#include <stdio.h>		/* needed for printf */",
+    "#include <inttypes.h>      /* needed for PRIdPTR */",
     "#endif",
     "",
     "#include <stdlib.h>	/* needed for malloc, etc */",
@@ -141,7 +145,7 @@ const char *body_2[] =
     "            const char *yys = NULL;",
     "            if (yychar <= YYMAXTOKEN) yys = yyname[yychar];",
     "            if (!yys) yys = \"illegal-symbol\";",
-    "            printf(\"%sdebug: state %ld, reading %d (%s)\\n\",",
+    "            printf(\"%sdebug: state %\" PRIdPTR \", reading %d (%s)\\n\",",
     "                    YYPREFIX, yystate, yychar, yys);",
     "            yytrap();",
     "        }",
@@ -156,7 +160,7 @@ const char *body_2[] =
     "          intptr_t new_state = unifiedTable[yyn + tableBASE]; /* yytable[yyn]*/",
     "#if YYDEBUG",
     "          if (yydebug) { ",
-    "            printf(\"%sdebug: state %ld, shifting to state %ld\\n\",",
+    "            printf(\"%sdebug: state %\" PRIdPTR \", shifting to state %\" PRIdPTR \"\\n\",",
     "                    YYPREFIX, yystate, new_state );",
     "          }",
     "#endif",
@@ -208,7 +212,7 @@ const char *body_2[] =
     "              intptr_t new_state = unifiedTable[yyn + tableBASE]; /*yytable[yyn]*/",
     "#if YYDEBUG",
     "              if (yydebug) {",
-    "                  printf(\"%sdebug: state %d, error recovery shifting to state %ld\\n\",",
+    "                  printf(\"%sdebug: state %d, error recovery shifting to state %\" PRIdPTR \"\\n\",",
     "                           YYPREFIX, yymarkPtr->state, new_state);",
     "              }",
     "#endif",
@@ -249,7 +253,7 @@ const char *body_2[] =
     "            const char* yys = NULL;",
     "            if (yychar <= YYMAXTOKEN) yys = yyname[yychar];",
     "            if (!yys) yys = \"illegal-symbol\";",
-    "            printf(\"%sdebug: state %ld, error recovery discards token %d\
+    "            printf(\"%sdebug: state %\" PRIdPTR \", error recovery discards token %d\
  (%s)\\n\",",
     "                    YYPREFIX, yystate, yychar, yys);",
     "        }",
@@ -261,7 +265,7 @@ const char *body_2[] =
     "yyreduce:",
     "#if YYDEBUG",
     "    if (yydebug) { ",
-    "        printf(\"%sdebug: state %ld, reducing by rule %ld (%s)\\n\",",
+    "        printf(\"%sdebug: state %\" PRIdPTR \", reducing by rule %\" PRIdPTR \" (%s)\\n\",",
     "                YYPREFIX, yystate, yyn, yyrule[yyn]);",
     "    }" ,
     "#endif",
@@ -335,7 +339,7 @@ const char *trailer[] =
     "reduction2: ;",
     "#if YYDEBUG",
     "    if (yydebug)",
-    "        printf(\"%sdebug: after reduction, shifting from state %d to state %ld\\n\", ",
+    "        printf(\"%sdebug: after reduction, shifting from state %d to state %\" PRIdPTR \"\\n\", ",
     "               YYPREFIX, yystack->mark->state, yystate);",
     "#endif",
     "    if (yymarkPtr >= yystack->last) { ",
