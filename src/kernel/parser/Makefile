@@ -22,7 +22,7 @@ else ifeq "$(OS)" "Darwin"
   EXT       := dylib
   OSLDFLAGS := -Wl,-flat_namespace -Wl,-undefined -Wl,warning -Wl,-exported_symbols_list -Wl,magparse.osx.exp
   OSCCWARN  := 
-  OSCCINC   := -I/usr/local/Cellar/icu4c/54.1/include
+  OSCCINC   := -I/usr/local/Cellar/icu4c/57.1/include
 else
   $(error UNKNOWN OS: $(OS))
 endif
