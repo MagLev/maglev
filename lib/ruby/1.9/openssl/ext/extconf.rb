@@ -47,7 +47,7 @@ module GetOpenSSLHeaders
 
   def get_headers(version)
     unless File.directory?("openssl-#{version}")
-      letter = 's'
+      letter = 't'
       file = "openssl-#{version}#{letter}.tar.gz"
       openssl_url = "ftp://ftp.openssl.org/source/#{file}"
       message " Downloading #{openssl_url}\n"
