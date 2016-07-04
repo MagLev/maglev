@@ -6,7 +6,7 @@
 require 'sinatra'
 require 'blog_app'
 require '../object_inspector/objectlog_app'
-require 'txn_wrapper'
+require 'lib/commit_code'
 
 use MagLevTransactionWrapper
 
