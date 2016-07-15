@@ -359,8 +359,8 @@ class Socket # identical to smalltalk RubySocket , subclass of BasicSocket
 
   def listen(queue_size=10)
     queue_size = Maglev::Type.coerce_to(queue_size, Fixnum, :to_int)
-    if queue_size < 1 || queue_size > 1000
-      raise ArgumentError , 'arg to listen must be >= 1 and <= 1000'
+    if queue_size < 1 || queue_size > 10000
+      raise ArgumentError , 'arg to listen must be >= 1 and <= 10000'
     end
     self.__listen(queue_size)
     0
