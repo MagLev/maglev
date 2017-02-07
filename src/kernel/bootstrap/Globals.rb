@@ -4,7 +4,6 @@
 #            Ruby class name , Gemstone class name
 RUBY.global('Array', 'Array')
 # deleted Behavior
-RUBY.global('BasicObject', 'ProtoObject')
 RUBY.global('Binding', 'RubyBinding')
 RUBY.global('Boolean', 'Boolean')
 RUBY.global('Class', 'Metaclass3')
