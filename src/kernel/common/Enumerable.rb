@@ -281,6 +281,14 @@ module Enumerable
     self
   end
 
+  def each_with_object(memo)
+    return to_enum(:each_with_object, memo) { enumerator_size } unless block_given?
+    each do |obj|
+      yield obj, memo
+    end
+    memo
+  end
+
   #  call-seq:
   #    e.each_slice(n) {...}
   #    e.each_slice(n)
