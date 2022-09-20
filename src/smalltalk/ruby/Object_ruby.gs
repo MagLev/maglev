@@ -256,17 +256,17 @@ newRubySubclass: aString  instancesPersistent: ipersistBool fixedIvs: ivList
 
 category: 'Ruby private'
 method:
-_addRubySingletonClass: committedOk envId: envId
+_addRubySingletonClass: singleton forSuperClass: singletonSuperclass
 
-"Insert a new singleton class in the receiver's class hierarchy.
+"Insert the singleton class in the receiver's class hierarchy.
  Returns the new class, or a String giving reason for failure
 "
 <primitive: 682>
-committedOk _validateClass: Boolean .
+"committedOk _validateClass: Boolean .
 envId _validateClass: SmallInteger .
-(envId < 1 or:[ envId > 255]) ifTrue:[ OutOfRange signal:'invalid envId'].
+(envId < 1 or:[ envId > 255]) ifTrue:[ OutOfRange signal:'invalid envId']."
 self _primitiveFailed: #_addRubySingletonClass:envId:
-     args: { committedOk . envId }
+     args: { singleton . singletonSuperclass }
 %
 
 

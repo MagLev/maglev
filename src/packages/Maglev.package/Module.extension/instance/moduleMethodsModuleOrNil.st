@@ -4,7 +4,6 @@ moduleMethodsModuleOrNil
    for a Module "
   | meta |
   meta := self virtualClass .
-  meta == Module ifTrue: [ ^ meta ].
-  meta isRubyModuleFunctions ifTrue:[ ^ meta ].
+  meta == Module ifTrue: [meta := self _singletonClassFor: 1. ^ meta].
+  meta isRubyModuleFunctions ifTrue: [^ meta].
   ^ nil
-

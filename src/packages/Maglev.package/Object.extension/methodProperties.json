@@ -16,9 +16,11 @@
 		"_rubyTo:" : "DataCurator 10/02/2012 14:30",
 		"_rubyTo_:" : "DataCurator 10/02/2012 14:30",
 		"_singletonClass:" : "DataCurator 10/02/2012 14:30",
+    "_singletonClassAllowedFor:" : "DataCurator 04/03/2013 18:24",
 		"_singletonClassFor:" : "DataCurator 10/02/2012 14:30",
 		"addRubyClassVar:value:mref:" : "DataCurator 10/02/2012 14:30",
-		"addRubySingletonClass:" : "DataCurator 10/02/2012 14:30",
+		"addRubySingletonClass" : "DataCurator 10/02/2012 14:30",
+    "addRubySingletonClassSecondLevel:" : "DataCurator 03/04/2013 18:20",
 		"classForConstantLookup:forModuleEval:" : "DataCurator 10/02/2012 14:30",
 		"clsMethodDefnTarget" : "DataCurator 10/02/2012 14:30",
 		"instanceEvalString:with:args:" : "DataCurator 10/02/2012 14:30",
@@ -48,4 +50,5 @@
 		"rubySingletonClass" : "DataCurator 10/02/2012 14:30",
 		"rubySingletonClassForExtend" : "DataCurator 10/02/2012 14:30",
 		"rubySingletonMethods:protection:" : "DataCurator 10/02/2012 14:30",
-		"rubySingletonMethods:protection:env:" : "DataCurator 10/02/2012 14:30" } }
+		"rubySingletonMethods:protection:env:" : "DataCurator 10/02/2012 14:30",
+    "rubySingletonSuperclassSecondLevel:" : "DataCurator 03/28/2013 18:06" } }
